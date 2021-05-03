@@ -46,4 +46,6 @@ dependencies {
     implementation 'com.danilomendes.progressbar:progressbar:1.0.2'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.3'
+    implementation "androidx.legacy:legacy-preference-v14:1.0.0"
+    implementation "androidx.preference:preference:1.1.1"
 }

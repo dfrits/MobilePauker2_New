@@ -1,25 +1,21 @@
-package de.daniel.mobilepauker2.models;
+package de.daniel.mobilepauker2.models
 
-import android.content.Context;
-import android.util.AttributeSet;
+import android.content.Context
+import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatEditText
 
-import androidx.appcompat.widget.AppCompatEditText;
-
-public class MPTextView extends AppCompatEditText {
-
-    public MPTextView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+class MPTextView : AppCompatEditText {
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context!!, attrs, defStyleAttr
+    ) {
     }
 
-    public MPTextView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    constructor(context: Context?, attrs: AttributeSet?) : super(
+        context!!, attrs
+    ) {
     }
 
-    public MPTextView(Context context) {
-        super(context);
-    }
-
-    /*public void setCard(CardSide cardside) {
+    constructor(context: Context?) : super(context!!) {} /*public void setCard(CardSide cardside) {
         setText(cardside.getText());
 
         setFont(cardside.getFont());

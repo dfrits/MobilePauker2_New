@@ -2,89 +2,85 @@
  * A Wrapper class of android.util.Log
  * Original author Prasanta Paul
  */
+package de.daniel.mobilepauker2.utils
 
-package de.daniel.mobilepauker2.utils;
+import android.util.Log
 
-public class Log {
-
-    public static final boolean enableLog = true;
-
-    public static final int VERBOSE = 0xA1;
-    public static final int DEBUG = 0xA2;
-    public static final int INFO = 0xA3;
-    public static final int WARN = 0xA4;
-    public static final int ERROR = 0xA5;
-
-    public static final int logLevel = VERBOSE;
-
-    public static void i(String tag, String msg) {
+object Log {
+    const val enableLog = true
+    const val VERBOSE = 0xA1
+    const val DEBUG = 0xA2
+    const val INFO = 0xA3
+    const val WARN = 0xA4
+    const val ERROR = 0xA5
+    const val logLevel = VERBOSE
+    fun i(tag: String?, msg: String?) {
         if (!enableLog || logLevel > INFO) {
-            return;
+            return
         }
-        android.util.Log.i(tag, msg);
+        Log.i(tag, msg!!)
     }
 
-    public static void i(String tag, String msg, Throwable tr) {
+    fun i(tag: String?, msg: String?, tr: Throwable?) {
         if (!enableLog || logLevel > INFO) {
-            return;
+            return
         }
-        android.util.Log.i(tag, msg, tr);
+        Log.i(tag, msg, tr)
     }
 
-    public static void v(String tag, String msg) {
+    fun v(tag: String?, msg: String?) {
         if (!enableLog || logLevel > VERBOSE) {
-            return;
+            return
         }
-        android.util.Log.v(tag, msg);
+        Log.v(tag, msg!!)
     }
 
-    public static void v(String tag, String msg, Throwable tr) {
+    fun v(tag: String?, msg: String?, tr: Throwable?) {
         if (!enableLog || logLevel > VERBOSE) {
-            return;
+            return
         }
-        android.util.Log.v(tag, msg, tr);
+        Log.v(tag, msg, tr)
     }
 
-    public static void d(String tag, String msg) {
+    fun d(tag: String?, msg: String?) {
         if (!enableLog || logLevel > DEBUG) {
-            return;
+            return
         }
-        android.util.Log.d(tag, msg);
+        Log.d(tag, msg!!)
     }
 
-    public static void d(String tag, String msg, Throwable tr) {
+    fun d(tag: String?, msg: String?, tr: Throwable?) {
         if (!enableLog || logLevel > DEBUG) {
-            return;
+            return
         }
-        android.util.Log.d(tag, msg, tr);
+        Log.d(tag, msg, tr)
     }
 
-    public static void w(String tag, String msg) {
+    fun w(tag: String?, msg: String?) {
         if (!enableLog || logLevel > WARN) {
-            return;
+            return
         }
-        android.util.Log.w(tag, msg);
+        Log.w(tag, msg!!)
     }
 
-    public static void w(String tag, String msg, Throwable tr) {
+    fun w(tag: String?, msg: String?, tr: Throwable?) {
         if (!enableLog || logLevel > WARN) {
-            return;
+            return
         }
-        android.util.Log.w(tag, msg, tr);
+        Log.w(tag, msg, tr)
     }
 
-    public static void e(String tag, String msg) {
+    fun e(tag: String?, msg: String?) {
         if (!enableLog || logLevel > ERROR) {
-            return;
+            return
         }
-        android.util.Log.e(tag, msg);
+        Log.e(tag, msg!!)
     }
 
-    public static void e(String tag, String msg, Throwable tr) {
+    fun e(tag: String?, msg: String?, tr: Throwable?) {
         if (!enableLog || logLevel > ERROR) {
-            return;
+            return
         }
-        android.util.Log.e(tag, msg, tr);
+        Log.e(tag, msg, tr)
     }
 }
-
