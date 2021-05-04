@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <de.daniel.mobilepauker2.models.MPTextView
+        <de.daniel.mobilepauker2.models.view.MPTextView
             android:id="@+id/tCardSideA"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -24,7 +24,7 @@
             android:textColor="@color/black"
             android:textSize="18sp" />
 
-        <de.daniel.mobilepauker2.models.MPTextView
+        <de.daniel.mobilepauker2.models.view.MPTextView
             android:id="@+id/tCardSideB"
             android:layout_width="0dp"
             android:layout_height="match_parent"
