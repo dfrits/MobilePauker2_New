@@ -1,16 +1,15 @@
 package de.daniel.mobilepauker2.data.xml
 
 import android.util.Xml
-import de.daniel.mobilepauker2.lesson.Batch
-import de.daniel.mobilepauker2.lesson.ComponentOrientation
-import de.daniel.mobilepauker2.lesson.FlashCard
-import de.daniel.mobilepauker2.lesson.Lesson
+import de.daniel.mobilepauker2.lesson.*
 import de.daniel.mobilepauker2.models.Font
+import de.daniel.mobilepauker2.models.NextExpireDateResult
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Log
 import org.xmlpull.v1.XmlPullParser
 import java.net.URL
 import java.util.*
+import kotlin.math.pow
 
 class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUrl) {
 
@@ -225,7 +224,8 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
                     "FC~XMLPullFeedParser::setupLesson",
                     "card initla batch=" + flashCard.initialBatch
                 )
-                val batchesToAdd: Int = flashCard.initialBatch - 2 - newLesson.getLongTermBatchesSize()
+                val batchesToAdd: Int =
+                    flashCard.initialBatch - 2 - newLesson.getLongTermBatchesSize()
                 Log.d("FC~XMLPullFeedParser::setupLesson", "batchsToAdd$batchesToAdd")
                 for (j in 0 until batchesToAdd) {
                     newLesson.addLongTermBatch()
@@ -251,12 +251,10 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
      * @return Eine Map mit dem frühesten Ablaufdatum **(index = 0)** und die Anzahl abgelaufener
      * Karten (**index = 1)**
      */
-    /*fun getNextExpireDate(): SparseLongArray {
+    fun getNextExpireDate(): NextExpireDateResult {
         val parser = Xml.newPullParser()
-        val map = SparseLongArray(2)
         val currentTimestamp = System.currentTimeMillis()
         return try {
-            // auto-detect the encoding from the stream
             parser.setInput(getInputStream(), null)
             var eventType = parser.eventType
             var nextExpireTimeStamp = Long.MIN_VALUE
@@ -277,32 +275,20 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
                                     "Lesson format is $lessonFormat"
                                 )
                             }
-                        } else if (name.equals(
-                                BATCH,
-                                ignoreCase = true
-                            )
-                        ) {
+                        } else if (name.equals(BATCH, ignoreCase = true)) {
                             batchCount++
-                        } else if (name.equals(
-                                FRONTSIDE,
-                                ignoreCase = true
-                            )
-                            || name.equals(
-                                REVERSESIDE,
-                                ignoreCase = true
-                            )
+                        } else if (name.equals(FRONTSIDE, ignoreCase = true)
+                            || name.equals(REVERSESIDE, ignoreCase = true)
                         ) {
                             val learnedTimestamp =
                                 parser.getAttributeValue(null, "LearnedTimestamp")
                             if (learnedTimestamp != null) {
                                 val factor = Math.E.pow((batchCount - 4).toDouble())
                                 val expirationTime =
-                                    (LongTermBatch.getExpirationUnit() * factor) as Long
+                                    (LongTermBatch.EXPIRATION_UNIT * factor) as Long
                                 try {
                                     val expireTimeStamp = learnedTimestamp.toLong() + expirationTime
-                                    if (nextExpireTimeStamp == Long.MIN_VALUE
-                                        || expireTimeStamp < nextExpireTimeStamp
-                                    ) {
+                                    if (nextExpireTimeStamp == Long.MIN_VALUE || expireTimeStamp < nextExpireTimeStamp) {
                                         nextExpireTimeStamp = expireTimeStamp
                                     }
                                     val diff = currentTimestamp - learnedTimestamp.toLong()
@@ -323,12 +309,10 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
                 }
                 eventType = parser.next()
             }
-            map.put(0, nextExpireTimeStamp)
-            map.put(1, expiredCards) // TODO Anzahl bzw. Name der Lektion mitgeben
-            map
+            NextExpireDateResult(nextExpireTimeStamp, expiredCards, feedUrl.file)
         } catch (e: Exception) {
             Log.e("FlashCardXMLPullFeedParser:parse()", e.message, e)
             throw RuntimeException(e)
         }
-    }*/
+    }
 }
