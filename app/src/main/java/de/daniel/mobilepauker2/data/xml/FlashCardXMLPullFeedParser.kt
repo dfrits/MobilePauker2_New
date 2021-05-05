@@ -1,6 +1,7 @@
 package de.daniel.mobilepauker2.data.xml
 
 import android.util.Xml
+import de.daniel.mobilepauker2.lesson.Batch
 import de.daniel.mobilepauker2.lesson.ComponentOrientation
 import de.daniel.mobilepauker2.lesson.FlashCard
 import de.daniel.mobilepauker2.lesson.Lesson
@@ -17,7 +18,7 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
         var flashCards: MutableList<FlashCard>? = null
         val parser = Xml.newPullParser()
         var batchCount = 0
-        var description: String? = "No Description"
+        var description: String = "No Description"
         return try {
             parser.setInput(getInputStream(), null)
             var eventType = parser.eventType
@@ -204,51 +205,43 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
         }
     }
 
-    private fun setupLesson(flashCardList: List<FlashCard>, description: String?): Lesson {
+    private fun setupLesson(flashCardList: List<FlashCard>, description: String): Lesson {
         val newLesson = Lesson()
-        /*val summaryBatch: Batch = newLesson.getSummaryBatch()
-        newLesson.setDescription(description)
+        val summaryBatch: Batch = newLesson.summaryBatch
+        newLesson.description = description
         for (i in flashCardList.indices) {
             val flashCard: FlashCard = flashCardList[i]
-            if (flashCard.getInitialBatch() < 3) {
-                flashCard.setLearned(false)
+            if (flashCard.initialBatch < 3) {
+                flashCard.isLearned = false
             } else {
-                flashCard.getFrontSide()
-                    .setLearned(true) // Warning using flash card set learned here sets the learned timestamp!
+                flashCard.frontSide.isLearned = true
             }
-            if (newLesson.getNumberOfLongTermBatches() < flashCard.getInitialBatch() - 2) {
+            if (newLesson.getLongTermBatchesSize() < flashCard.initialBatch - 2) {
                 Log.d(
                     "FC~XMLPullFeedParser::setupLesson",
-                    "num of long term batches=" + newLesson.getNumberOfLongTermBatches()
+                    "num of long term batches=" + newLesson.getLongTermBatchesSize()
                 )
                 Log.d(
                     "FC~XMLPullFeedParser::setupLesson",
-                    "card initla batch=" + flashCard.getInitialBatch()
+                    "card initla batch=" + flashCard.initialBatch
                 )
-                val batchesToAdd: Int =
-                    flashCard.getInitialBatch() - 2 - newLesson.getNumberOfLongTermBatches()
+                val batchesToAdd: Int = flashCard.initialBatch - 2 - newLesson.getLongTermBatchesSize()
                 Log.d("FC~XMLPullFeedParser::setupLesson", "batchsToAdd$batchesToAdd")
                 for (j in 0 until batchesToAdd) {
                     newLesson.addLongTermBatch()
                 }
             }
             var batch: Batch
-            if (flashCard.isLearned()) {
-                // must put the card into the corresponding long
-                // term batch
-                batch = newLesson.getLongTermBatch(
-                    flashCard.getInitialBatch() - 3
-                )
+            if (flashCard.isLearned) {
+                batch = newLesson.getLongTermBatchFromIndex(flashCard.initialBatch - 3)
             } else {
-                // must put the card into the unlearned batch
-                batch = newLesson.getUnlearnedBatch()
+                batch = newLesson.unlearnedBatch
             }
             batch.addCard(flashCard)
             summaryBatch.addCard(flashCard)
         }
 
         newLesson.refreshExpiration()
-        printLessonToDebug(newLesson)*/
         return newLesson
     }
 
@@ -331,7 +324,7 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
                 eventType = parser.next()
             }
             map.put(0, nextExpireTimeStamp)
-            map.put(1, expiredCards)
+            map.put(1, expiredCards) // TODO Anzahl bzw. Name der Lektion mitgeben
             map
         } catch (e: Exception) {
             Log.e("FlashCardXMLPullFeedParser:parse()", e.message, e)
