@@ -241,7 +241,7 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
             summaryBatch.addCard(flashCard)
         }
 
-        newLesson.refreshExpiration()
+        newLesson.refreshExpiredCards()
         return newLesson
     }
 
