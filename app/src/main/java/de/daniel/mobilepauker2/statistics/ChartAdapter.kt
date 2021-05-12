@@ -7,13 +7,18 @@ import android.view.ViewGroup
 import androidx.annotation.NonNull
 import androidx.recyclerview.widget.RecyclerView
 import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.models.ModelManager
 import java.util.*
+import javax.inject.Inject
 
 class ChartAdapter(private val context: Context, val callback: ChartAdapterCallback) :
     RecyclerView.Adapter<ChartAdapter.ViewHolder>() {
     private val batchStatistics: List<BatchStatistics>
     private val lessonSize: Int
     private val chartBars: List<ChartBar>
+
+    @Inject
+    lateinit var modelManager: ModelManager
 
     @NonNull
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): ViewHolder {
