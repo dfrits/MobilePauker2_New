@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.annotation.NonNull
 import androidx.recyclerview.widget.RecyclerView
 import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.models.ModelManager
 import java.util.*
 import javax.inject.Inject
@@ -36,8 +37,8 @@ class ChartAdapter(private val context: Context, val callback: ChartAdapterCallb
         when (position) {
             0 -> {
                 titel = context.resources.getString(R.string.sum)
-                abgelaufen = modelManager.getExpiredCardsSize()
-                ungelernt = modelManager.getUnlearnedBatchSize()
+                abgelaufen = 0//modelManager.getExpiredCardsSize()
+                ungelernt = 0//modelManager.getUnlearnedBatchSize()
                 gelernt = lessonSize - abgelaufen - ungelernt
                 chartBar.show(
                     context,
@@ -51,7 +52,7 @@ class ChartAdapter(private val context: Context, val callback: ChartAdapterCallb
             }
             1 -> {
                 titel = context.resources.getString(R.string.untrained)
-                ungelernt = modelManager.getUnlearnedBatchSize()
+                ungelernt = 0//modelManager.getUnlearnedBatchSize()
                 chartBar.show(context, titel, ungelernt, -1, ungelernt, -1, lessonSize)
             }
             else -> {
@@ -82,8 +83,9 @@ class ChartAdapter(private val context: Context, val callback: ChartAdapterCallb
     }
 
     init {
-        batchStatistics = modelManager.getBatchStatistics()
-        lessonSize = modelManager.getLessonSize()
+        (context as PaukerApplication).appSingletonComponent.inject(this)
+        batchStatistics = emptyList()//modelManager.getBatchStatistics()
+        lessonSize = 0//modelManager.getLessonSize()
         chartBars = ArrayList(itemCount)
     }
 }
