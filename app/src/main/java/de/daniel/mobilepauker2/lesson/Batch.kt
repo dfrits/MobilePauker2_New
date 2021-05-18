@@ -9,7 +9,7 @@ import java.util.logging.Logger
  * a batch is part of a lesson
  * @author Ronny.Standtke@gmx.net
  */
-open class Batch internal constructor(private val cards: MutableList<Card>) {
+open class Batch internal constructor(val cards: MutableList<Card>) {
     // support for search result caching
     private var searchPattern: String? = null
     private var searchSide: Card.Element? = null
@@ -30,30 +30,6 @@ open class Batch internal constructor(private val cards: MutableList<Card>) {
         }
 
         protected abstract fun compareCards(card1: Card, card2: Card): Int
-    }
-
-    /**
-     * returns the number of cards in this batch
-     * @return the number of cards in this batch
-     */
-    val numberOfCards: Int
-        get() = cards.size
-
-    /**
-     * returns the card at the index <CODE>i</CODE>
-     * @param index the index of the returned card
-     * @return the card at index <CODE>i</CODE>
-     */
-    fun getCard(index: Int): Card {
-        return cards[index]
-    }
-
-    /**
-     * returns all cards in the batch
-     * @return all cards in the batch
-     */
-    fun getCards(): List<Card> {
-        return cards
     }
 
     /**

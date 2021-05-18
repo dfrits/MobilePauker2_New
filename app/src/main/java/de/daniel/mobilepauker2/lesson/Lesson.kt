@@ -19,7 +19,7 @@ class Lesson {
 
     fun getLongTermBatchFromIndex(index: Int): Batch = longTermBatches[index]
 
-    fun refreshExpiration() {
-        //longTermBatches.forEach { it.refreshExpiration() }
+    fun refreshExpiredCards() {
+        longTermBatches.forEach { it.refreshExpiredCards() }
     }
 }
