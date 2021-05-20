@@ -1,4 +1,4 @@
-package de.daniel.mobilepauker2.lesson
+package de.daniel.mobilepauker2.lesson.card
 
 import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.utils.Constants

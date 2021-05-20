@@ -1,5 +1,9 @@
 package de.daniel.mobilepauker2.lesson
 
+import de.daniel.mobilepauker2.lesson.batch.Batch
+import de.daniel.mobilepauker2.lesson.batch.LongTermBatch
+import de.daniel.mobilepauker2.lesson.batch.SummaryBatch
+import de.daniel.mobilepauker2.lesson.card.Card
 import de.daniel.mobilepauker2.utils.Log
 import java.util.*
 

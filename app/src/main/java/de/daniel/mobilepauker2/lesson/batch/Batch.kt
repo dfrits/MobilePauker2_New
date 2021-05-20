@@ -1,5 +1,6 @@
-package de.daniel.mobilepauker2.lesson
+package de.daniel.mobilepauker2.lesson.batch
 
+import de.daniel.mobilepauker2.lesson.card.Card
 import java.text.Collator
 import java.util.*
 

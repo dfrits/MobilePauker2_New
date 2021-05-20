@@ -2,6 +2,11 @@ package de.daniel.mobilepauker2.lesson
 
 import android.content.Context
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.lesson.batch.Batch
+import de.daniel.mobilepauker2.lesson.batch.BatchType
+import de.daniel.mobilepauker2.lesson.batch.LongTermBatch
+import de.daniel.mobilepauker2.lesson.card.Card
+import de.daniel.mobilepauker2.lesson.card.FlashCard
 import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.models.LearningPhase.*
 import de.daniel.mobilepauker2.models.LearningPhase.Companion.currentPhase

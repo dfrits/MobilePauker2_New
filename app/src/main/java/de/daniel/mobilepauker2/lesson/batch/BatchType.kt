@@ -1,4 +1,4 @@
-package de.daniel.mobilepauker2.lesson
+package de.daniel.mobilepauker2.lesson.batch
 
 enum class BatchType {
     CURRENT,
