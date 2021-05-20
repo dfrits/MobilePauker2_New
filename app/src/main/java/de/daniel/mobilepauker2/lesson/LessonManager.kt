@@ -6,6 +6,7 @@ import de.daniel.mobilepauker2.lesson.batch.Batch
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lesson.batch.LongTermBatch
 import de.daniel.mobilepauker2.lesson.card.Card
+import de.daniel.mobilepauker2.lesson.card.CardPackAdapter
 import de.daniel.mobilepauker2.lesson.card.FlashCard
 import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.models.LearningPhase.*
@@ -112,6 +113,11 @@ class LessonManager @Inject constructor(val context: Context) {
         flashCard.sideAText = sideA
         flashCard.sideBText = sideB
         lesson?.addNewCard(flashCard)
+    }
+
+    fun addCard(sideA: String, sideB: String, index: String, learnStatus: String) {
+        val newCard = FlashCard(sideA, sideB, index, learnStatus)
+        lesson?.unlearnedBatch?.addCard(newCard)
     }
 
     fun getBatchStatistics(): List<BatchStatistics> {

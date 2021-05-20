@@ -1,0 +1,123 @@
+/* 
+ * Copyright 2011 Brian Ford
+ * 
+ * This file is part of Pocket Pauker.
+ * 
+ * Pocket Pauker is free software: you can redistribute it and/or modify it under the 
+ * terms of the GNU General Public License as published by the Free Software Foundation, 
+ * either version 3 of the License, or (at your option) any later version.
+ * 
+ * Pocket Pauker is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more 
+ * details.
+ * 
+ * See http://www.gnu.org/licenses/.
+
+*/
+package de.daniel.mobilepauker2.lesson.card
+
+import android.database.AbstractCursor
+import android.database.CursorIndexOutOfBoundsException
+import de.daniel.mobilepauker2.lesson.LessonManager
+import de.daniel.mobilepauker2.lesson.batch.BatchType
+import javax.inject.Inject
+
+
+class FlashCardCursor : AbstractCursor() {
+
+    @Inject
+    lateinit var lessonManager: LessonManager
+
+    /**
+     * Adds a new row to the end of the FlashCard array.
+     * @param columnValues in the same order as the the column names specified at cursor
+     * construction time
+     * @throws IllegalArgumentException if `columnValues.length != columnNames.length`
+     */
+    fun addRow(columnValues: Array<String>) {
+        require(columnValues.size == columnCount) {
+            ("columnNames.length = "
+                    + columnCount + ", columnValues.length = "
+                    + columnValues.size)
+        }
+        lessonManager.addCard(
+            columnValues[CardPackAdapter.KEY_SIDEA_ID],
+            columnValues[CardPackAdapter.KEY_SIDEB_ID],
+            columnValues[CardPackAdapter.KEY_INDEX_ID],
+            columnValues[CardPackAdapter.KEY_LEARN_STATUS_ID]
+        )
+    }
+
+    /**
+     * Gets value at the given column for the current row.
+     */
+    private operator fun get(column: Int): String? {
+        if (column < 0 || column >= columnCount) {
+            throw CursorIndexOutOfBoundsException(
+                "Requested column: "
+                        + column + ", # of columns: " + columnCount
+            )
+        }
+        if (getPosition() < 0) {
+            throw CursorIndexOutOfBoundsException("Before first row.")
+        }
+        if (getPosition() >= lessonManager.getBatchSize(BatchType.CURRENT)) {
+            throw CursorIndexOutOfBoundsException("After last row.")
+        }
+        val flashCard: FlashCard? = lessonManager.getCardFromCurrentPack(getPosition())
+        when (column) {
+            CardPackAdapter.KEY_SIDEA_ID -> {
+                return flashCard?.sideAText ?: ""
+            }
+            CardPackAdapter.KEY_SIDEB_ID -> {
+                return flashCard?.sideBText ?: ""
+            }
+            CardPackAdapter.KEY_ROWID_ID -> {
+                return Integer.toString(getPosition())
+            }
+            CardPackAdapter.KEY_LEARN_STATUS_ID -> {
+                return if (flashCard != null && flashCard.isLearned) {
+                    "true"
+                } else {
+                    "false"
+                }
+            }
+            CardPackAdapter.KEY_INDEX_ID -> {
+                return if (flashCard == null) null else flashCard.index
+            }
+        }
+        return null
+    }
+
+    override fun getColumnCount(): Int = columnNames.size
+
+    // Create new Cursor
+    /*override fun requery(): Boolean {
+        return super.requery()
+    }*/
+
+    override fun getCount(): Int = lessonManager.getBatchSize(BatchType.CURRENT)
+
+    override fun getColumnNames(): Array<String> = arrayOf(
+        CardPackAdapter.KEY_ROWID,
+        CardPackAdapter.KEY_SIDEA,
+        CardPackAdapter.KEY_SIDEB,
+        CardPackAdapter.KEY_INDEX,
+        CardPackAdapter.KEY_LEARN_STATUS
+    )
+
+    override fun getString(column: Int): String = get(column) ?: ""
+
+    override fun getShort(column: Int): Short = get(column)?.toShort() ?: 0
+
+    override fun getInt(column: Int): Int = get(column)?.toInt() ?: 0
+
+    override fun getLong(column: Int): Long = get(column)?.toLong() ?: 0
+
+    override fun getFloat(column: Int): Float = get(column)?.toFloat() ?: 0.0f
+
+    override fun getDouble(column: Int): Double = get(column)?.toDouble() ?: 0.0
+
+    override fun isNull(column: Int): Boolean = get(column) == null
+}
