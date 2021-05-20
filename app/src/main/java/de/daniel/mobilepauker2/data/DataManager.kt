@@ -9,8 +9,11 @@ import de.daniel.mobilepauker2.lesson.Lesson
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Toaster.Companion.showToast
+import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
+import java.io.InputStreamReader
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -44,10 +47,10 @@ class DataManager @Inject constructor(val context: Context) {
         }
     }
 
-    fun getPathOfCurrentFile(): File = getFilePath(currentFileName)
+    fun getPathOfCurrentFile(): File = getFilePathForName(currentFileName)
 
     @Throws(IOException::class)
-    fun getFilePath(filename: String): File {
+    fun getFilePathForName(filename: String): File {
         if (!validateFileEnding(filename)) {
             showToast(
                 context as Activity,
@@ -95,6 +98,155 @@ class DataManager @Inject constructor(val context: Context) {
         currentFileName = file.name
         fileAbsolutePath = file.absolutePath
         lessonManager.lesson = lesson
+    }
+
+    fun deleteLesson(file: File): Boolean {
+        val filename = file.name
+        try {
+            if (file.delete()) {
+                val fos = context.openFileOutput(
+                    Constants.DELETED_FILES_NAMES_FILE_NAME,
+                    Context.MODE_APPEND
+                )
+                val text = "\n$filename;*;${System.currentTimeMillis()}"
+                fos.write(text.toByteArray())
+                fos.close()
+            } else return false
+        } catch (e: IOException) {
+            return false
+        }
+        return try {
+            val list: List<String> = getLokalAddedFiles()
+            if (list.contains(filename)) {
+                resetAddedFilesData()
+                val fos = context.openFileOutput(
+                    Constants.ADDED_FILES_NAMES_FILE_NAME,
+                    Context.MODE_APPEND
+                )
+                for (name in list) {
+                    if (name != filename) {
+                        val newText = "\n$name"
+                        fos.write(newText.toByteArray())
+                    }
+                }
+                fos.close()
+            }
+            true
+        } catch (e: IOException) {
+            false
+        }
+    }
+
+    fun addLesson(file: File) {
+        var filename = file.name
+        val index =
+            if (filename.endsWith(".xml")) filename.indexOf(".xml") else filename.indexOf(".pau")
+        if (index != -1) {
+            filename = filename.substring(0, index)
+            addLesson(filename)
+        }
+    }
+
+    fun addCurrentLesson() {
+        addLesson(currentFileName)
+    }
+
+    fun getLokalDeletedFiles(): Map<String, String> {
+        val filesToDelete: MutableMap<String, String> = HashMap()
+        try {
+            val fis = context.openFileInput(Constants.DELETED_FILES_NAMES_FILE_NAME)
+            val reader = BufferedReader(InputStreamReader(fis))
+            var fileName = reader.readLine()
+            while (fileName != null) {
+                if (!fileName.trim { it <= ' ' }.isEmpty()) {
+                    try {
+                        val split: Array<String?> = fileName.split(";*;").toTypedArray()
+                        val name = if (split[0] == null) "" else split[0]!!
+                        val time = if (split[1] == null) "-1" else split[1]!!
+                        filesToDelete[name] = time
+                    } catch (e: Exception) {
+                        filesToDelete[fileName] = "-1"
+                    }
+                }
+                fileName = reader.readLine()
+            }
+        } catch (ignored: IOException) {
+        }
+        return filesToDelete
+    }
+
+    fun getLokalAddedFiles(): List<String> {
+        val filesToAdd: MutableList<String> = ArrayList()
+        try {
+            val fis = context.openFileInput(Constants.ADDED_FILES_NAMES_FILE_NAME)
+            val reader = BufferedReader(InputStreamReader(fis))
+            var fileName = reader.readLine()
+            while (fileName != null) {
+                if (!fileName.trim { it <= ' ' }.isEmpty()) {
+                    filesToAdd.add(fileName)
+                }
+                fileName = reader.readLine()
+            }
+        } catch (ignored: IOException) {
+        }
+        return filesToAdd
+    }
+
+    fun resetDeletedFilesData(): Boolean {
+        return try {
+            val fos = context.openFileOutput(
+                Constants.DELETED_FILES_NAMES_FILE_NAME,
+                Context.MODE_PRIVATE
+            )
+            val text = "\n"
+            fos.write(text.toByteArray())
+            fos.close()
+            true
+        } catch (e: IOException) {
+            false
+        }
+    }
+
+    fun resetAddedFilesData(): Boolean {
+        return try {
+            val fos =
+                context.openFileOutput(Constants.ADDED_FILES_NAMES_FILE_NAME, Context.MODE_PRIVATE)
+            val text = "\n"
+            fos.write(text.toByteArray())
+            fos.close()
+            true
+        } catch (e: IOException) {
+            false
+        }
+    }
+
+    private fun addLesson(fileName: String) {
+        try {
+            val fos =
+                context.openFileOutput(Constants.ADDED_FILES_NAMES_FILE_NAME, Context.MODE_APPEND)
+            val text = "\n$fileName"
+            fos.write(text.toByteArray())
+            fos.close()
+        } catch (ignored: IOException) {
+        }
+        try {
+            val map: Map<String, String> = getLokalDeletedFiles()
+            if (map.keys.contains(fileName)) {
+                resetDeletedFilesData()
+                val fos = context.openFileOutput(
+                    Constants.DELETED_FILES_NAMES_FILE_NAME,
+                    Context.MODE_APPEND
+                )
+                for ((key) in map) {
+                    if (key != fileName) {
+                        val newText = "\n$fileName;*;${System.currentTimeMillis()}"
+                        fos.write(newText.toByteArray())
+                    }
+                }
+                fos.close()
+            }
+        } catch (ignored: IOException) {
+        }
     }
 
     private fun setCorrectFileEnding(name: String): String {
