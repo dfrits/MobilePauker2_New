@@ -1,5 +1,6 @@
 package de.daniel.mobilepauker2.lesson
 
+import java.util.*
 import kotlin.math.pow
 
 class LongTermBatch(newBatchIndex: Int) : Batch(mutableListOf()) {
@@ -17,6 +18,29 @@ class LongTermBatch(newBatchIndex: Int) : Batch(mutableListOf()) {
     init {
         val factor = Math.E.pow(newBatchIndex)
         expirationTime = EXPIRATION_UNIT * factor
+    }
+
+    fun getNumberOfExpiredCards(): Int {
+        refreshExpiredCards()
+        return expiredCards.size
+    }
+
+    fun getExpiredCards(): Collection<Card> {
+        refreshExpiredCards()
+        return expiredCards
+    }
+
+    fun getLearnedCards(): Collection<Card> {
+        val learnedCards: MutableCollection<Card> = ArrayList()
+        val currentTime = System.currentTimeMillis()
+        for (card in cards) {
+            val learnedTime: Long = card.learnedTimestamp
+            val diff = currentTime - learnedTime
+            if (diff < expirationTime) {
+                learnedCards.add(card)
+            }
+        }
+        return learnedCards
     }
 
     fun refreshExpiredCards() {

@@ -18,7 +18,7 @@ import javax.inject.Singleton
 class DataManager @Inject constructor(val context: Context) {
     private var fileAbsolutePath: String = ""
     private var saveRequired: Boolean = false
-    private var currentFileName = Constants.DEFAULT_FILE_NAME
+    var currentFileName = Constants.DEFAULT_FILE_NAME
 
     @Inject
     lateinit var lessonManager: LessonManager
@@ -43,6 +43,8 @@ class DataManager @Inject constructor(val context: Context) {
             filename
         }
     }
+
+    fun getPathOfCurrentFile(): File = getFilePath(currentFileName)
 
     @Throws(IOException::class)
     fun getFilePath(filename: String): File {
@@ -92,7 +94,7 @@ class DataManager @Inject constructor(val context: Context) {
         val lesson: Lesson = xmlFlashCardFeedParser.parse()
         currentFileName = file.name
         fileAbsolutePath = file.absolutePath
-        lessonManager.setLesson(lesson)
+        lessonManager.lesson = lesson
     }
 
     private fun setCorrectFileEnding(name: String): String {

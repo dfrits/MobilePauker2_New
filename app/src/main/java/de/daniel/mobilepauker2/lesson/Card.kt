@@ -2,10 +2,7 @@ package de.daniel.mobilepauker2.lesson
 
 import java.util.*
 
-open class Card(
-    var frontSide: CardSide,
-    var reverseSide: CardSide
-) : Comparable<Card> {
+open class Card(var frontSide: CardSide, var reverseSide: CardSide) : Comparable<Card> {
 
     var id: String? = null
         get() {
@@ -105,6 +102,22 @@ open class Card(
         frontSide.setRepeatByTyping(repeatByTyping)
     }
 
+    open fun flipSides() {
+        val learnedTimestamp: Long = frontSide.learnedTimestamp
+        val longTermBatchNumber: Int = frontSide.longTermBatchNumber
+        val orientation: ComponentOrientation = frontSide.orientation
+        val learned: Boolean = frontSide.isLearned
+        val repeatedByTyping: Boolean = frontSide.isRepeatedByTyping
+        val tmpCardSide = frontSide
+        frontSide = reverseSide
+        reverseSide = tmpCardSide
+        frontSide.setLearnedTimeStamp(learnedTimestamp)
+        frontSide.longTermBatchNumber = longTermBatchNumber
+        frontSide.orientation = orientation
+        frontSide.isLearned = learned
+        frontSide.setRepeatByTyping(repeatedByTyping)
+    }
+
     /**
      * Sets a search pattern onto this card.
      * @param pattern   the search pattern
@@ -144,25 +157,15 @@ open class Card(
         return searchHits
     }*/
 
-    fun flipCardSides() {
-        val learnedTimestamp = frontSide.learnedTimestamp
-        val longTermBatchNumber = frontSide.longTermBatchNumber
-        val orientation: ComponentOrientation? = frontSide.orientation
-        val learned = frontSide.isLearned
-        val repeatedByTyping = frontSide.isRepeatedByTyping
-        val tmpCardSide = frontSide
-        frontSide = reverseSide
-        reverseSide = tmpCardSide
-        frontSide.setLearnedTimeStamp(learnedTimestamp)
-        frontSide.longTermBatchNumber = longTermBatchNumber
-        frontSide.orientation = orientation
-        frontSide.isLearned = learned
-        frontSide.setRepeatByTyping(repeatedByTyping)
-    }
-
     fun resetCard() {
         frontSide.reset()
         reverseSide.reset()
+    }
+
+    open fun expire() {
+        val expiredTime = System.currentTimeMillis() - expirationTime - 60000
+        frontSide.isLearned = true
+        frontSide.setLearnedTimeStamp(expiredTime)
     }
 
     /**
