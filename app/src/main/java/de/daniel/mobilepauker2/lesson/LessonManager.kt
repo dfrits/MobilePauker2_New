@@ -2,9 +2,9 @@ package de.daniel.mobilepauker2.lesson
 
 import android.content.Context
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.models.LearningPhase.*
 import de.daniel.mobilepauker2.models.LearningPhase.Companion.currentPhase
-import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.settings.SettingsManager.*
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
@@ -358,6 +358,15 @@ class LessonManager @Inject constructor(val context: Context) {
         if (index != -1 && batch != null) {
             lesson?.instantRepeatCards(batch, intArrayOf(index))
         }
+    }
+
+    fun getBatchSize(batchType: BatchType): Int = when (batchType) {
+        BatchType.CURRENT -> currentPack.size
+        BatchType.EXPIRED -> lesson?.getNumberOfExpiredCards() ?: 0
+        BatchType.LESSON -> lesson?.getCards()?.size ?: 0
+        BatchType.UNLEARNED -> lesson?.unlearnedBatch?.getNumberOfCards() ?: 0
+        BatchType.ULTRA_SHORT_TERM -> lesson?.ultraShortTermList?.size ?: 0
+        BatchType.SHORT_TERM -> lesson?.shortTermList?.size ?: 0
     }
 
     private fun getBatchOfCard(card: Card): Batch? {
