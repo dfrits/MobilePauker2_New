@@ -1,6 +1,7 @@
 package de.daniel.mobilepauker2.lesson
 
 import android.content.Context
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.lesson.batch.Batch
 import de.daniel.mobilepauker2.lesson.batch.BatchType
@@ -12,8 +13,8 @@ import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.models.LearningPhase.*
 import de.daniel.mobilepauker2.models.LearningPhase.Companion.currentPhase
 import de.daniel.mobilepauker2.settings.SettingsManager
-import de.daniel.mobilepauker2.settings.SettingsManager.*
-import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
+import de.daniel.mobilepauker2.settings.SettingsManager.Keys.LEARN_NEW_CARDS_RANDOMLY
+import de.daniel.mobilepauker2.settings.SettingsManager.Keys.RETURN_FORGOTTEN_CARDS
 import de.daniel.mobilepauker2.statistics.BatchStatistics
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Log
@@ -22,7 +23,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LessonManager @Inject constructor(val context: Context) {
+class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Context) {
     var lesson: Lesson? = null
     var currentPack = mutableListOf<FlashCard>()
 
@@ -31,6 +32,10 @@ class LessonManager @Inject constructor(val context: Context) {
 
     @Inject
     lateinit var settingsManager: SettingsManager
+
+    init {
+        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+    }
 
     fun setupNewLesson() {
         dataManager.currentFileName = Constants.DEFAULT_FILE_NAME

@@ -17,17 +17,23 @@
 */
 package de.daniel.mobilepauker2.lesson.card
 
+import android.content.Context
 import android.database.AbstractCursor
 import android.database.CursorIndexOutOfBoundsException
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import javax.inject.Inject
 
 
-class FlashCardCursor : AbstractCursor() {
+class FlashCardCursor(context: Context) : AbstractCursor() {
 
     @Inject
     lateinit var lessonManager: LessonManager
+
+    init {
+        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+    }
 
     /**
      * Adds a new row to the end of the FlashCard array.

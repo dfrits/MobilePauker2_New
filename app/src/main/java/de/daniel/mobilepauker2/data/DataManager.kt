@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.widget.Toast
 import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.xml.FlashCardXMLPullFeedParser
 import de.daniel.mobilepauker2.lesson.Lesson
 import de.daniel.mobilepauker2.lesson.LessonManager
@@ -18,13 +19,17 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class DataManager @Inject constructor(val context: Context) {
+class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context) {
     private var fileAbsolutePath: String = ""
     private var saveRequired: Boolean = false
     var currentFileName = Constants.DEFAULT_FILE_NAME
 
     @Inject
-    lateinit var lessonManager: LessonManager
+    lateinit var lessonManager:LessonManager
+
+    init {
+        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+    }
 
     fun setNewFileName(newName: String): Boolean {
         setCorrectFileEnding(newName).also {

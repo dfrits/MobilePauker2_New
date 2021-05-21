@@ -3,6 +3,7 @@ package de.daniel.mobilepauker2.lesson.card
 import android.content.Context
 import android.database.Cursor
 import android.database.CursorIndexOutOfBoundsException
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.utils.Log
@@ -14,7 +15,11 @@ class CardPackRamAdapter(context: Context) : CardPackAdapter(context) {
 
     @Inject
     lateinit var lessonManager: LessonManager
-    private val cardCursor: FlashCardCursor
+    private val cardCursor: FlashCardCursor = FlashCardCursor(context)
+
+    init {
+        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+    }
 
     override fun open(): CardPackAdapter {
         return this
@@ -67,9 +72,5 @@ class CardPackRamAdapter(context: Context) : CardPackAdapter(context) {
 
     fun setCardUnLearned() {
         lessonManager.moveCardToUnlearndBatch(cardCursor.getPosition())
-    }
-
-    init {
-        cardCursor = FlashCardCursor()
     }
 }

@@ -4,8 +4,9 @@ import android.content.Context
 import androidx.annotation.NonNull
 import androidx.preference.PreferenceManager
 import de.daniel.mobilepauker2.R
+import javax.inject.Inject
 
-class SettingsManager {
+class SettingsManager @Inject constructor() {
 
     @NonNull
     fun getSettingsKey(context: Context, key: Keys?): String {

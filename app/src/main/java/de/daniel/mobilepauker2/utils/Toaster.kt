@@ -6,6 +6,7 @@ import android.text.format.DateFormat
 import android.util.SparseLongArray
 import android.widget.Toast
 import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.data.xml.FlashCardXMLPullFeedParser
 import de.daniel.mobilepauker2.models.NextExpireDateResult
@@ -16,11 +17,15 @@ import java.net.MalformedURLException
 import java.util.*
 import javax.inject.Inject
 
-class Toaster {
+class Toaster @Inject constructor(context: Context) {
     @Inject
     lateinit var settingsManager: SettingsManager
     @Inject
     lateinit var dataManager: DataManager
+
+    init {
+        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+    }
 
     companion object {
         fun showToast(context: Activity, text: String?, duration: Int) {

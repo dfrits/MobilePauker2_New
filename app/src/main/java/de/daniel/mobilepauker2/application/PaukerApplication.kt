@@ -1,13 +1,16 @@
 package de.daniel.mobilepauker2.application
 
 import android.app.Application
-import de.daniel.mobilepauker2.statistics.ChartAdapter
 
-class PaukerApplication: Application() {
-    val appComponent = DaggerApplicationComponent.create()
-    val appSingletonComponent = DaggerApplicationSingletonComponent.create()
+class PaukerApplication : Application() {
+    lateinit var applicationSingletonComponent: ApplicationSingletonComponent
 
-    fun inject(chartAdapter: ChartAdapter) {
+    override fun onCreate() {
+        super.onCreate()
 
+        applicationSingletonComponent = DaggerApplicationSingletonComponent.builder()
+            .application(this)
+            .managerModule(this)
+            .build()
     }
 }

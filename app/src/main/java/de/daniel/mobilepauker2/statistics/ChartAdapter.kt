@@ -83,7 +83,7 @@ class ChartAdapter(private val context: Context, val callback: ChartAdapterCallb
     }
 
     init {
-        (context as PaukerApplication).appSingletonComponent.inject(this)
+        (context as PaukerApplication).applicationSingletonComponent.inject(this)
         batchStatistics = emptyList()//modelManager.getBatchStatistics()
         lessonSize = 0//modelManager.getLessonSize()
         chartBars = ArrayList(itemCount)
