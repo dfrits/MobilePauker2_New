@@ -1,4 +1,4 @@
-package de.daniel.mobilepauker2.lesson
+package de.daniel.mobilepauker2.lesson.card
 
 import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.utils.Constants
@@ -8,8 +8,7 @@ class CardSide private constructor(var text: String) : Comparable<CardSide> {
     constructor() : this("")
 
     var font: Font? = null
-    var orientation: ComponentOrientation? = null
-        get() = if (field == null) ComponentOrientation(Constants.STANDARD_ORIENTATION) else field
+    var orientation: ComponentOrientation = ComponentOrientation(Constants.STANDARD_ORIENTATION)
     var isRepeatedByTyping = false
         private set
     var isLearned = false

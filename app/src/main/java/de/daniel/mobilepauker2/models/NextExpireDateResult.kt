@@ -1,4 +1,4 @@
 package de.daniel.mobilepauker2.models
 
-class NextExpireDateResult(timeStamp: Long, expiredCards: Long, lessonName: String) {
+class NextExpireDateResult(val timeStamp: Long, val expiredCards: Long, val lessonName: String) {
 }

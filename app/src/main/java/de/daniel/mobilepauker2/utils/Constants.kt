@@ -18,9 +18,11 @@ object Constants {
     const val DROPBOX_USER_ID = "DROPBOX_USER_ID"
     const val DROPBOX_PATH = ""
 
+    @Deprecated("Wird durch neuen Sync ersetzt")
     // Datei, in der die Namen der lokal gelöschten Lektionen stehen
     const val DELETED_FILES_NAMES_FILE_NAME = "trash"
 
+    @Deprecated("Wird durch neuen Sync ersetzt")
     // Datei, in der die Namen der lokal neuhinzugefügten Lektionen stehen
     const val ADDED_FILES_NAMES_FILE_NAME = "news"
 

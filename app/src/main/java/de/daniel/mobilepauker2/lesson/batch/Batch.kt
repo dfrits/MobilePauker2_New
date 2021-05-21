@@ -1,9 +1,8 @@
-package de.daniel.mobilepauker2.lesson
+package de.daniel.mobilepauker2.lesson.batch
 
+import de.daniel.mobilepauker2.lesson.card.Card
 import java.text.Collator
 import java.util.*
-import java.util.logging.Level
-import java.util.logging.Logger
 
 /**
  * a batch is part of a lesson
@@ -14,6 +13,7 @@ open class Batch internal constructor(val cards: MutableList<Card>) {
     private var searchPattern: String? = null
     private var searchSide: Card.Element? = null
     private var matchCase = false
+
     //private val searchHits: MutableList<SearchHit>
     private var currentSearchHit = 0
     //private var savedSearchHit: SearchHit? = null
@@ -119,10 +119,6 @@ open class Batch internal constructor(val cards: MutableList<Card>) {
             Card.Element.LEARNED_DATE -> comparator = learnedDateComparator
             Card.Element.EXPIRED_DATE -> comparator = expiredDateComparator
             Card.Element.REPEATING_MODE -> comparator = repeatingModeComparator
-            else -> LOGGER.log(
-                Level.WARNING,
-                "unknown cardElement {0}", cardElement
-            )
         }
 
         if (comparator != null) {
@@ -130,6 +126,10 @@ open class Batch internal constructor(val cards: MutableList<Card>) {
             Collections.sort(cards, comparator)
         }
     }
+
+    fun getNumberOfCards(): Int = cards.size
+
+    fun getCardFromIndex(index: Int): Card = cards[index]
 
     /**
      * searches for a given string
@@ -179,7 +179,6 @@ open class Batch internal constructor(val cards: MutableList<Card>) {
     }*/
 
     companion object {
-        private val LOGGER = Logger.getLogger(Batch::class.java.name)
         private val collator = Collator.getInstance()
         private val frontSideComparator: AbstractCardComparator<Card> =
             object : AbstractCardComparator<Card>() {

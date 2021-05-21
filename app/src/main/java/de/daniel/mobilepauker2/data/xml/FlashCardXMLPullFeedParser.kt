@@ -2,6 +2,10 @@ package de.daniel.mobilepauker2.data.xml
 
 import android.util.Xml
 import de.daniel.mobilepauker2.lesson.*
+import de.daniel.mobilepauker2.lesson.batch.Batch
+import de.daniel.mobilepauker2.lesson.batch.LongTermBatch
+import de.daniel.mobilepauker2.lesson.card.ComponentOrientation
+import de.daniel.mobilepauker2.lesson.card.FlashCard
 import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.models.NextExpireDateResult
 import de.daniel.mobilepauker2.utils.Constants
