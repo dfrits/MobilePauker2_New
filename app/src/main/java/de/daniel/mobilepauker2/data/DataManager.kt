@@ -100,6 +100,7 @@ class DataManager @Inject constructor(val context: Context) {
         lessonManager.lesson = lesson
     }
 
+    @Deprecated("Wird durch neuen Sync ersetzt. Lektion wird lediglich gelöscht.")
     fun deleteLesson(file: File): Boolean {
         val filename = file.name
         try {
@@ -137,20 +138,24 @@ class DataManager @Inject constructor(val context: Context) {
         }
     }
 
+    @Deprecated("Wird durch neuen Sync ersetzt")
     fun addLesson(file: File) {
         var filename = file.name
         val index =
-            if (filename.endsWith(".xml")) filename.indexOf(".xml") else filename.indexOf(".pau")
+            if (filename.endsWith(".xml")) filename.indexOf(".xml")
+            else filename.indexOf(".pau")
         if (index != -1) {
             filename = filename.substring(0, index)
             addLesson(filename)
         }
     }
 
+    @Deprecated("Wird durch neuen Sync ersetzt")
     fun addCurrentLesson() {
         addLesson(currentFileName)
     }
 
+    @Deprecated("Wird durch neuen Sync ersetzt")
     fun getLokalDeletedFiles(): Map<String, String> {
         val filesToDelete: MutableMap<String, String> = HashMap()
         try {
@@ -175,6 +180,7 @@ class DataManager @Inject constructor(val context: Context) {
         return filesToDelete
     }
 
+    @Deprecated("Wird durch neuen Sync ersetzt")
     fun getLokalAddedFiles(): List<String> {
         val filesToAdd: MutableList<String> = ArrayList()
         try {
@@ -192,6 +198,7 @@ class DataManager @Inject constructor(val context: Context) {
         return filesToAdd
     }
 
+    @Deprecated("Wird durch neuen Sync ersetzt")
     fun resetDeletedFilesData(): Boolean {
         return try {
             val fos = context.openFileOutput(
@@ -207,6 +214,7 @@ class DataManager @Inject constructor(val context: Context) {
         }
     }
 
+    @Deprecated("Wird durch neuen Sync ersetzt")
     fun resetAddedFilesData(): Boolean {
         return try {
             val fos =
@@ -220,6 +228,7 @@ class DataManager @Inject constructor(val context: Context) {
         }
     }
 
+    @Deprecated("Wird durch neuen Sync ersetzt")
     private fun addLesson(fileName: String) {
         try {
             val fos =
