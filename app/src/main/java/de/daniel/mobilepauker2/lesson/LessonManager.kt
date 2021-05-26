@@ -24,8 +24,9 @@ import javax.inject.Singleton
 
 @Singleton
 class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Context) {
-    var lesson: Lesson? = null
+    private var lesson: Lesson? = null
     var currentPack = mutableListOf<FlashCard>()
+    var lessonDescription = lesson?.description ?: ""
 
     @Inject
     lateinit var dataManager: DataManager
@@ -42,77 +43,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         lesson = Lesson()
     }
 
-    private fun setupCurrentPack(context: Context) {
-        var cardIterator: Iterator<Card>
-        lesson?.let { lesson ->
-            when (currentPhase) {
-                NOTHING -> {
-                    currentPack.clear()
-                    cardIterator = lesson.getCards().iterator()
-                }
-                BROWSE_NEW -> {
-                    currentPack.clear()
-                    cardIterator = lesson.unlearnedBatch.cards.iterator()
-                }
-                SIMPLE_LEARNING -> {
-                    currentPack.clear()
-                    cardIterator = lesson.unlearnedBatch.cards.iterator()
-                }
-                FILLING_USTM -> {
-                    Log.d(
-                        "MobilePauker++::setupCurrentPack",
-                        "Setting batch to UnlearnedBatch"
-                    )
-                    currentPack.clear()
-                    cardIterator = lesson.unlearnedBatch.cards.iterator()
-                }
-                WAITING_FOR_USTM -> {
-                    Log.d("MobilePauker++::setupCurrentPack", "Waiting for ustm")
-                    return
-                }
-                REPEATING_USTM -> {
-                    Log.d(
-                        "MobilePauker++::setupCurrentPack",
-                        "Setting pack as ultra short term memory"
-                    )
-                    currentPack.clear()
-                    cardIterator = lesson.ultraShortTermList.listIterator()
-                }
-                WAITING_FOR_STM -> {
-                    cardIterator = lesson.shortTermList.listIterator()
-                }
-                REPEATING_STM -> {
-                    Log.d(
-                        "MobilePauker++::setupCurrentPack",
-                        "Setting pack as short term memory"
-                    )
-                    currentPack.clear()
-                    cardIterator = lesson.shortTermList.listIterator()
-                }
-                REPEATING_LTM -> {
-                    Log.d(
-                        "MobilePauker++::setupCurrentPack",
-                        "Setting pack as expired cards"
-                    )
-                    lesson.refreshExpiration()
-                    currentPack.clear()
-                    cardIterator = lesson.getExpiredCards().iterator()
-                }
-            }
-
-            // Fill the current pack
-            fillCurrentPack(cardIterator)
-        }
-    }
-
-    private fun fillCurrentPack(cardIterator: Iterator<Card>) {
-        while (cardIterator.hasNext()) {
-            currentPack.add(cardIterator.next() as FlashCard)
-        }
-        if (doPackNeedShuffle()) {
-            shuffleCurrentPack()
-        }
-    }
+    fun isLessonNotNew() = dataManager.currentFileName != Constants.DEFAULT_FILE_NAME
 
     fun addCard(flashCard: FlashCard, sideA: String, sideB: String) {
         flashCard.sideAText = sideA
@@ -385,6 +316,10 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         BatchType.SHORT_TERM -> lesson?.shortTermList?.size ?: 0
     }
 
+    fun setupLesson(lesson: Lesson) {
+        this.lesson = lesson
+    }
+
     private fun getBatchOfCard(card: Card): Batch? {
         val batchNumber: Int = card.longTermBatchNumber
         return if (batchNumber == 0) lesson?.summaryBatch
@@ -463,6 +398,78 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
                             + "\" -> can't find batch of card!"
                 )
             }
+        }
+    }
+
+    private fun setupCurrentPack(context: Context) {
+        var cardIterator: Iterator<Card>
+        lesson?.let { lesson ->
+            when (currentPhase) {
+                NOTHING -> {
+                    currentPack.clear()
+                    cardIterator = lesson.getCards().iterator()
+                }
+                BROWSE_NEW -> {
+                    currentPack.clear()
+                    cardIterator = lesson.unlearnedBatch.cards.iterator()
+                }
+                SIMPLE_LEARNING -> {
+                    currentPack.clear()
+                    cardIterator = lesson.unlearnedBatch.cards.iterator()
+                }
+                FILLING_USTM -> {
+                    Log.d(
+                        "MobilePauker++::setupCurrentPack",
+                        "Setting batch to UnlearnedBatch"
+                    )
+                    currentPack.clear()
+                    cardIterator = lesson.unlearnedBatch.cards.iterator()
+                }
+                WAITING_FOR_USTM -> {
+                    Log.d("MobilePauker++::setupCurrentPack", "Waiting for ustm")
+                    return
+                }
+                REPEATING_USTM -> {
+                    Log.d(
+                        "MobilePauker++::setupCurrentPack",
+                        "Setting pack as ultra short term memory"
+                    )
+                    currentPack.clear()
+                    cardIterator = lesson.ultraShortTermList.listIterator()
+                }
+                WAITING_FOR_STM -> {
+                    cardIterator = lesson.shortTermList.listIterator()
+                }
+                REPEATING_STM -> {
+                    Log.d(
+                        "MobilePauker++::setupCurrentPack",
+                        "Setting pack as short term memory"
+                    )
+                    currentPack.clear()
+                    cardIterator = lesson.shortTermList.listIterator()
+                }
+                REPEATING_LTM -> {
+                    Log.d(
+                        "MobilePauker++::setupCurrentPack",
+                        "Setting pack as expired cards"
+                    )
+                    lesson.refreshExpiration()
+                    currentPack.clear()
+                    cardIterator = lesson.getExpiredCards().iterator()
+                }
+            }
+
+            // Fill the current pack
+            fillCurrentPack(cardIterator)
+        }
+    }
+
+    private fun fillCurrentPack(cardIterator: Iterator<Card>) {
+        while (cardIterator.hasNext()) {
+            currentPack.add(cardIterator.next() as FlashCard)
+        }
+        if (doPackNeedShuffle()) {
+            shuffleCurrentPack()
         }
     }
 }

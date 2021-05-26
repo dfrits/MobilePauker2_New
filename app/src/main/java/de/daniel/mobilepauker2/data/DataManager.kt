@@ -102,7 +102,7 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         val lesson: Lesson = xmlFlashCardFeedParser.parse()
         currentFileName = file.name
         fileAbsolutePath = file.absolutePath
-        lessonManager.lesson = lesson
+        lessonManager.setupLesson(lesson)
     }
 
     @Deprecated("Wird durch neuen Sync ersetzt. Lektion wird lediglich gelöscht.")
