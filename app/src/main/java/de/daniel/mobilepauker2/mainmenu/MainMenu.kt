@@ -3,15 +3,17 @@ package de.daniel.mobilepauker2.mainmenu
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.text.method.ScrollingMovementMethod
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.SearchView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.db.chart.view.ChartView
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState
 import de.daniel.mobilepauker2.R
@@ -34,6 +36,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     private val context = this
     private lateinit var chartView: RecyclerView
+    private lateinit var search: MenuItem
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
@@ -47,6 +50,43 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         initButtons()
         initView()
         initChartList()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+        val save = menu.findItem(R.id.mSaveFile)
+        search = menu.findItem(R.id.mSearch)
+        val open = menu.findItem(R.id.mOpenLesson)
+        menu.setGroupEnabled(
+            R.id.mGroup,
+            lessonManager.isLessonNotNew() || !lessonManager.isLessonEmpty()
+        )
+        if (lessonManager.getBatchSize(BatchType.LESSON) > 0) {
+            search.isVisible = true
+            open.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+        } else {
+            search.isVisible = false
+            open.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        }
+        save.isVisible = dataManager.saveRequired
+        if (search.isVisible) {
+            val searchView = search.actionView as SearchView
+            searchView.isIconifiedByDefault = false
+            searchView.isIconified = false
+            searchView.queryHint = getString(R.string.search_hint)
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String): Boolean {
+                    return false
+                }
+            })
+            searchView.setOnQueryTextFocusChangeListener { v, hasFocus -> if (!hasFocus) searchView.clearFocus() }
+        }
+        return true
     }
 
     private fun initButtons() {

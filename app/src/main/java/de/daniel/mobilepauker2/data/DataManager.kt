@@ -21,7 +21,7 @@ import javax.inject.Singleton
 @Singleton
 class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context) {
     private var fileAbsolutePath: String = ""
-    private var saveRequired: Boolean = false
+    var saveRequired: Boolean = false
     var currentFileName = Constants.DEFAULT_FILE_NAME
 
     @Inject
