@@ -9,7 +9,7 @@ import de.daniel.mobilepauker2.data.xml.FlashCardXMLPullFeedParser
 import de.daniel.mobilepauker2.lesson.Lesson
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.utils.Constants
-import de.daniel.mobilepauker2.utils.Toaster.Companion.showToast
+import de.daniel.mobilepauker2.utils.Toaster
 import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
@@ -26,6 +26,9 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
 
     @Inject
     lateinit var lessonManager:LessonManager
+
+    @Inject
+    lateinit var toaster: Toaster
 
     init {
         (context as PaukerApplication).applicationSingletonComponent.inject(this)
@@ -57,11 +60,7 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     @Throws(IOException::class)
     fun getFilePathForName(filename: String): File {
         if (!validateFileEnding(filename)) {
-            showToast(
-                context as Activity,
-                R.string.error_filename_invalid,
-                Toast.LENGTH_LONG
-            )
+            toaster.showToast(R.string.error_filename_invalid, Toast.LENGTH_LONG)
             throw IOException("Filename invalid")
         }
         val filePath = context.getExternalFilesDir(null)

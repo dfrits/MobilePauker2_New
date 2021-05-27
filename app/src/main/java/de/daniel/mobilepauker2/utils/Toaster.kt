@@ -17,9 +17,10 @@ import java.net.MalformedURLException
 import java.util.*
 import javax.inject.Inject
 
-class Toaster @Inject constructor(context: Context) {
+class Toaster @Inject constructor(val context: Context) {
     @Inject
     lateinit var settingsManager: SettingsManager
+
     @Inject
     lateinit var dataManager: DataManager
 
@@ -27,18 +28,16 @@ class Toaster @Inject constructor(context: Context) {
         (context as PaukerApplication).applicationSingletonComponent.inject(this)
     }
 
-    companion object {
-        fun showToast(context: Activity, text: String?, duration: Int) {
-            context.runOnUiThread {
-                if (text != null && text.isNotEmpty()) {
-                    Toast.makeText(context, text, duration).show()
-                }
+    fun showToast(text: String, duration: Int) {
+        (context as Activity).runOnUiThread {
+            if (text.isNotEmpty()) {
+                Toast.makeText(context, text, duration).show()
             }
         }
+    }
 
-        fun showToast(context: Activity, textResource: Int, duration: Int) {
-            showToast(context, context.getString(textResource), duration)
-        }
+    fun showToast(textResource: Int, duration: Int) {
+        showToast(context.getString(textResource), duration)
     }
 
     fun showExpireToast(context: Context) {
@@ -57,7 +56,7 @@ class Toaster @Inject constructor(context: Context) {
                 val date = DateFormat.format("dd.MM.yyyy HH:mm", cal).toString()
                 var text = context.getString(R.string.next_expire_date)
                 text = "$text $date"
-                showToast(context as Activity, text, Toast.LENGTH_LONG * 2)
+                showToast(text, Toast.LENGTH_LONG * 2)
             }
         } catch (ignored: MalformedURLException) {
         }
