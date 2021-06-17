@@ -1,4 +1,7 @@
 package de.daniel.mobilepauker2.lesson
 
-class LessonManager {
+import android.content.Context
+import javax.inject.Inject
+
+class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Context) {
 }

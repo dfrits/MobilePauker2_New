@@ -1,4 +1,7 @@
 package de.daniel.mobilepauker2.data
 
-class DataManager {
+import android.content.Context
+import javax.inject.Inject
+
+class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context) {
 }
