@@ -9,16 +9,16 @@ import de.daniel.mobilepauker2.lesson.LessonManager
 import javax.inject.Singleton
 
 @Module
-class ManagerModule {
+class ManagerModule(val context: Context) {
     @Singleton
     @Provides
-    fun provideLessonManager(context: Context): LessonManager {
+    fun provideLessonManager(): LessonManager {
         return LessonManager(context)
     }
 
     @Singleton
     @Provides
-    fun provideDataManager(context: Context): DataManager {
+    fun provideDataManager(): DataManager {
         return DataManager(context)
     }
 }

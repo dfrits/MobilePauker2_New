@@ -9,8 +9,8 @@ class PaukerApplication : Application() {
         super.onCreate()
 
         applicationSingletonComponent = DaggerApplicationSingletonComponent.builder()
-            .application(this)
-            .managerModule(this)
+            .applicationModule(ApplicationModule(this))
+            .managerModule(ManagerModule(this))
             .build()
     }
 }
