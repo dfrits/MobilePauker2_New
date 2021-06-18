@@ -13,13 +13,13 @@ class ProviderModule(val application: Application) {
     @Singleton
     @Provides
     fun provideLessonManager(): LessonManager {
-        return LessonManager(application)
+        return LessonManager(application.applicationContext)
     }
 
     @Singleton
     @Provides
     fun provideDataManager(): DataManager {
-        return DataManager(application)
+        return DataManager(application.applicationContext)
     }
 
     @Singleton
