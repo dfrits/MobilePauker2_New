@@ -13,18 +13,8 @@ import de.daniel.mobilepauker2.utils.Toaster
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [ManagerModule::class])
+@Component(modules = [ProviderModule::class])
 interface ApplicationSingletonComponent {
-    @Component.Builder
-    interface SingletonBuilder {
-        @BindsInstance
-        fun managerModule(context: Context): SingletonBuilder
-
-        @BindsInstance
-        fun application(application: Application): SingletonBuilder
-
-        fun build(): ApplicationSingletonComponent
-    }
 
     fun inject(manager: DataManager)
     fun inject(manager: LessonManager)
