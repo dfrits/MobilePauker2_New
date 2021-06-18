@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState
 import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
@@ -112,6 +113,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     override fun onResume() {
         Log.d("MainMenuActivity::onResume", "ENTRY")
         super.onResume()
+        (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
         lessonManager.resetLesson()
         search.collapseActionView()
         if (!firstStart) {
