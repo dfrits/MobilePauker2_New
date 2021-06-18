@@ -312,4 +312,37 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         initChartList()
         initView()
     }
+
+    // Menu clicks
+    fun mSaveFileClicked(menuItem: MenuItem) {
+
+    }
+
+    fun mOpenSearchClicked(menuItem: MenuItem) {
+
+    }
+
+    fun mOpenLessonClicked(menuItem: MenuItem) {
+
+    }
+
+    fun mNewLessonClicked(menuItem: MenuItem) {
+
+    }
+
+    fun mResetLessonClicked(menuItem: MenuItem) {
+
+    }
+
+    fun mFlipSidesClicked(menuItem: MenuItem) {
+
+    }
+
+    fun mEditInfoTextClicked(menuItem: MenuItem) {
+
+    }
+
+    fun mSettingsClicked(menuItem: MenuItem) {
+
+    }
 }
