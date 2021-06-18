@@ -1,6 +1,7 @@
 package de.daniel.mobilepauker2.lesson
 
 import android.content.Context
+import dagger.Lazy
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.lesson.batch.Batch
@@ -29,7 +30,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
     var lessonDescription = lesson?.description ?: ""
 
     @Inject
-    lateinit var dataManager: DataManager
+    lateinit var dataManager: Lazy<DataManager>
 
     @Inject
     lateinit var settingsManager: SettingsManager
@@ -39,11 +40,11 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
     }
 
     fun setupNewLesson() {
-        dataManager.currentFileName = Constants.DEFAULT_FILE_NAME
+        dataManager.get().currentFileName = Constants.DEFAULT_FILE_NAME
         lesson = Lesson()
     }
 
-    fun isLessonNotNew() = dataManager.currentFileName != Constants.DEFAULT_FILE_NAME
+    fun isLessonNotNew() = dataManager.get().currentFileName != Constants.DEFAULT_FILE_NAME
 
     fun addCard(flashCard: FlashCard, sideA: String, sideB: String) {
         flashCard.sideAText = sideA

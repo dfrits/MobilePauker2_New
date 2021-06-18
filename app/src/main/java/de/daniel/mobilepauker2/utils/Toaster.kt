@@ -5,6 +5,7 @@ import android.content.Context
 import android.text.format.DateFormat
 import android.util.SparseLongArray
 import android.widget.Toast
+import dagger.Lazy
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
@@ -22,7 +23,7 @@ class Toaster @Inject constructor(val context: Context) {
     lateinit var settingsManager: SettingsManager
 
     @Inject
-    lateinit var dataManager: DataManager
+    lateinit var dataManager: Lazy<DataManager>
 
     init {
         (context as PaukerApplication).applicationSingletonComponent.inject(this)
@@ -43,7 +44,7 @@ class Toaster @Inject constructor(val context: Context) {
     fun showExpireToast(context: Context) {
         if (!settingsManager.getBoolPreference(context, ENABLE_EXPIRE_TOAST)) return
 
-        val filePath: File = dataManager.getPathOfCurrentFile()
+        val filePath: File = dataManager.get().getPathOfCurrentFile()
         val uri = filePath.toURI()
         val parser: FlashCardXMLPullFeedParser
 

@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.lesson.LessonManager
+import de.daniel.mobilepauker2.settings.SettingsManager
 import javax.inject.Singleton
 
 @Module
@@ -20,6 +21,11 @@ class ProviderModule(val application: Application) {
     @Provides
     fun provideDataManager(): DataManager {
         return DataManager(application.applicationContext)
+    }
+
+    @Provides
+    fun provideSettingsManager(): SettingsManager {
+        return SettingsManager()
     }
 
     @Singleton

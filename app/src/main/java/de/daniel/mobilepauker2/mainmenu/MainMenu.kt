@@ -115,7 +115,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         super.onResume()
         (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
         lessonManager.resetLesson()
-        search.collapseActionView()
+        //search.collapseActionView() // TODO
         if (!firstStart) {
             initButtons()
             initView()
