@@ -150,6 +150,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         if (requestCode == RQ_WRITE_EXT_SAVE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             saveLesson(REQUEST_CODE_SAVE_DIALOG_NORMAL)
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
