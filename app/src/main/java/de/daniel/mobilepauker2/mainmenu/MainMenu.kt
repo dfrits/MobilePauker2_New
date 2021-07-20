@@ -234,7 +234,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 runOnUiThread {
                     val onClickListener: ChartAdapterCallback = object : ChartAdapterCallback {
                         override fun onClick(position: Int) {
-                            //showBatchDetails(position)
+                            //showBatchDetails(position) // TODO
                         }
                     }
                     val adapter = ChartAdapter(context, onClickListener)
