@@ -345,4 +345,18 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     fun mSettingsClicked(menuItem: MenuItem) {
 
     }
+
+    // Button clicks
+
+    fun addNewCard(view: View) {
+
+    }
+
+    fun learnNewCard(view: View) {
+
+    }
+
+    fun repeatCards(view: View) {
+
+    }
 }
