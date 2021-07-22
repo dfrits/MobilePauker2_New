@@ -54,8 +54,10 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     private var firstStart = true
     private lateinit var search: MenuItem
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
 
@@ -113,7 +115,6 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     override fun onResume() {
         Log.d("MainMenuActivity::onResume", "ENTRY")
         super.onResume()
-        (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
         lessonManager.resetLesson()
         //search.collapseActionView() // TODO
         if (!firstStart) {
@@ -161,10 +162,10 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_SAVE_DIALOG_NORMAL) {
             if (resultCode == RESULT_OK) {
-                toaster.showToast(R.string.saving_success, Toast.LENGTH_SHORT)
+                toaster.showToast(context as Activity, R.string.saving_success, Toast.LENGTH_SHORT)
                 dataManager.saveRequired = false
 
-                toaster.showExpireToast(context)
+                toaster.showExpireToast(context as Activity)
             }
             invalidateOptionsMenu()
         } else if (requestCode == Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON && resultCode == RESULT_OK) {
@@ -312,6 +313,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     private fun createNewLesson() {
         viewModel.createNewLesson()
+        toaster.showToast(context as Activity, R.string.new_lession_created, Toast.LENGTH_SHORT)
         initButtons()
         initChartList()
         initView()
