@@ -157,10 +157,10 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_SAVE_DIALOG_NORMAL) {
             if (resultCode == RESULT_OK) {
-                toaster.showToast(R.string.saving_success, Toast.LENGTH_SHORT)
+                toaster.showToast(context as Activity, R.string.saving_success, Toast.LENGTH_SHORT)
                 dataManager.saveRequired = false
 
-                toaster.showExpireToast(context)
+                toaster.showExpireToast(context as Activity)
             }
             invalidateOptionsMenu()
         } else if (requestCode == Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON && resultCode == RESULT_OK) {
@@ -309,6 +309,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     private fun createNewLesson() {
         viewModel.createNewLesson()
+        toaster.showToast(context as Activity, R.string.new_lession_created, Toast.LENGTH_SHORT)
         initButtons()
         initChartList()
         initView()

@@ -1,5 +1,6 @@
 package de.daniel.mobilepauker2.mainmenu
 
+import android.app.Activity
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import de.daniel.mobilepauker2.R
@@ -17,6 +18,5 @@ class MainMenuViewModel @Inject constructor(
     fun createNewLesson() {
         lessonManager.setupNewLesson()
         dataManager.saveRequired = false
-        toaster.showToast(R.string.new_lession_created, Toast.LENGTH_SHORT)
     }
 }

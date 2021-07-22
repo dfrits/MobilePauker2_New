@@ -60,7 +60,7 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     @Throws(IOException::class)
     fun getFilePathForName(filename: String): File {
         if (!validateFileEnding(filename)) {
-            toaster.showToast(R.string.error_filename_invalid, Toast.LENGTH_LONG)
+            toaster.showToast(context as Activity, R.string.error_filename_invalid, Toast.LENGTH_LONG)
             throw IOException("Filename invalid")
         }
         val filePath = context.getExternalFilesDir(null)
