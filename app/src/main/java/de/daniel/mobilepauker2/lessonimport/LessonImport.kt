@@ -1,5 +1,6 @@
 package de.daniel.mobilepauker2.lessonimport
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.SharedPreferences
@@ -125,7 +126,11 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 Log.d("OpenLesson", "Synchro erfolgreich")
             } else {
                 Log.d("OpenLesson", "Synchro nicht erfolgreich")
-                toaster.showToast(R.string.error_synchronizing, Toast.LENGTH_SHORT)
+                toaster.showToast(
+                    context as Activity,
+                    R.string.error_synchronizing,
+                    Toast.LENGTH_SHORT
+                )
             }
             init()
             if (lessonManager.isLessonNotNew())
@@ -133,7 +138,11 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                     try {
                         openLesson(dataManager.getReadableCurrentFileName())
                     } catch (ignored: IOException) {
-                        toaster.showToast(R.string.reopen_lesson_error, Toast.LENGTH_LONG)
+                        toaster.showToast(
+                            context as Activity,
+                            R.string.reopen_lesson_error,
+                            Toast.LENGTH_LONG
+                        )
                         //errorReporter.AddCustomData("ImportThread", "IOException?") TODO
                     }
                 } else {
@@ -157,7 +166,11 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 openLesson(fileNames[lastSelection])
                 finish()
             } catch (e: IOException) {
-                toaster.showToast(R.string.error_reading_from_xml, Toast.LENGTH_LONG)
+                toaster.showToast(
+                    context as Activity,
+                    R.string.error_reading_from_xml,
+                    Toast.LENGTH_LONG
+                )
                 //errorReporter.instance().AddCustomData("ImportThread", "IOException?") TODO
             }
         }
@@ -232,6 +245,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 }
             } catch (ignored: IOException) {
                 toaster.showToast(
+                    context as Activity,
                     R.string.error_reading_from_xml,
                     Toast.LENGTH_SHORT
                 )
@@ -240,6 +254,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 text = null
             } catch (ignored: RuntimeException) {
                 toaster.showToast(
+                    context as Activity,
                     R.string.error_reading_from_xml,
                     Toast.LENGTH_SHORT
                 )
@@ -310,7 +325,11 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                             dataManager.saveRequired = false
                         }
                     } else {
-                        toaster.showToast(R.string.delete_lesson_error, Toast.LENGTH_SHORT)
+                        toaster.showToast(
+                            context as Activity,
+                            R.string.delete_lesson_error,
+                            Toast.LENGTH_SHORT
+                        )
                     }
                 }
             }
@@ -331,13 +350,21 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG_BEFORE_OPEN)*/ // TODO
                 Log.d("LessonImportActivity:openLesson", "Check for newer version on DB")
             } else {
-                toaster.showToast(R.string.open_lesson_hint, Toast.LENGTH_SHORT)
+                toaster.showToast(
+                    context as Activity,
+                    R.string.open_lesson_hint,
+                    Toast.LENGTH_SHORT
+                )
                 openLesson(filename)
                 finish()
             }
         } catch (e: IOException) {
             resetSelection(null)
-            toaster.showToast(getString(R.string.error_reading_from_xml), Toast.LENGTH_SHORT)
+            toaster.showToast(
+                context as Activity,
+                getString(R.string.error_reading_from_xml),
+                Toast.LENGTH_SHORT
+            )
             //ErrorReporter.instance().AddCustomData("ImportThread", "IOException?") // TODO
         }
     }
