@@ -2,6 +2,7 @@ package de.daniel.mobilepauker2.data
 
 import android.app.Activity
 import android.content.Context
+import android.os.Environment
 import android.widget.Toast
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
@@ -69,13 +70,15 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     @Throws(SecurityException::class)
     fun listFiles(): Array<File> {
         val appDirectory = File(
-            context.getExternalFilesDir(null).toString() + Constants.DEFAULT_APP_FILE_DIRECTORY
+            Environment.getExternalStorageDirectory().toString() + Constants.DEFAULT_APP_FILE_DIRECTORY
         )
 
         if (!appDirectory.exists() && !appDirectory.mkdir()) return emptyArray()
 
         if (appDirectory.exists() && appDirectory.isDirectory) {
-            val listFiles = appDirectory.listFiles { file -> isNameValid(file.name) }
+            val listFiles = appDirectory.listFiles {
+                    file -> isNameValid(file.name)
+            }
             if (listFiles != null) return listFiles
         }
 
