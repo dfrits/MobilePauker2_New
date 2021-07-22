@@ -54,8 +54,10 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     private var firstStart = true
     private lateinit var search: MenuItem
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
 
@@ -113,7 +115,6 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     override fun onResume() {
         Log.d("MainMenuActivity::onResume", "ENTRY")
         super.onResume()
-        (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
         lessonManager.resetLesson()
         //search.collapseActionView() // TODO
         if (!firstStart) {
