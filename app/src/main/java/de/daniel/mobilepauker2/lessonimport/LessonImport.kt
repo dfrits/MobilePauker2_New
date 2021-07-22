@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.dropbox.core.android.Auth
 import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.data.xml.FlashCardXMLPullFeedParser
 import de.daniel.mobilepauker2.lesson.LessonManager
@@ -64,6 +65,8 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
 
         preferences = PreferenceManager.getDefaultSharedPreferences(context)
 

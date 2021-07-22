@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.annotation.Nullable
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import java.util.*
 import javax.inject.Inject
@@ -28,5 +29,9 @@ class LessonImportAdapter(context: Context, private val data: List<String>) :
         val name: String = dataManager.getReadableFileName(data[position])
         tv.text = name
         return view
+    }
+
+    init {
+        (context.applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
     }
 }
