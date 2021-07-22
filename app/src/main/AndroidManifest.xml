@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="de.daniel.mobilepauker2">
 
     <application
+        android:name=".application.PaukerApplication"
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_rules"
-        android:installLocation="internalOnly"
         android:icon="@mipmap/ic_launcher"
+        android:installLocation="internalOnly"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".application.PaukerApplication">
+        tools:ignore="LockedOrientationActivity" >
 
         <activity
             android:name=".mainmenu.MainMenu"
@@ -22,6 +24,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".lessonimport.LessonImport"
+            android:label="@string/lessons"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".mainmenu.MainMenu"
+            android:theme="@style/OpenLessonTheme"/>
 
     </application>
 
