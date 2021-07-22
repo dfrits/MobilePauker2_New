@@ -2,6 +2,7 @@ package de.daniel.mobilepauker2.lessonimport
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -38,7 +39,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     private val CONTEXT_DELETE_SHORTCUT = 3
     private val context = this
     private val fileNames = mutableListOf<String>()
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private lateinit var preferences: SharedPreferences
 
     @Inject
     lateinit var viewModel: LessonImportViewModel
@@ -62,6 +63,8 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
         init()
     }
@@ -109,7 +112,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
 
     override fun onResume() {
         super.onResume()
-        val uid: String = Auth.getUid()
+        val uid = Auth.getUid()
         val storedUid = preferences.getString(Constants.DROPBOX_USER_ID, null)
         if (uid != storedUid) {
             preferences.edit().putString(Constants.DROPBOX_USER_ID, uid).apply()

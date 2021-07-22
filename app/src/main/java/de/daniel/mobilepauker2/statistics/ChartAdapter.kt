@@ -12,7 +12,7 @@ import de.daniel.mobilepauker2.models.ModelManager
 import java.util.*
 import javax.inject.Inject
 
-class ChartAdapter(private val context: Context, val callback: ChartAdapterCallback) :
+class ChartAdapter(private val context: PaukerApplication, val callback: ChartAdapterCallback) :
     RecyclerView.Adapter<ChartAdapter.ViewHolder>() {
     private val batchStatistics: List<BatchStatistics>
     private val lessonSize: Int
@@ -83,7 +83,7 @@ class ChartAdapter(private val context: Context, val callback: ChartAdapterCallb
     }
 
     init {
-        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+        context.applicationSingletonComponent.inject(this)
         batchStatistics = emptyList()//modelManager.getBatchStatistics()
         lessonSize = 0//modelManager.getLessonSize()
         chartBars = ArrayList(itemCount)

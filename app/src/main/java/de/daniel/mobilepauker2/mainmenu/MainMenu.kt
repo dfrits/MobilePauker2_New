@@ -1,7 +1,6 @@
 package de.daniel.mobilepauker2.mainmenu
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -26,6 +25,7 @@ import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
+import de.daniel.mobilepauker2.lessonimport.LessonImport
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
@@ -144,13 +144,17 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults[0] == -1) return
+        PreferenceManager.getDefaultSharedPreferences(context)
+            .edit().putBoolean("FirstTime", false).apply()
+
         if (requestCode == RQ_WRITE_EXT_OPEN && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             openLesson()
         }
         if (requestCode == RQ_WRITE_EXT_SAVE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             saveLesson(REQUEST_CODE_SAVE_DIALOG_NORMAL)
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -166,7 +170,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         } else if (requestCode == Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON && resultCode == RESULT_OK) {
             createNewLesson()
         } else if (requestCode == Constants.REQUEST_CODE_SAVE_DIALOG_OPEN && resultCode == RESULT_OK) {
-            //startActivity(Intent(context, LessonImportActivity::class.java)) // TODO
+            startActivity(Intent(context, LessonImport::class.java))
         }
     }
 
@@ -178,13 +182,13 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             it.isEnabled = hasCardsToLearn
             it.isClickable = hasCardsToLearn
         }
-        findViewById<ImageButton>(R.id.tLearnNewCardDesc)?.isEnabled = hasCardsToLearn
+        findViewById<TextView>(R.id.tLearnNewCardDesc)?.isEnabled = hasCardsToLearn
 
         findViewById<ImageButton>(R.id.bRepeatExpiredCards)?.let {
             it.isEnabled = hasExpiredCards
             it.isClickable = hasExpiredCards
         }
-        findViewById<ImageButton>(R.id.tRepeatExpiredCardsDesc)?.isEnabled = hasExpiredCards
+        findViewById<TextView>(R.id.tRepeatExpiredCardsDesc)?.isEnabled = hasExpiredCards
     }
 
     private fun initView() {
@@ -214,7 +218,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             it.panelState = PanelState.COLLAPSED
         }
 
-        title = if (lessonManager.isLessonNotNew()) dataManager.getReadableFileName()
+        title = if (lessonManager.isLessonNotNew()) dataManager.getReadableCurrentFileName()
         else getString(R.string.app_name)
     }
 
@@ -237,7 +241,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                             //showBatchDetails(position) // TODO
                         }
                     }
-                    val adapter = ChartAdapter(context, onClickListener)
+                    val adapter = ChartAdapter(application as PaukerApplication, onClickListener)
                     it.adapter = adapter
                 }
             }
@@ -258,11 +262,11 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                         saveLesson(Constants.REQUEST_CODE_SAVE_DIALOG_OPEN)
                     }
                     .setNeutralButton(R.string.open_lesson) { dialog, _ ->
-                        //startActivity(Intent(context, LessonImportActivity::class.java)) // TODO
+                        startActivity(Intent(context, LessonImport::class.java))
                         dialog.dismiss()
                     }
                 builder.create().show()
-            } //else startActivity(Intent(context, LessonImportActivity::class.java)) TODO
+            } else startActivity(Intent(context, LessonImport::class.java))
         }
     }
 
@@ -278,7 +282,6 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         val pref = PreferenceManager.getDefaultSharedPreferences(context)
         val builder = AlertDialog.Builder(context)
         builder.setTitle(R.string.app_name).setPositiveButton(R.string.next) { dialog, _ ->
-            pref.edit().putBoolean("FirstTime", false).apply()
             requestPermissions(
                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
                 requestCode
@@ -324,7 +327,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     fun mOpenLessonClicked(menuItem: MenuItem) {
-
+        openLesson()
     }
 
     fun mNewLessonClicked(menuItem: MenuItem) {
