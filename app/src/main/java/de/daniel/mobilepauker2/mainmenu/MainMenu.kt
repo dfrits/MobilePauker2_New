@@ -6,9 +6,11 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.os.Environment
 import android.provider.Settings
+import android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
 import android.text.method.ScrollingMovementMethod
 import android.view.Menu
 import android.view.MenuItem
@@ -147,10 +149,6 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (grantResults[0] == -1) return
-        PreferenceManager.getDefaultSharedPreferences(context)
-            .edit().putBoolean("FirstTime", false).apply()
-
         if (requestCode == RQ_WRITE_EXT_OPEN && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             openLesson()
         }
@@ -251,10 +249,8 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     private fun openLesson() {
-        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            checkPermission(RQ_WRITE_EXT_OPEN)
+        if (!hasPermission()) {
+            showPermissionDialog(RQ_WRITE_EXT_OPEN)
         } else {
             if (dataManager.saveRequired) {
                 val builder = AlertDialog.Builder(context)
@@ -273,23 +269,44 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     private fun saveLesson(requestCode: Int) {
-        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            checkPermission(RQ_WRITE_EXT_SAVE)
+        if (!hasPermission()) {
+            showPermissionDialog(RQ_WRITE_EXT_SAVE)
         } //else startActivityForResult(Intent(context, SaveDialog::class.java), requestCode) TODO
     }
 
-    private fun checkPermission(requestCode: Int) {
+    private fun createNewLesson() {
+        viewModel.createNewLesson()
+        toaster.showToast(context as Activity, R.string.new_lession_created, Toast.LENGTH_SHORT)
+        initButtons()
+        initChartList()
+        initView()
+    }
+
+    private fun hasPermission(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (Environment.isExternalStorageManager()
+            ) {
+                return true
+            }
+        } else if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            return true
+        }
+        return false
+    }
+
+    private fun showPermissionDialog(requestCode: Int) {
         val pref = PreferenceManager.getDefaultSharedPreferences(context)
         val builder = AlertDialog.Builder(context)
-        builder.setTitle(R.string.app_name).setPositiveButton(R.string.next) { dialog, _ ->
-            requestPermissions(
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                requestCode
-            )
-            dialog.dismiss()
-        }.setNeutralButton(R.string.not_now) { dialog, _ -> dialog.dismiss() }
+        builder.setTitle(R.string.app_name)
+            .setPositiveButton(R.string.next) { dialog, _ ->
+                PreferenceManager.getDefaultSharedPreferences(context)
+                    .edit().putBoolean("FirstTime", false).apply()
+                requestPermission(requestCode)
+                dialog.dismiss()
+            }
+            .setNeutralButton(R.string.not_now) { dialog, _ -> dialog.dismiss() }
 
         if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             builder.setMessage(R.string.write_permission_rational_message)
@@ -299,11 +316,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             } else {
                 builder.setMessage(R.string.write_permission_rational_message)
                     .setPositiveButton(R.string.settings) { dialog, _ ->
-                        val intent = Intent()
-                        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                        val uri = Uri.fromParts("package", packageName, null)
-                        intent.data = uri
-                        startActivity(intent)
+                        showPermissionSettings()
                         dialog.dismiss()
                     }
             }
@@ -312,12 +325,31 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         dialog.show()
     }
 
-    private fun createNewLesson() {
-        viewModel.createNewLesson()
-        toaster.showToast(context as Activity, R.string.new_lession_created, Toast.LENGTH_SHORT)
-        initButtons()
-        initChartList()
-        initView()
+    private fun requestPermission(requestCode: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val intent = Intent()
+            intent.action = ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+            startActivity(intent)
+        } else {
+            requestPermissions(
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                requestCode
+            )
+        }
+    }
+
+    private fun showPermissionSettings() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val intent = Intent()
+            intent.action = ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+            startActivity(intent)
+        } else {
+            val intent = Intent()
+            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            val uri = Uri.fromParts("package", packageName, null)
+            intent.data = uri
+            startActivity(intent)
+        }
     }
 
     // Menu clicks
