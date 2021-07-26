@@ -61,7 +61,7 @@ class ShortcutsManager @Inject constructor(private val context: Context) {
         }
     }
 
-    fun deleteShortcut(context: Context, ID: String) {
+    fun deleteShortcut(ID: String) {
         val shortcutManager = context.getSystemService(ShortcutManager::class.java)
 
         if (shortcutManager != null) {

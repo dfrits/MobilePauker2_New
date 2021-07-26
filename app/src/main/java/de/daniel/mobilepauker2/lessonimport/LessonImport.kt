@@ -22,9 +22,9 @@ import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.settings.SettingsManager
+import de.daniel.mobilepauker2.shortcut.ShortcutsManager
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Log
-import de.daniel.mobilepauker2.shortcut.ShortcutReceiver
 import de.daniel.mobilepauker2.utils.Toaster
 import java.io.File
 import java.io.IOException
@@ -55,6 +55,9 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
 
     @Inject
     lateinit var settingsManager: SettingsManager
+
+    @Inject
+    lateinit var shortcutsManager: ShortcutsManager
 
     private var accessToken: String? = null
     private var listView: ListView? = null
@@ -206,7 +209,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 menu.add(0, CONTEXT_OPEN, 0, R.string.open_lesson)
 
                 val pos = (menuInfo as AdapterContextMenuInfo).position
-                if (ShortcutReceiver.hasShortcut(listView.getItemAtPosition(pos) as String)
+                if (shortcutsManager.hasShortcut(listView.getItemAtPosition(pos) as String)
                 ) {
                     menu.add(0, CONTEXT_DELETE_SHORTCUT, 0, R.string.shortcut_remove)
                 } else {
@@ -309,7 +312,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                     if (dataManager.deleteLesson(file)) {
                         init()
                         resetSelection()
-                        ShortcutReceiver.deleteShortcut(context, filename) // TODO
+                        shortcutsManager.deleteShortcut(filename)
                         if (!fileNames.contains(dataManager.currentFileName)) {
                             lessonManager.setupNewLesson()
                             dataManager.saveRequired = false
@@ -365,13 +368,13 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     }
 
     private fun createShortCut(position: Int) {
-        //ShortcutReceiver.createShortcut(this, listView!!.getItemAtPosition(position) as String) // TODO
+        shortcutsManager.createShortcut(listView!!.getItemAtPosition(position) as String)
         init()
         resetSelection(null)
     }
 
     private fun deleteShortCut(position: Int) {
-        //ShortcutReceiver.deleteShortcut(this, listView!!.getItemAtPosition(position) as String) // TODO
+        shortcutsManager.deleteShortcut(listView!!.getItemAtPosition(position) as String)
         init()
         resetSelection(null)
     }
