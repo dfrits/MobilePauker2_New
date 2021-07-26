@@ -6,13 +6,11 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.text.Html
 import android.text.format.DateFormat
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.OnCreateContextMenuListener
 import android.widget.*
 import android.widget.AdapterView.AdapterContextMenuInfo
 import android.widget.AdapterView.OnItemClickListener
@@ -22,7 +20,6 @@ import com.dropbox.core.android.Auth
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
-import de.daniel.mobilepauker2.data.xml.FlashCardXMLPullFeedParser
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.utils.Constants
@@ -61,7 +58,6 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     private var accessToken: String? = null
     private var listView: ListView? = null
     private var files = emptyArray<File>()
-    private var lastSelection: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,8 +72,8 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.open_lesson, menu)
 
-        menu.findItem(R.id.mSyncFilesWithDropbox).isVisible = lastSelection == -1
-        menu.findItem(R.id.mOpenLesson).isVisible = lastSelection != -1
+        menu.findItem(R.id.mSyncFilesWithDropbox).isVisible = viewModel.lastSelection == -1
+        menu.findItem(R.id.mOpenLesson).isVisible = viewModel.lastSelection != -1
         return true
     }
 
@@ -92,9 +88,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 )
                 deleteLesson(position)
             }
-            CONTEXT_OPEN -> openLesson(
-                position
-            )
+            CONTEXT_OPEN -> openLesson(position)
             CONTEXT_CREATE_SHORTCUT -> {
                 Log.d(
                     "LessonImportActivity::createShortcut", "create new dynamic " +
@@ -166,7 +160,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 } else {
                     Log.d("LessonImportActivity::onActivityResult", "File wurde nicht aktualisiert")
                 }
-                openLesson(fileNames[lastSelection])
+                openLesson(fileNames[viewModel.lastSelection])
                 finish()
             } catch (e: IOException) {
                 toaster.showToast(
@@ -181,7 +175,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     }
 
     override fun onBackPressed() {
-        if (lastSelection > -1) {
+        if (viewModel.lastSelection > -1) {
             resetSelection()
         } else {
             super.onBackPressed()
@@ -206,7 +200,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 itemClicked(position)
             }
             registerForContextMenu(listView)
-            listView.setOnCreateContextMenuListener(OnCreateContextMenuListener { menu, _, menuInfo ->
+            listView.setOnCreateContextMenuListener { menu, _, menuInfo ->
                 menu.add(0, CONTEXT_DELETE, 0, R.string.delete)
                 menu.add(0, CONTEXT_OPEN, 0, R.string.open_lesson)
 
@@ -217,22 +211,21 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 } else {
                     menu.add(0, CONTEXT_CREATE_SHORTCUT, 0, R.string.shortcut_add)
                 }*/ // TODO
-            })
+            }
         }
     }
 
     private fun itemClicked(position: Int) {
         val infoText: TextView = findViewById(R.id.infoText)
-        if (lastSelection != position) {
+        if (viewModel.lastSelection != position) {
             listView!!.getChildAt(position).isSelected = true
-            lastSelection = position
+            viewModel.itemClicked(position)
             var text: String? = getString(R.string.next_expire_date)
             try {
                 val uri: URI = dataManager.getFilePathForName(
                     listView!!.getItemAtPosition(position) as String
                 ).toURI()
-                val parser = FlashCardXMLPullFeedParser(uri.toURL())
-                val result = parser.getNextExpireDate()
+                val result = viewModel.getNextExpireDate(uri)
                 if (result.timeStamp > Long.MIN_VALUE) {
                     if (result.expiredCards > 0) {
                         text = "${getString(R.string.expired_cards)} ${result.expiredCards}"
@@ -246,24 +239,20 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 } else {
                     text = text + " " + getString(R.string.nothing_learned_yet)
                 }
-            } catch (ignored: IOException) {
-                toaster.showToast(
-                    context as Activity,
-                    R.string.error_reading_from_xml,
-                    Toast.LENGTH_SHORT
-                )
-                resetSelection()
-                init()
-                text = null
-            } catch (ignored: RuntimeException) {
-                toaster.showToast(
-                    context as Activity,
-                    R.string.error_reading_from_xml,
-                    Toast.LENGTH_SHORT
-                )
-                resetSelection()
-                init()
-                text = null
+            } catch (e: Exception) {
+                when (e) {
+                    is IOException, is java.lang.RuntimeException -> {
+                        toaster.showToast(
+                            context as Activity,
+                            R.string.error_reading_from_xml,
+                            Toast.LENGTH_SHORT
+                        )
+                        resetSelection()
+                        init()
+                        text = null
+                    }
+                    else -> throw e
+                }
             }
             if (text != null) {
                 infoText.text = text
@@ -271,7 +260,6 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
             }
         } else {
             listView!!.getChildAt(position).isSelected = false
-            lastSelection = -1
             infoText.visibility = View.GONE
         }
         (listView!!.adapter as ArrayAdapter<*>).notifyDataSetChanged()
@@ -315,13 +303,11 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
             .setPositiveButton(R.string.delete) { dialog, _ ->
                 dialog.dismiss()
                 val filename = listView!!.getItemAtPosition(position).toString()
-                val filePath = "${Environment.getExternalStorageDirectory()} " +
-                        "${Constants.DEFAULT_APP_FILE_DIRECTORY} $filename"
-                val file = File(filePath)
+                val file = dataManager.getFilePathForName(filename)
                 if (file.isFile) {
                     if (dataManager.deleteLesson(file)) {
                         init()
-                        resetSelection(null)
+                        resetSelection()
                         //ShortcutReceiver.deleteShortcut(context, filename) // TODO
                         if (!fileNames.contains(dataManager.currentFileName)) {
                             lessonManager.setupNewLesson()
@@ -336,15 +322,14 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                     }
                 }
             }
-            .setNeutralButton(R.string.cancel) { dialog, which -> dialog.dismiss() }
+            .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
         builder.create().show()
     }
 
     private fun openLesson(position: Int) {
         val filename = listView!!.getItemAtPosition(position) as String
         try {
-            if (settingsManager.getBoolPreference(context, SettingsManager.Keys.AUTO_DOWNLOAD)
-            ) {
+            if (settingsManager.getBoolPreference(context, SettingsManager.Keys.AUTO_DOWNLOAD)) {
                 val accessToken = preferences.getString(Constants.DROPBOX_ACCESS_TOKEN, null)
                 /*val syncIntent = Intent(context, SyncDialog::class.java)
                 syncIntent.putExtra(SyncDialog.FILES, paukerManager.getFilePath(context, filename))
@@ -399,11 +384,11 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     // View Clicks
 
     fun resetSelection(view: View? = null) {
-        if (lastSelection != -1) {
-            listView!!.clearChoices()
-            lastSelection = -1
+        if (viewModel.lastSelection != -1) {
+            listView?.clearChoices()
+            viewModel.resetSelection()
             findViewById<TextView>(R.id.infoText).visibility = View.GONE
-            (listView!!.adapter as ArrayAdapter<*>).notifyDataSetChanged()
+            (listView?.adapter as ArrayAdapter<*>).notifyDataSetChanged()
             invalidateOptionsMenu()
         }
     }
@@ -435,6 +420,6 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     }
 
     fun mOpenLessonClicked(item: MenuItem?) {
-        openLesson(lastSelection)
+        openLesson(viewModel.lastSelection)
     }
 }
