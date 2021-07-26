@@ -66,7 +66,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
         setContentView(R.layout.main_menu)
 
-        if (!lessonManager.isLessonSetup()) lessonManager.createNewLesson()
+        viewModel.checkLessonIsSetup()
 
         initButtons()
         initView()
@@ -82,7 +82,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             R.id.mGroup,
             lessonManager.isLessonNotNew() || !lessonManager.isLessonEmpty()
         )
-        if (lessonManager.getBatchSize(BatchType.LESSON) > 0) {
+        if (viewModel.getBatchSize(BatchType.LESSON) > 0) {
             search.isVisible = true
             open.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
         } else {
@@ -118,7 +118,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     override fun onResume() {
         Log.d("MainMenuActivity::onResume", "ENTRY")
         super.onResume()
-        lessonManager.resetLesson()
+        viewModel.resetLesson()
         //search.collapseActionView() // TODO
         if (!firstStart) {
             initButtons()
@@ -175,8 +175,8 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     private fun initButtons() {
-        val hasCardsToLearn = lessonManager.getBatchSize(BatchType.UNLEARNED) != 0
-        val hasExpiredCards = lessonManager.getBatchSize(BatchType.EXPIRED) != 0
+        val hasCardsToLearn = viewModel.getBatchSize(BatchType.UNLEARNED) != 0
+        val hasExpiredCards = viewModel.getBatchSize(BatchType.EXPIRED) != 0
 
         findViewById<ImageButton>(R.id.bLearnNewCard)?.let {
             it.isEnabled = hasCardsToLearn
@@ -194,7 +194,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     private fun initView() {
         invalidateOptionsMenu()
 
-        val description: String = lessonManager.lessonDescription
+        val description: String = viewModel.getDescription()
         val descriptionView: TextView = findViewById(R.id.infoText)
         descriptionView.text = description
         if (description.isNotEmpty()) {
@@ -218,8 +218,9 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             it.panelState = PanelState.COLLAPSED
         }
 
-        title = if (lessonManager.isLessonNotNew()) dataManager.getReadableCurrentFileName()
-        else getString(R.string.app_name)
+        title =
+            if (lessonManager.isLessonNotNew()) dataManager.getReadableCurrentFileName()
+            else getString(R.string.app_name)
     }
 
     private fun initChartList() {
