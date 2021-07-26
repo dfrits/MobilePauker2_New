@@ -24,6 +24,7 @@ import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Log
+import de.daniel.mobilepauker2.shortcut.ShortcutReceiver
 import de.daniel.mobilepauker2.utils.Toaster
 import java.io.File
 import java.io.IOException
@@ -205,12 +206,12 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 menu.add(0, CONTEXT_OPEN, 0, R.string.open_lesson)
 
                 val pos = (menuInfo as AdapterContextMenuInfo).position
-                /*if (ShortcutReceiver.hasShortcut(context, listView.getItemAtPosition(pos) as String)
+                if (ShortcutReceiver.hasShortcut(listView.getItemAtPosition(pos) as String)
                 ) {
                     menu.add(0, CONTEXT_DELETE_SHORTCUT, 0, R.string.shortcut_remove)
                 } else {
                     menu.add(0, CONTEXT_CREATE_SHORTCUT, 0, R.string.shortcut_add)
-                }*/ // TODO
+                }
             }
         }
     }
@@ -308,7 +309,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                     if (dataManager.deleteLesson(file)) {
                         init()
                         resetSelection()
-                        //ShortcutReceiver.deleteShortcut(context, filename) // TODO
+                        ShortcutReceiver.deleteShortcut(context, filename) // TODO
                         if (!fileNames.contains(dataManager.currentFileName)) {
                             lessonManager.setupNewLesson()
                             dataManager.saveRequired = false
