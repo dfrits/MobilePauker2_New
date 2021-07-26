@@ -81,7 +81,7 @@ class Lesson {
         }
     }
 
-    fun reset() {
+    fun resetLongTermBatches() {
         for (longTermBatch in longTermBatches) {
             for (card in longTermBatch.cards) {
                 card.isLearned = false
@@ -89,6 +89,19 @@ class Lesson {
             }
         }
         longTermBatches.clear()
+    }
+
+    fun resetShortTermBatches() {
+        for (card in ultraShortTermList) {
+            unlearnedBatch.addCard(card)
+        }
+
+        for (card in shortTermList) {
+            unlearnedBatch.addCard(card)
+        }
+
+        ultraShortTermList.clear()
+        shortTermList.clear()
     }
 
     fun merge(otherLesson: Lesson) {

@@ -118,7 +118,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     override fun onResume() {
         Log.d("MainMenuActivity::onResume", "ENTRY")
         super.onResume()
-        viewModel.resetLesson()
+        viewModel.resetShortTerms()
         //search.collapseActionView() // TODO
         if (!firstStart) {
             initButtons()

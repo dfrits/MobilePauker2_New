@@ -203,8 +203,12 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         }
     }
 
-    fun resetLesson() {
-        lesson?.reset()
+    fun resetLongTermBatches() {
+        lesson?.resetLongTermBatches()
+    }
+
+    fun resetShortTermBatches() {
+        lesson?.resetShortTermBatches()
     }
 
     fun flipAllCards() {
@@ -317,8 +321,8 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         BatchType.SHORT_TERM -> lesson?.shortTermList?.size ?: 0
     }
 
-    fun setupLesson(lesson: Lesson) {
-        this.lesson = lesson
+    fun setupLesson(setupLesson: Lesson) {
+        lesson = setupLesson
     }
 
     private fun getBatchOfCard(card: Card): Batch? {
