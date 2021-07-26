@@ -62,8 +62,8 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
             toaster.showToast(context as Activity, R.string.error_filename_invalid, Toast.LENGTH_LONG)
             throw IOException("Filename invalid")
         }
-        val filePath = context.getExternalFilesDir(null)
-            .toString() + Constants.DEFAULT_APP_FILE_DIRECTORY + filename
+        val filePath = "${Environment.getExternalStorageDirectory()}" +
+                "${Constants.DEFAULT_APP_FILE_DIRECTORY}$filename"
         return File(filePath)
     }
 
