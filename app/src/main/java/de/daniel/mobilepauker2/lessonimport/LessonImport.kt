@@ -133,7 +133,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
             if (lessonManager.isLessonNotNew())
                 if (fileNames.contains(dataManager.getReadableCurrentFileName())) {
                     try {
-                        openLesson(dataManager.getReadableCurrentFileName())
+                        viewModel.openLesson(dataManager.getReadableCurrentFileName())
                     } catch (ignored: IOException) {
                         toaster.showToast(
                             context as Activity,
@@ -160,7 +160,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 } else {
                     Log.d("LessonImportActivity::onActivityResult", "File wurde nicht aktualisiert")
                 }
-                openLesson(fileNames[viewModel.lastSelection])
+                viewModel.openLesson(fileNames[viewModel.lastSelection])
                 finish()
             } catch (e: IOException) {
                 toaster.showToast(
@@ -343,7 +343,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                     R.string.open_lesson_hint,
                     Toast.LENGTH_SHORT
                 )
-                openLesson(filename)
+                viewModel.openLesson(filename)
                 finish()
             }
         } catch (e: IOException) {
@@ -355,12 +355,6 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
             )
             //ErrorReporter.instance().AddCustomData("ImportThread", "IOException?") // TODO
         }
-    }
-
-    @Throws(IOException::class)
-    private fun openLesson(filename: String) {
-        dataManager.loadLessonFromFile(dataManager.getFilePathForName(filename))
-        dataManager.saveRequired = false
     }
 
     private fun createShortCut(position: Int) {
