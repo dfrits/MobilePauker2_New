@@ -34,7 +34,7 @@ class ModelManager @Inject constructor() {
                 mFont.family,
                 Typeface.ITALIC
             )
-        ) else cardSide.setTypeface(Typeface.create(mFont.family, Typeface.NORMAL))
+        ) else cardSide.typeface = Typeface.create(mFont.family, Typeface.NORMAL)
 
         val backgroundColor: Int = mFont.backgroundColor
 

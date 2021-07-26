@@ -240,7 +240,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         return true
     }
 
-    fun deleteCard(card: Card): Boolean { // TODO LessonManager
+    fun deleteCard(card: Card): Boolean {
         if (card.isLearned) {
             val batchNumber: Int = card.longTermBatchNumber
             val longTermBatch: LongTermBatch =
