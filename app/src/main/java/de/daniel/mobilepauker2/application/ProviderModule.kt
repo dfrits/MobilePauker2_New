@@ -25,7 +25,7 @@ class ProviderModule(val application: Application) {
 
     @Provides
     fun provideSettingsManager(): SettingsManager {
-        return SettingsManager()
+        return SettingsManager(application.applicationContext)
     }
 
     @Singleton

@@ -329,7 +329,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     private fun openLesson(position: Int) {
         val filename = listView!!.getItemAtPosition(position) as String
         try {
-            if (settingsManager.getBoolPreference(context, SettingsManager.Keys.AUTO_DOWNLOAD)) {
+            if (settingsManager.getBoolPreference(SettingsManager.Keys.AUTO_DOWNLOAD)) {
                 val accessToken = preferences.getString(Constants.DROPBOX_ACCESS_TOKEN, null)
                 /*val syncIntent = Intent(context, SyncDialog::class.java)
                 syncIntent.putExtra(SyncDialog.FILES, paukerManager.getFilePath(context, filename))

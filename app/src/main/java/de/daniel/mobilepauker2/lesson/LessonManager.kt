@@ -123,7 +123,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
                             "Unable to delete card from USTM"
                         )
                     }
-                    when (settingsManager.getStringPreference(context, RETURN_FORGOTTEN_CARDS)) {
+                    when (settingsManager.getStringPreference(RETURN_FORGOTTEN_CARDS)) {
                         "1" -> lesson.unlearnedBatch.addCard(currentCard)
                         "2" -> {
                             val numberOfCards: Int = lesson.unlearnedBatch.getNumberOfCards()
@@ -141,7 +141,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
                 REPEATING_STM -> {
                     currentCard.isLearned = false
                     lesson.shortTermList.remove(currentCard)
-                    when (settingsManager.getStringPreference(context, RETURN_FORGOTTEN_CARDS)) {
+                    when (settingsManager.getStringPreference(RETURN_FORGOTTEN_CARDS)) {
                         "1" -> lesson.unlearnedBatch.addCard(currentCard)
                         "2" -> {
                             val numberOfCards: Int = lesson.unlearnedBatch.getNumberOfCards()
@@ -163,9 +163,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
                     val longTermBatch: LongTermBatch =
                         lesson.getLongTermBatchFromIndex(longTermBatchNumber) as LongTermBatch
                     longTermBatch.removeCard(currentCard)
-                    when (settingsManager.getStringPreference(
-                        context, RETURN_FORGOTTEN_CARDS
-                    )) {
+                    when (settingsManager.getStringPreference(RETURN_FORGOTTEN_CARDS)) {
                         "1" -> lesson.unlearnedBatch.addCard(currentCard)
                         "2" -> {
                             val numberOfCards: Int = lesson.unlearnedBatch.getNumberOfCards()
@@ -338,13 +336,13 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
             || currentPhase == REPEATING_USTM
             || currentPhase == FILLING_USTM
         ) {
-            if (settingsManager.getBoolPreference(context, LEARN_NEW_CARDS_RANDOMLY)) {
+            if (settingsManager.getBoolPreference(LEARN_NEW_CARDS_RANDOMLY)) {
                 return true
             }
         }
 
         return (currentPhase == REPEATING_LTM
-                && settingsManager.getBoolPreference(context, LEARN_NEW_CARDS_RANDOMLY))
+                && settingsManager.getBoolPreference(LEARN_NEW_CARDS_RANDOMLY))
     }
 
     private fun pushCurrentCard(currentCard: FlashCard) {
