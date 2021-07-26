@@ -289,7 +289,7 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
                             if (learnedTimestamp != null) {
                                 val factor = Math.E.pow((batchCount - 4).toDouble())
                                 val expirationTime =
-                                    (LongTermBatch.EXPIRATION_UNIT * factor) as Long
+                                    (LongTermBatch.EXPIRATION_UNIT * factor).toLong()
                                 try {
                                     val expireTimeStamp = learnedTimestamp.toLong() + expirationTime
                                     if (nextExpireTimeStamp == Long.MIN_VALUE || expireTimeStamp < nextExpireTimeStamp) {
