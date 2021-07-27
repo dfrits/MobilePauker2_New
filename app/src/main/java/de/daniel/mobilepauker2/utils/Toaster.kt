@@ -42,7 +42,7 @@ class Toaster @Inject constructor(val context: Context) {
     }
 
     fun showExpireToast(activity: Activity) {
-        if (!settingsManager.getBoolPreference(context, ENABLE_EXPIRE_TOAST)) return
+        if (!settingsManager.getBoolPreference(ENABLE_EXPIRE_TOAST)) return
 
         val filePath: File = dataManager.get().getPathOfCurrentFile()
         val uri = filePath.toURI()

@@ -22,6 +22,7 @@ import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.settings.SettingsManager
+import de.daniel.mobilepauker2.shortcut.ShortcutsManager
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -54,6 +55,9 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
 
     @Inject
     lateinit var settingsManager: SettingsManager
+
+    @Inject
+    lateinit var shortcutsManager: ShortcutsManager
 
     private var accessToken: String? = null
     private var listView: ListView? = null
@@ -205,12 +209,12 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 menu.add(0, CONTEXT_OPEN, 0, R.string.open_lesson)
 
                 val pos = (menuInfo as AdapterContextMenuInfo).position
-                /*if (ShortcutReceiver.hasShortcut(context, listView.getItemAtPosition(pos) as String)
+                if (shortcutsManager.hasShortcut(listView.getItemAtPosition(pos) as String)
                 ) {
                     menu.add(0, CONTEXT_DELETE_SHORTCUT, 0, R.string.shortcut_remove)
                 } else {
                     menu.add(0, CONTEXT_CREATE_SHORTCUT, 0, R.string.shortcut_add)
-                }*/ // TODO
+                }
             }
         }
     }
@@ -308,7 +312,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                     if (dataManager.deleteLesson(file)) {
                         init()
                         resetSelection()
-                        //ShortcutReceiver.deleteShortcut(context, filename) // TODO
+                        shortcutsManager.deleteShortcut(context as Activity, filename)
                         if (!fileNames.contains(dataManager.currentFileName)) {
                             lessonManager.setupNewLesson()
                             dataManager.saveRequired = false
@@ -329,7 +333,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     private fun openLesson(position: Int) {
         val filename = listView!!.getItemAtPosition(position) as String
         try {
-            if (settingsManager.getBoolPreference(context, SettingsManager.Keys.AUTO_DOWNLOAD)) {
+            if (settingsManager.getBoolPreference(SettingsManager.Keys.AUTO_DOWNLOAD)) {
                 val accessToken = preferences.getString(Constants.DROPBOX_ACCESS_TOKEN, null)
                 /*val syncIntent = Intent(context, SyncDialog::class.java)
                 syncIntent.putExtra(SyncDialog.FILES, paukerManager.getFilePath(context, filename))
@@ -358,13 +362,19 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     }
 
     private fun createShortCut(position: Int) {
-        //ShortcutReceiver.createShortcut(this, listView!!.getItemAtPosition(position) as String) // TODO
+        shortcutsManager.createShortcut(
+            context as Activity,
+            listView!!.getItemAtPosition(position) as String
+        )
         init()
         resetSelection(null)
     }
 
     private fun deleteShortCut(position: Int) {
-        //ShortcutReceiver.deleteShortcut(this, listView!!.getItemAtPosition(position) as String) // TODO
+        shortcutsManager.deleteShortcut(
+            context as Activity,
+            listView!!.getItemAtPosition(position) as String
+        )
         init()
         resetSelection(null)
     }
