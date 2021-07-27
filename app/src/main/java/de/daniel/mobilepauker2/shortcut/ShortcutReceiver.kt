@@ -17,6 +17,7 @@ import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Constants.SHORTCUT_EXTRA
+import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
 import java.io.IOException
@@ -33,6 +34,9 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
 
     @Inject
     lateinit var dataManager: DataManager
+
+    @Inject
+    lateinit var errorReporter: ErrorReporter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,7 +122,7 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
                 getString(R.string.error_reading_from_xml),
                 Toast.LENGTH_SHORT
             )
-            //ErrorReporter.instance()!!.AddCustomData("ImportThread", "IOException?") // TODO
+            errorReporter.addCustomData("ImportThread", "IOException?")
         }
     }
 }

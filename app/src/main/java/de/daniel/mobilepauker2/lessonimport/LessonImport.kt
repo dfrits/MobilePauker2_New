@@ -24,6 +24,7 @@ import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.shortcut.ShortcutsManager
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
 import java.io.File
@@ -58,6 +59,9 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
 
     @Inject
     lateinit var shortcutsManager: ShortcutsManager
+
+    @Inject
+    lateinit var errorReporter: ErrorReporter
 
     private var accessToken: String? = null
     private var listView: ListView? = null
@@ -144,7 +148,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                             R.string.reopen_lesson_error,
                             Toast.LENGTH_LONG
                         )
-                        //errorReporter.AddCustomData("ImportThread", "IOException?") TODO
+                        errorReporter.addCustomData("ImportThread", "IOException?")
                     }
                 } else {
                     lessonManager.setupNewLesson()
@@ -172,7 +176,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                     R.string.error_reading_from_xml,
                     Toast.LENGTH_LONG
                 )
-                //errorReporter.instance().AddCustomData("ImportThread", "IOException?") TODO
+                errorReporter.addCustomData("ImportThread", "IOException?")
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
@@ -357,7 +361,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                 getString(R.string.error_reading_from_xml),
                 Toast.LENGTH_SHORT
             )
-            //ErrorReporter.instance().AddCustomData("ImportThread", "IOException?") // TODO
+            errorReporter.addCustomData("ImportThread", "IOException?")
         }
     }
 

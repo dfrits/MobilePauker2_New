@@ -33,6 +33,7 @@ import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_NORMAL
+import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
 import javax.inject.Inject
@@ -49,6 +50,9 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     @Inject
     lateinit var toaster: Toaster
+
+    @Inject
+    lateinit var errorReporter: ErrorReporter
 
     private val context = this
     private val RQ_WRITE_EXT_SAVE = 98
@@ -67,6 +71,8 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         setContentView(R.layout.main_menu)
 
         viewModel.checkLessonIsSetup()
+
+        errorReporter.init()
 
         initButtons()
         initView()
@@ -350,6 +356,27 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             val uri = Uri.fromParts("package", packageName, null)
             intent.data = uri
             startActivity(intent)
+        }
+    }
+
+    private fun checkErrors() {
+        if (errorReporter.isThereAnyErrorsToReport) {
+            val alt_bld = AlertDialog.Builder(this)
+            alt_bld.setTitle(getString(R.string.crash_report_title))
+                .setMessage(getString(R.string.crash_report_message))
+                .setCancelable(false)
+                .setPositiveButton(
+                    getString(R.string.ok)
+                ) { _, _ -> errorReporter.checkErrorAndSendMail() }
+                .setNeutralButton(
+                    getString(R.string.cancel)
+                ) { dialog, _ ->
+                    errorReporter.deleteErrorFiles()
+                    dialog.cancel()
+                }
+            val alert = alt_bld.create()
+            alert.setIcon(R.mipmap.ic_launcher)
+            alert.show()
         }
     }
 
