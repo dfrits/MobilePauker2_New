@@ -7,6 +7,7 @@ import dagger.Provides
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.settings.SettingsManager
+import de.daniel.mobilepauker2.utils.ErrorReporter
 import javax.inject.Singleton
 
 @Module
@@ -26,6 +27,11 @@ class ProviderModule(val application: Application) {
     @Provides
     fun provideSettingsManager(): SettingsManager {
         return SettingsManager(application.applicationContext)
+    }
+
+    @Provides
+    fun provideErrorReporter(): ErrorReporter {
+        return ErrorReporter(application.applicationContext)
     }
 
     @Singleton

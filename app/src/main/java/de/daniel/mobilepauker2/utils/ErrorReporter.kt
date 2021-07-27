@@ -14,28 +14,30 @@ import android.os.StatFs
 import de.daniel.mobilepauker2.R
 import java.io.*
 import java.util.*
+import javax.inject.Inject
 
-class ErrorReporter : Thread.UncaughtExceptionHandler {
+class ErrorReporter @Inject constructor(private val context: Context) :
+    Thread.UncaughtExceptionHandler {
+
     private val CustomParameters = HashMap<String, String>()
-    private var VersionName: String? = null
-    private var PackageName: String? = null
-    private var FilePath: String? = null
-    private var PhoneModel: String? = null
-    private var AndroidVersion: String? = null
-    private var Board: String? = null
-    private var Brand: String? = null
-    private var Device: String? = null
-    private var Display: String? = null
-    private var FingerPrint: String? = null
-    private var Host: String? = null
-    private var ID: String? = null
-    private var Model: String? = null
-    private var Product: String? = null
-    private var Tags: String? = null
+    private var VersionName: String = ""
+    private var PackageName: String = ""
+    private var FilePath: String = ""
+    private var PhoneModel: String = ""
+    private var AndroidVersion: String = ""
+    private var Board: String = ""
+    private var Brand: String = ""
+    private var Device: String = ""
+    private var Display: String = ""
+    private var FingerPrint: String = ""
+    private var Host: String = ""
+    private var ID: String = ""
+    private var Model: String = ""
+    private var Product: String = ""
+    private var Tags: String = ""
     private var Time: Long = 0
-    private var Type: String? = null
-    private var User: String? = null
-    private var context: Context? = null
+    private var Type: String = ""
+    private var User: String = ""
 
     private val availableInternalMemorySize: Long
         get() {
@@ -57,7 +59,7 @@ class ErrorReporter : Thread.UncaughtExceptionHandler {
 
     val isThereAnyErrorsToReport: Boolean
         get() {
-            FilePath = context!!.filesDir.absolutePath
+            FilePath = context.filesDir.absolutePath
             return bIsThereAnyErrorFile()
         }
 
@@ -102,9 +104,8 @@ class ErrorReporter : Thread.UncaughtExceptionHandler {
         saveAsFile(report.toString())
     }
 
-    fun init(context: Context?) {
+    fun init() {
         Thread.setDefaultUncaughtExceptionHandler(this)
-        this.context = context
     }
 
     fun addCustomData(Key: String, Value: String) {
@@ -113,9 +114,9 @@ class ErrorReporter : Thread.UncaughtExceptionHandler {
 
     fun deleteErrorFiles() {
         try {
-            FilePath = context!!.filesDir.absolutePath
+            FilePath = context.filesDir.absolutePath
             if (bIsThereAnyErrorFile()) {
-                val fos = context!!.openFileOutput("error.stacktrace", Context.MODE_PRIVATE)
+                val fos = context.openFileOutput("error.stacktrace", Context.MODE_PRIVATE)
                 val text = "\n"
                 fos.write(text.toByteArray())
                 fos.close()
@@ -128,14 +129,14 @@ class ErrorReporter : Thread.UncaughtExceptionHandler {
 
     fun checkErrorAndSendMail() {
         try {
-            FilePath = context!!.filesDir.absolutePath
+            FilePath = context.filesDir.absolutePath
             if (bIsThereAnyErrorFile()) {
                 val wholeErrorText = StringBuilder()
                 wholeErrorText.append("New Trace collected :\n")
                 wholeErrorText.append("=====================\n ")
                 val input = BufferedReader(
                     InputStreamReader(
-                        context!!.openFileInput("error.stacktrace")
+                        context.openFileInput("error.stacktrace")
                     )
                 )
                 var line: String?
@@ -165,11 +166,11 @@ class ErrorReporter : Thread.UncaughtExceptionHandler {
 
     private fun recoltInformations() {
         try {
-            val pm = context!!.packageManager
+            val pm = context.packageManager
             val pi: PackageInfo
             // Version
             if (pm != null) {
-                pi = pm.getPackageInfo(context!!.packageName, 0)
+                pi = pm.getPackageInfo(context.packageName, 0)
                 VersionName = pi.versionName
                 // Package name
                 PackageName = pi.packageName
