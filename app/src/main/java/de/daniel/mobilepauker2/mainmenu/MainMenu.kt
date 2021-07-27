@@ -125,7 +125,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         Log.d("MainMenuActivity::onResume", "ENTRY")
         super.onResume()
         viewModel.resetShortTerms()
-        //search.collapseActionView() // TODO
+        search.collapseActionView()
         if (!firstStart) {
             initButtons()
             initView()
