@@ -28,68 +28,44 @@ class ShortcutsManager @Inject constructor(private val context: Context) {
     @Inject
     lateinit var dataManager: DataManager
 
-    fun createShortcut(filename: String) {
-        val shortcutManager = context.getSystemService(ShortcutManager::class.java)
-
-        if (shortcutManager != null) {
-            if (shortcutManager.dynamicShortcuts.size == 5) {
-                Log.d("LessonImportActivity::createShortcut", "already 5 shortcuts created")
-                toaster.showToast(
-                    context as Activity,
-                    R.string.shortcut_create_error,
-                    Toast.LENGTH_LONG
-                )
-            } else {
-                val intent = Intent(context, ShortcutReceiver::class.java)
-                intent.action = Constants.SHORTCUT_ACTION
-                intent.putExtra(Constants.SHORTCUT_EXTRA, filename)
-                val icon = TextDrawable(filename[0].toString())
-                icon.setBold(true)
-                val shortcut = ShortcutInfo.Builder(context, filename)
-                    .setShortLabel(dataManager.getReadableFileName(filename))
-                    .setIcon(Icon.createWithBitmap(drawableToBitmap(icon)))
-                    .setIntent(intent)
-                    .build()
-                shortcutManager.addDynamicShortcuts(listOf(shortcut))
-                toaster.showToast(
-                    context as Activity,
-                    R.string.shortcut_added,
-                    Toast.LENGTH_SHORT
-                )
-                Log.d("LessonImportActivity::createShortcut", "Shortcut created")
-            }
+    fun createShortcut(activity: Activity, filename: String) {
+        if (shortcutManager.dynamicShortcuts.size == 5) {
+            Log.d("LessonImportActivity::createShortcut", "already 5 shortcuts created")
+            toaster.showToast(activity, R.string.shortcut_create_error, Toast.LENGTH_LONG)
+        } else {
+            val intent = Intent(context, ShortcutReceiver::class.java)
+            intent.action = Constants.SHORTCUT_ACTION
+            intent.putExtra(Constants.SHORTCUT_EXTRA, filename)
+            val icon = TextDrawable(filename[0].toString())
+            icon.setBold(true)
+            val shortcut = ShortcutInfo.Builder(context, filename)
+                .setShortLabel(dataManager.getReadableFileName(filename))
+                .setIcon(Icon.createWithBitmap(drawableToBitmap(icon)))
+                .setIntent(intent)
+                .build()
+            shortcutManager.addDynamicShortcuts(listOf(shortcut))
+            toaster.showToast(activity, R.string.shortcut_added, Toast.LENGTH_SHORT)
+            Log.d("LessonImportActivity::createShortcut", "Shortcut created")
         }
     }
 
-    fun deleteShortcut(ID: String) {
-        val shortcutManager = context.getSystemService(ShortcutManager::class.java)
-
-        if (shortcutManager != null) {
-            shortcutManager.removeDynamicShortcuts(listOf(ID))
-            toaster.showToast(
-                context as Activity,
-                R.string.shortcut_removed,
-                Toast.LENGTH_SHORT
-            )
-            Log.d("LessonImportActivity::deleteShortcut", "Shortcut deleted")
-        }
+    fun deleteShortcut(activity: Activity, ID: String) {
+        shortcutManager.removeDynamicShortcuts(listOf(ID))
+        toaster.showToast(activity, R.string.shortcut_removed, Toast.LENGTH_SHORT)
+        Log.d("LessonImportActivity::deleteShortcut", "Shortcut deleted")
     }
 
     fun hasShortcut(ID: String): Boolean {
-        val shortcutManager = context.getSystemService(ShortcutManager::class.java)
-
-        if (shortcutManager != null) {
-            val shortcuts = shortcutManager.dynamicShortcuts
-            for (info in shortcuts) {
-                if (info.id == ID) {
-                    return true
-                }
+        val shortcuts = shortcutManager.dynamicShortcuts
+        for (info in shortcuts) {
+            if (info.id == ID) {
+                return true
             }
         }
         return false
     }
 
-    private fun drawableToBitmap(drawable: Drawable): Bitmap? {
+    private fun drawableToBitmap(drawable: Drawable): Bitmap {
         val bitmap: Bitmap = if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) {
             Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
         } else {

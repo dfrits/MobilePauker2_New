@@ -312,7 +312,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
                     if (dataManager.deleteLesson(file)) {
                         init()
                         resetSelection()
-                        shortcutsManager.deleteShortcut(filename)
+                        shortcutsManager.deleteShortcut(context as Activity, filename)
                         if (!fileNames.contains(dataManager.currentFileName)) {
                             lessonManager.setupNewLesson()
                             dataManager.saveRequired = false
@@ -368,13 +368,19 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     }
 
     private fun createShortCut(position: Int) {
-        shortcutsManager.createShortcut(listView!!.getItemAtPosition(position) as String)
+        shortcutsManager.createShortcut(
+            context as Activity,
+            listView!!.getItemAtPosition(position) as String
+        )
         init()
         resetSelection(null)
     }
 
     private fun deleteShortCut(position: Int) {
-        shortcutsManager.deleteShortcut(listView!!.getItemAtPosition(position) as String)
+        shortcutsManager.deleteShortcut(
+            context as Activity,
+            listView!!.getItemAtPosition(position) as String
+        )
         init()
         resetSelection(null)
     }
