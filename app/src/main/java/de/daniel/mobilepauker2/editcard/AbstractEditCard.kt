@@ -77,9 +77,9 @@ abstract class AbstractEditCard : AppCompatActivity(R.layout.edit_card) {
         resetCardAndFinish()
     }
 
-    fun okClicked(view: View?) {}
+    open fun okClicked(view: View?) {}
 
-    fun resetCardSides(view: View? = null) {
+    open fun resetCardSides(view: View? = null) {
         fontChanged = false
         flashCard.setRepeatByTyping(initIsRepeatedByTyping)
         sideAEditText.setText(initSideAText)
