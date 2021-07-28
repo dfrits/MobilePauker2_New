@@ -35,6 +35,12 @@
             android:parentActivityName=".mainmenu.MainMenu"
             android:theme="@style/OpenLessonTheme"/>
 
+        <activity
+            android:name=".editcard.AddCard"
+            android:label="@string/add_new_card"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
     </application>
 
 </manifest>
