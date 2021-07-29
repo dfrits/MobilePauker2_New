@@ -26,6 +26,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.editcard.AddCard
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lessonimport.LessonImport
@@ -59,7 +60,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     private val RQ_WRITE_EXT_OPEN = 99
     private var chartView: RecyclerView? = null
     private var firstStart = true
-    private lateinit var search: MenuItem
+    private var search: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,15 +90,15 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             lessonManager.isLessonNotNew() || !lessonManager.isLessonEmpty()
         )
         if (viewModel.getBatchSize(BatchType.LESSON) > 0) {
-            search.isVisible = true
+            search?.isVisible = true
             open.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
         } else {
-            search.isVisible = false
+            search?.isVisible = false
             open.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         }
         save.isVisible = dataManager.saveRequired
-        if (search.isVisible) {
-            val searchView = search.actionView as SearchView
+        if (search?.isVisible == true) {
+            val searchView = search?.actionView as SearchView
             searchView.isIconifiedByDefault = false
             searchView.isIconified = false
             searchView.queryHint = getString(R.string.search_hint)
@@ -125,7 +126,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         Log.d("MainMenuActivity::onResume", "ENTRY")
         super.onResume()
         viewModel.resetShortTerms()
-        search.collapseActionView()
+        search?.collapseActionView()
         if (!firstStart) {
             initButtons()
             initView()
@@ -416,7 +417,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     // Button clicks
 
     fun addNewCard(view: View) {
-
+        startActivity(Intent(context, AddCard::class.java))
     }
 
     fun learnNewCard(view: View) {
