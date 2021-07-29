@@ -22,7 +22,7 @@ class MPEditText : AppCompatEditText {
     lateinit var modelManager: ModelManager
 
     init {
-        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+        (context.applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
     }
 
     fun setCard(cardSide: CardSide) {
