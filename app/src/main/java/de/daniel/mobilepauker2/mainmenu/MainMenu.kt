@@ -30,6 +30,7 @@ import de.daniel.mobilepauker2.editcard.AddCard
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lessonimport.LessonImport
+import de.daniel.mobilepauker2.settings.PaukerSettings
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
@@ -411,7 +412,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     fun mSettingsClicked(menuItem: MenuItem) {
-        startActivity(Intent(context, Settings::class.java))
+        startActivity(Intent(context, PaukerSettings::class.java))
     }
 
     // Button clicks

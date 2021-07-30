@@ -42,7 +42,7 @@
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <activity
-            android:name=".settings.Settings"
+            android:name=".settings.PaukerSettings"
             android:label="@string/settings"
             android:screenOrientation="portrait" />
 

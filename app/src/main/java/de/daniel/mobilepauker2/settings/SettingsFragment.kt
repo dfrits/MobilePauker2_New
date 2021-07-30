@@ -38,7 +38,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
