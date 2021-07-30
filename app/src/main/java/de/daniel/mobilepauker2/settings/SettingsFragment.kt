@@ -17,6 +17,7 @@ import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceScreen
 import androidx.preference.PreferenceFragmentCompat
 import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Log
@@ -31,6 +32,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (context?.applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
         addPreferencesFromResource(R.xml.preferences)
         val preferenceScreen: PreferenceScreen = preferenceScreen
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
@@ -118,11 +120,13 @@ class SettingsFragment : PreferenceFragmentCompat(),
                 initSyncPrefs()
             } else if (preferenceKey == settingsManager.getSettingsKey(RING_TONE)) {
                 val notificationManager =
-                    context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 val ringtonePath =
-                    notificationManager.getNotificationChannel(Constants.NOTIFICATION_CHANNEL_ID).sound
-                val ringtone = RingtoneManager.getRingtone(context, ringtonePath)
-                preference.summary = ringtone.getTitle(context)
+                    notificationManager.getNotificationChannel(Constants.NOTIFICATION_CHANNEL_ID)?.sound
+                ringtonePath?.let {
+                    val ringtone = RingtoneManager.getRingtone(context, it)
+                    preference.summary = ringtone.getTitle(context)
+                }
             }
         }
     }

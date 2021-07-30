@@ -11,7 +11,7 @@ class MinFilter(private val preference: EditTextPreference) : TextWatcher {
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
     override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
     override fun afterTextChanged(text: Editable) {
-        /*val dialog = preference.dialog
+        val dialog = preference
         if (dialog is AlertDialog) {
             val button = dialog.getButton(DialogInterface.BUTTON_POSITIVE)
             if (text.isEmpty()) {
@@ -24,6 +24,6 @@ class MinFilter(private val preference: EditTextPreference) : TextWatcher {
             } catch (e: Exception) {
                 button.isEnabled = false
             }
-        }*/ // TODO
+        }
     }
 }
