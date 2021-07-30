@@ -411,7 +411,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     fun mSettingsClicked(menuItem: MenuItem) {
-
+        startActivity(Intent(context, Settings::class.java))
     }
 
     // Button clicks
