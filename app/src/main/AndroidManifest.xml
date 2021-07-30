@@ -41,6 +41,11 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
+        <activity
+            android:name=".settings.Settings"
+            android:label="@string/settings"
+            android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>
