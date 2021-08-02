@@ -27,6 +27,7 @@ import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.editcard.AddCard
+import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lessonimport.LessonImport
@@ -407,7 +408,8 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     fun mEditInfoTextClicked(menuItem: MenuItem) {
-
+        startActivity(Intent(context, EditDescription::class.java))
+        overridePendingTransition(R.anim.slide_in_bottom, R.anim.stay)
     }
 
     fun mSettingsClicked(menuItem: MenuItem) {
