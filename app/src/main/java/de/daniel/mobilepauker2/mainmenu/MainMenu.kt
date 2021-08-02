@@ -291,7 +291,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     private fun hasPermission(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (Environment.isExternalStorageManager()
             ) {
                 return true
