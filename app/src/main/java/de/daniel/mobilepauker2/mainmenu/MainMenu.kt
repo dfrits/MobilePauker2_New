@@ -89,12 +89,14 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             R.id.mGroup,
             lessonManager.isLessonNotNew() || !lessonManager.isLessonEmpty()
         )
+        open.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         if (viewModel.getBatchSize(BatchType.LESSON) > 0) {
             search?.isVisible = true
-            open.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
         } else {
             search?.isVisible = false
-            open.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+            if (!dataManager.saveRequired) {
+                open.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+            }
         }
         save.isVisible = dataManager.saveRequired
         if (search?.isVisible == true) {
