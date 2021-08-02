@@ -7,15 +7,9 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.os.Bundle
-import androidx.preference.PreferenceManager
-import androidx.preference.SwitchPreference
-import androidx.preference.ListPreference
 import android.provider.Settings.*
-import androidx.preference.EditTextPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceGroup
-import androidx.preference.PreferenceScreen
-import androidx.preference.PreferenceFragmentCompat
+import androidx.fragment.app.DialogFragment
+import androidx.preference.*
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
@@ -26,6 +20,8 @@ import javax.inject.Inject
 
 class SettingsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
+    private var dialogFragment: DialogFragment? = null
+    private val DIALOG_FRAGMENT_TAG = "androidx.preference.PreferenceFragment.DIALOG"
 
     @Inject
     lateinit var settingsManager: SettingsManager
@@ -63,17 +59,45 @@ class SettingsFragment : PreferenceFragmentCompat(),
         preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
+    override fun onDisplayPreferenceDialog(preference: Preference?) {
+        if (activity is PaukerSettings) {
+            val dialog: DialogFragment = when (preference) {
+                is EditTextPreference -> {
+                    EditTextPreferenceDialogFragmentCompat.newInstance(preference.key)
+                }
+                is ListPreference -> {
+                    ListPreferenceDialogFragmentCompat.newInstance(preference.key)
+                }
+                else -> {
+                    throw IllegalArgumentException(
+                        "Tried to display dialog for unknown " +
+                                "preference type. Did you forget to override onDisplayPreferenceDialog()?"
+                    )
+                }
+            }
+
+            if (preference is EditTextPreference) {
+                preference.setOnBindEditTextListener { editText ->
+                    editText.addTextChangedListener(MinFilter(dialog))
+                }
+            }
+
+            dialog.setTargetFragment(this, 0)
+
+            dialogFragment = dialog
+
+            dialog.show(parentFragmentManager, DIALOG_FRAGMENT_TAG)
+        }else {
+            super.onDisplayPreferenceDialog(preference)
+        }
+    }
+
     private fun init(preference: Preference) {
         if (preference is PreferenceGroup) {
             for (i in 0 until preference.preferenceCount) {
                 init(preference.getPreference(i))
             }
         } else {
-            if (preference is EditTextPreference) {
-                preference.setOnBindEditTextListener { editText ->
-                    editText.addTextChangedListener(MinFilter(preference))
-                }
-            }
             updatePrefSummary(preference)
         }
         findPreference<Preference>(settingsManager.getSettingsKey(RING_TONE))?.onPreferenceClickListener =
@@ -93,12 +117,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
         val context = context
         if (summ != null) {
             if (preference is EditTextPreference) {
-                val editTextP = preference
-                if (editTextP.key == settingsManager.getSettingsKey(USTM))
+                if (preference.key == settingsManager.getSettingsKey(USTM))
                     summ = getString(R.string.ustm_summ)
-                else if (editTextP.key == settingsManager.getSettingsKey(STM))
+                else if (preference.key == settingsManager.getSettingsKey(STM))
                     summ = getString(R.string.stm_summ)
-                editTextP.summary = String.format(summ.toString(), editTextP.text)
+                preference.summary = String.format(summ.toString(), preference.text)
             } else if (preference is ListPreference) {
                 when (preference.key) {
                     settingsManager.getSettingsKey(REPEAT_CARDS) -> {
