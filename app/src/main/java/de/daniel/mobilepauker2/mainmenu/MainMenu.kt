@@ -3,6 +3,7 @@ package de.daniel.mobilepauker2.mainmenu
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -406,7 +407,24 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     fun mFlipSidesClicked(menuItem: MenuItem) {
-
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle(R.string.reverse_sides_dialog_title)
+            .setMessage(R.string.reverse_sides_dialog_info)
+            .setPositiveButton(R.string.flip_cards) { dialog, _ ->
+                lessonManager.flipAllCards()
+                dataManager.saveRequired = true
+                initButtons()
+                initChartList()
+                initView()
+                toaster.showToast(
+                    context as Activity,
+                    R.string.flip_sides_complete,
+                    Toast.LENGTH_SHORT
+                )
+                dialog.cancel()
+            }
+            .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
+        builder.create().show()
     }
 
     fun mEditInfoTextClicked(menuItem: MenuItem) {
