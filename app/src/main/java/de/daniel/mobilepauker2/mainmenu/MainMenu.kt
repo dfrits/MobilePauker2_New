@@ -403,7 +403,24 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     fun mResetLessonClicked(menuItem: MenuItem) {
-
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle(R.string.reset_lesson_dialog_title)
+            .setMessage(R.string.reset_lesson_dialog_info)
+            .setPositiveButton(R.string.reset) { dialog, _ ->
+                lessonManager.resetLongTermBatches()
+                dataManager.saveRequired = true
+                initButtons()
+                initChartList()
+                initView()
+                toaster.showToast(
+                    context as Activity,
+                    R.string.lektion_zurückgesetzt,
+                    Toast.LENGTH_SHORT
+                )
+                dialog.cancel()
+            }
+            .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
+        builder.create().show()
     }
 
     fun mFlipSidesClicked(menuItem: MenuItem) {
