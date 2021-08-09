@@ -399,7 +399,16 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     fun mNewLessonClicked(menuItem: MenuItem) {
-
+        if (dataManager.saveRequired) {
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle(R.string.lesson_not_saved_dialog_title)
+                .setMessage(R.string.save_lesson_before_question)
+                .setPositiveButton(R.string.save) { _, _ ->
+                    saveLesson(Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON)
+                }
+                .setNeutralButton(R.string.no) { _, _ -> createNewLesson() }
+            builder.create().show()
+        } else createNewLesson()
     }
 
     fun mResetLessonClicked(menuItem: MenuItem) {
