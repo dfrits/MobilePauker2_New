@@ -467,6 +467,23 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         }
     }
 
+    fun setCurrentPack(context: Context?, stackIndex: Int) {
+        val cardIterator: Iterator<Card>
+        lesson?.let { lesson ->
+            if (getBatchSize(BatchType.LESSON) > 0) {
+                currentPack.clear()
+                cardIterator = when (stackIndex) {
+                    0 -> lesson.summaryBatch.cards.iterator()
+                    1 -> lesson.unlearnedBatch.cards.iterator()
+                    else -> lesson.getLongTermBatchFromIndex(stackIndex - 2).cards.iterator()
+                }
+
+                // Fill the current pack
+                fillCurrentPack(cardIterator)
+            }
+        }
+    }
+
     private fun fillCurrentPack(cardIterator: Iterator<Card>) {
         while (cardIterator.hasNext()) {
             currentPack.add(cardIterator.next() as FlashCard)
