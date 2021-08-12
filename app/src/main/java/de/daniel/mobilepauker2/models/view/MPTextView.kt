@@ -3,25 +3,32 @@ package de.daniel.mobilepauker2.models.view
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
+import de.daniel.mobilepauker2.lesson.card.CardSide
+import de.daniel.mobilepauker2.models.Font
+import de.daniel.mobilepauker2.models.ModelManager
+import javax.inject.Inject
 
 class MPTextView : AppCompatEditText {
+
+    @Inject
+    lateinit var modelManager: ModelManager
+
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context!!, attrs, defStyleAttr
-    ) {
-    }
+    )
 
     constructor(context: Context?, attrs: AttributeSet?) : super(
         context!!, attrs
-    ) {
+    )
+
+    constructor(context: Context?) : super(context!!)
+
+    fun setCard(cardSide: CardSide) {
+        setText(cardSide.text)
+        setFont(cardSide.font)
     }
 
-    constructor(context: Context?) : super(context!!) {} /*public void setCard(CardSide cardside) {
-        setText(cardside.getText());
-
-        setFont(cardside.getFont());
+    fun setFont(font: Font?) {
+        modelManager.setFont(font, this)
     }
-
-    public void setFont(@Nullable Font font) {
-        ModelManager.instance().setFont(font, this);
-    }*/
 }
