@@ -3,6 +3,7 @@ package de.daniel.mobilepauker2.models.view
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.lesson.card.CardSide
 import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.models.ModelManager
@@ -13,15 +14,21 @@ class MPTextView : AppCompatEditText {
     @Inject
     lateinit var modelManager: ModelManager
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context!!, attrs, defStyleAttr
-    )
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context, attrs, defStyleAttr
+    ) {
+        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+    }
 
-    constructor(context: Context?, attrs: AttributeSet?) : super(
-        context!!, attrs
-    )
+    constructor(context: Context, attrs: AttributeSet?) : super(
+        context, attrs
+    ) {
+        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+    }
 
-    constructor(context: Context?) : super(context!!)
+    constructor(context: Context) : super(context) {
+        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+    }
 
     fun setCard(cardSide: CardSide) {
         setText(cardSide.text)

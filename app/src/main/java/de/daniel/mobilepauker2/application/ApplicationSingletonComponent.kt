@@ -12,6 +12,8 @@ import de.daniel.mobilepauker2.lessonimport.LessonImport
 import de.daniel.mobilepauker2.lessonimport.LessonImportAdapter
 import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.models.view.MPEditText
+import de.daniel.mobilepauker2.models.view.MPTextView
+import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.utils.Toaster
 import javax.inject.Singleton
@@ -33,4 +35,6 @@ interface ApplicationSingletonComponent {
     fun inject(abstractEditCard: AbstractEditCard)
     fun inject(addCard: AddCard)
     fun inject(editDescription: EditDescription)
+    fun inject(mpTextView: MPTextView)
+    fun inject(search: Search)
 }
