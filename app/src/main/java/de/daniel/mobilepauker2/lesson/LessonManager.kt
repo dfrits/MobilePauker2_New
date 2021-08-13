@@ -222,13 +222,14 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         lesson = Lesson()
     }
 
-    fun sortBatch(stackIndex: Int, sortByElement: Card.Element, asc_direction: Boolean) {
+    fun sortBatch(stackIndex: Int, sortByElement: Card.Element, asc_direction: Boolean): Boolean {
         val batch: Batch? = when (stackIndex) {
             0 -> lesson?.summaryBatch
             1 -> lesson?.unlearnedBatch
             else -> lesson?.getLongTermBatchFromIndex(stackIndex - 2)
         }
-        batch?.sortCards(sortByElement, asc_direction)
+
+        return batch?.sortCards(sortByElement, asc_direction) ?: false
     }
 
     fun deleteCard(position: Int): Boolean {
@@ -467,7 +468,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         }
     }
 
-    fun setCurrentPack(context: Context?, stackIndex: Int) {
+    fun setCurrentPack(stackIndex: Int): MutableList<FlashCard> {
         val cardIterator: Iterator<Card>
         lesson?.let { lesson ->
             if (getBatchSize(BatchType.LESSON) > 0) {
@@ -482,6 +483,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
                 fillCurrentPack(cardIterator)
             }
         }
+        return currentPack
     }
 
     private fun fillCurrentPack(cardIterator: Iterator<Card>) {
