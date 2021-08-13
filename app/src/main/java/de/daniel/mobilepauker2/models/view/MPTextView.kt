@@ -17,17 +17,17 @@ class MPTextView : AppCompatEditText {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
         context, attrs, defStyleAttr
     ) {
-        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+        (context.applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(
         context, attrs
     ) {
-        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+        (context.applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
     }
 
     constructor(context: Context) : super(context) {
-        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+        (context.applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
     }
 
     fun setCard(cardSide: CardSide) {

@@ -3,6 +3,7 @@ package de.daniel.mobilepauker2.mainmenu
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.SearchManager
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -32,6 +33,7 @@ import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lessonimport.LessonImport
+import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
@@ -108,7 +110,11 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             searchView.queryHint = getString(R.string.search_hint)
             searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
-
+                    val browseIntent = Intent(Intent.ACTION_SEARCH)
+                    browseIntent.setClass(context, Search::class.java)
+                    browseIntent.putExtra(SearchManager.QUERY, query)
+                    startActivity(browseIntent)
+                    searchView.setQuery("", false)
                     return true
                 }
 
@@ -250,7 +256,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 runOnUiThread {
                     val onClickListener: ChartAdapterCallback = object : ChartAdapterCallback {
                         override fun onClick(position: Int) {
-                            //showBatchDetails(position) // TODO
+                            showBatchDetails(position)
                         }
                     }
                     val adapter = ChartAdapter(application as PaukerApplication, onClickListener)
@@ -258,6 +264,20 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 }
             }
         }.run()
+    }
+
+    private fun showBatchDetails(index: Int) {
+        if (lessonManager.getBatchSize(BatchType.LESSON) == 0) return
+        val browseIntent = Intent(Intent.ACTION_SEARCH)
+        browseIntent.setClass(context, Search::class.java)
+        browseIntent.putExtra(SearchManager.QUERY, "")
+        if (index > 1 && lessonManager.getBatchStatistics()[index - 2].batchSize == 0
+            || index == 1 && lessonManager.getBatchSize(BatchType.UNLEARNED) == 0
+        ) {
+            return
+        }
+        browseIntent.putExtra(Constants.STACK_INDEX, index)
+        startActivity(browseIntent)
     }
 
     private fun openLesson() {
