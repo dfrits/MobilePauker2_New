@@ -29,20 +29,20 @@ class Toaster @Inject constructor(val context: Context) {
         (context as PaukerApplication).applicationSingletonComponent.inject(this)
     }
 
-    fun showToast(text: String, duration: Int) {
-        (context as Activity).runOnUiThread {
+    fun showToast(activity: Activity, text: String, duration: Int) {
+        activity.runOnUiThread {
             if (text.isNotEmpty()) {
                 Toast.makeText(context, text, duration).show()
             }
         }
     }
 
-    fun showToast(textResource: Int, duration: Int) {
-        showToast(context.getString(textResource), duration)
+    fun showToast(activity: Activity, textResource: Int, duration: Int) {
+        showToast(activity, context.getString(textResource), duration)
     }
 
-    fun showExpireToast(context: Context) {
-        if (!settingsManager.getBoolPreference(context, ENABLE_EXPIRE_TOAST)) return
+    fun showExpireToast(activity: Activity) {
+        if (!settingsManager.getBoolPreference(ENABLE_EXPIRE_TOAST)) return
 
         val filePath: File = dataManager.get().getPathOfCurrentFile()
         val uri = filePath.toURI()
@@ -57,7 +57,7 @@ class Toaster @Inject constructor(val context: Context) {
                 val date = DateFormat.format("dd.MM.yyyy HH:mm", cal).toString()
                 var text = context.getString(R.string.next_expire_date)
                 text = "$text $date"
-                showToast(text, Toast.LENGTH_LONG * 2)
+                showToast(activity, text, Toast.LENGTH_LONG * 2)
             }
         } catch (ignored: MalformedURLException) {
         }

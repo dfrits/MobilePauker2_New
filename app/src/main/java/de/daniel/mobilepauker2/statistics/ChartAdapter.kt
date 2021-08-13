@@ -8,18 +8,20 @@ import androidx.annotation.NonNull
 import androidx.recyclerview.widget.RecyclerView
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
+import de.daniel.mobilepauker2.lesson.LessonManager
+import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.models.ModelManager
 import java.util.*
 import javax.inject.Inject
 
-class ChartAdapter(private val context: Context, val callback: ChartAdapterCallback) :
+class ChartAdapter(private val context: PaukerApplication, val callback: ChartAdapterCallback) :
     RecyclerView.Adapter<ChartAdapter.ViewHolder>() {
     private val batchStatistics: List<BatchStatistics>
     private val lessonSize: Int
     private val chartBars: List<ChartBar>
 
     @Inject
-    lateinit var modelManager: ModelManager
+    lateinit var lessonManager: LessonManager
 
     @NonNull
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): ViewHolder {
@@ -37,8 +39,8 @@ class ChartAdapter(private val context: Context, val callback: ChartAdapterCallb
         when (position) {
             0 -> {
                 titel = context.resources.getString(R.string.sum)
-                abgelaufen = 0//modelManager.getExpiredCardsSize()
-                ungelernt = 0//modelManager.getUnlearnedBatchSize()
+                abgelaufen = lessonManager.getBatchSize(BatchType.EXPIRED)
+                ungelernt = lessonManager.getBatchSize(BatchType.UNLEARNED)
                 gelernt = lessonSize - abgelaufen - ungelernt
                 chartBar.show(
                     context,
@@ -52,7 +54,7 @@ class ChartAdapter(private val context: Context, val callback: ChartAdapterCallb
             }
             1 -> {
                 titel = context.resources.getString(R.string.untrained)
-                ungelernt = 0//modelManager.getUnlearnedBatchSize()
+                ungelernt = lessonManager.getBatchSize(BatchType.UNLEARNED)
                 chartBar.show(context, titel, ungelernt, -1, ungelernt, -1, lessonSize)
             }
             else -> {
@@ -83,9 +85,9 @@ class ChartAdapter(private val context: Context, val callback: ChartAdapterCallb
     }
 
     init {
-        (context as PaukerApplication).applicationSingletonComponent.inject(this)
-        batchStatistics = emptyList()//modelManager.getBatchStatistics()
-        lessonSize = 0//modelManager.getLessonSize()
+        context.applicationSingletonComponent.inject(this)
+        batchStatistics = lessonManager.getBatchStatistics()
+        lessonSize = lessonManager.getBatchSize(BatchType.LESSON)
         chartBars = ArrayList(itemCount)
     }
 }

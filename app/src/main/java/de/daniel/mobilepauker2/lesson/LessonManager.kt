@@ -123,7 +123,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
                             "Unable to delete card from USTM"
                         )
                     }
-                    when (settingsManager.getStringPreference(context, RETURN_FORGOTTEN_CARDS)) {
+                    when (settingsManager.getStringPreference(RETURN_FORGOTTEN_CARDS)) {
                         "1" -> lesson.unlearnedBatch.addCard(currentCard)
                         "2" -> {
                             val numberOfCards: Int = lesson.unlearnedBatch.getNumberOfCards()
@@ -141,7 +141,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
                 REPEATING_STM -> {
                     currentCard.isLearned = false
                     lesson.shortTermList.remove(currentCard)
-                    when (settingsManager.getStringPreference(context, RETURN_FORGOTTEN_CARDS)) {
+                    when (settingsManager.getStringPreference(RETURN_FORGOTTEN_CARDS)) {
                         "1" -> lesson.unlearnedBatch.addCard(currentCard)
                         "2" -> {
                             val numberOfCards: Int = lesson.unlearnedBatch.getNumberOfCards()
@@ -163,9 +163,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
                     val longTermBatch: LongTermBatch =
                         lesson.getLongTermBatchFromIndex(longTermBatchNumber) as LongTermBatch
                     longTermBatch.removeCard(currentCard)
-                    when (settingsManager.getStringPreference(
-                        context, RETURN_FORGOTTEN_CARDS
-                    )) {
+                    when (settingsManager.getStringPreference(RETURN_FORGOTTEN_CARDS)) {
                         "1" -> lesson.unlearnedBatch.addCard(currentCard)
                         "2" -> {
                             val numberOfCards: Int = lesson.unlearnedBatch.getNumberOfCards()
@@ -203,8 +201,12 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         }
     }
 
-    fun resetLesson() {
-        lesson?.reset()
+    fun resetLongTermBatches() {
+        lesson?.resetLongTermBatches()
+    }
+
+    fun resetShortTermBatches() {
+        lesson?.resetShortTermBatches()
     }
 
     fun flipAllCards() {
@@ -236,7 +238,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         return true
     }
 
-    fun deleteCard(card: Card): Boolean { // TODO LessonManager
+    fun deleteCard(card: Card): Boolean {
         if (card.isLearned) {
             val batchNumber: Int = card.longTermBatchNumber
             val longTermBatch: LongTermBatch =
@@ -317,8 +319,8 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         BatchType.SHORT_TERM -> lesson?.shortTermList?.size ?: 0
     }
 
-    fun setupLesson(lesson: Lesson) {
-        this.lesson = lesson
+    fun setupLesson(setupLesson: Lesson) {
+        lesson = setupLesson
     }
 
     private fun getBatchOfCard(card: Card): Batch? {
@@ -338,13 +340,13 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
             || currentPhase == REPEATING_USTM
             || currentPhase == FILLING_USTM
         ) {
-            if (settingsManager.getBoolPreference(context, LEARN_NEW_CARDS_RANDOMLY)) {
+            if (settingsManager.getBoolPreference(LEARN_NEW_CARDS_RANDOMLY)) {
                 return true
             }
         }
 
         return (currentPhase == REPEATING_LTM
-                && settingsManager.getBoolPreference(context, LEARN_NEW_CARDS_RANDOMLY))
+                && settingsManager.getBoolPreference(LEARN_NEW_CARDS_RANDOMLY))
     }
 
     private fun pushCurrentCard(currentCard: FlashCard) {

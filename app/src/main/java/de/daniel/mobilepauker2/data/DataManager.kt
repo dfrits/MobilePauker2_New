@@ -2,6 +2,7 @@ package de.daniel.mobilepauker2.data
 
 import android.app.Activity
 import android.content.Context
+import android.os.Environment
 import android.widget.Toast
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
@@ -25,7 +26,7 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     var currentFileName = Constants.DEFAULT_FILE_NAME
 
     @Inject
-    lateinit var lessonManager:LessonManager
+    lateinit var lessonManager: LessonManager
 
     @Inject
     lateinit var toaster: Toaster
@@ -43,16 +44,14 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         }
     }
 
-    fun getReadableFileName(): String {
-        val filename: String = currentFileName
+    fun getReadableCurrentFileName(): String = getReadableFileName(currentFileName)
 
-        return if (validateFileEnding(filename)) {
-            filename.substring(0, filename.length - 7)
-        } else if (filename.endsWith(".pau") || filename.endsWith(".xml")) {
-            filename.substring(0, filename.length - 4)
-        } else {
-            filename
-        }
+    fun getReadableFileName(fileName: String) = if (validateFileEnding(fileName)) {
+        fileName.substring(0, fileName.length - 7)
+    } else if (fileName.endsWith(".pau") || fileName.endsWith(".xml")) {
+        fileName.substring(0, fileName.length - 4)
+    } else {
+        fileName
     }
 
     fun getPathOfCurrentFile(): File = getFilePathForName(currentFileName)
@@ -60,24 +59,26 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     @Throws(IOException::class)
     fun getFilePathForName(filename: String): File {
         if (!validateFileEnding(filename)) {
-            toaster.showToast(R.string.error_filename_invalid, Toast.LENGTH_LONG)
+            toaster.showToast(context as Activity, R.string.error_filename_invalid, Toast.LENGTH_LONG)
             throw IOException("Filename invalid")
         }
-        val filePath = context.getExternalFilesDir(null)
-            .toString() + Constants.DEFAULT_APP_FILE_DIRECTORY + filename
+        val filePath = "${Environment.getExternalStorageDirectory()}" +
+                "${Constants.DEFAULT_APP_FILE_DIRECTORY}$filename"
         return File(filePath)
     }
 
     @Throws(SecurityException::class)
     fun listFiles(): Array<File> {
         val appDirectory = File(
-            context.getExternalFilesDir(null).toString() + Constants.DEFAULT_APP_FILE_DIRECTORY
+            Environment.getExternalStorageDirectory().toString() + Constants.DEFAULT_APP_FILE_DIRECTORY
         )
 
         if (!appDirectory.exists() && !appDirectory.mkdir()) return emptyArray()
 
         if (appDirectory.exists() && appDirectory.isDirectory) {
-            val listFiles = appDirectory.listFiles { file -> isNameValid(file.name) }
+            val listFiles = appDirectory.listFiles {
+                    file -> isNameValid(file.name)
+            }
             if (listFiles != null) return listFiles
         }
 

@@ -1,22 +1,30 @@
 package de.daniel.mobilepauker2.mainmenu
 
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
-import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.lesson.LessonManager
-import de.daniel.mobilepauker2.utils.Toaster
+import de.daniel.mobilepauker2.lesson.batch.BatchType
 import javax.inject.Inject
 
 class MainMenuViewModel @Inject constructor(
     val lessonManager: LessonManager,
-    val dataManager: DataManager,
-    val toaster: Toaster
+    val dataManager: DataManager
 ) : ViewModel() {
 
     fun createNewLesson() {
         lessonManager.setupNewLesson()
         dataManager.saveRequired = false
-        toaster.showToast(R.string.new_lession_created, Toast.LENGTH_SHORT)
     }
+
+    fun checkLessonIsSetup() {
+        if (!lessonManager.isLessonSetup()) lessonManager.createNewLesson()
+    }
+
+    fun getBatchSize(batchType: BatchType) = lessonManager.getBatchSize(batchType)
+
+    fun resetShortTerms() {
+        lessonManager.resetShortTermBatches()
+    }
+
+    fun getDescription(): String = lessonManager.lessonDescription
 }
