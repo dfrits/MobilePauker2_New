@@ -10,7 +10,7 @@ import de.daniel.mobilepauker2.utils.Log
 import java.util.*
 import javax.inject.Inject
 
-class SearchViewModel {
+class SearchViewModel @Inject constructor() {
     var stackIndex = 0
     var pack: List<FlashCard> = emptyList()
     var itemPosition: Vector<Int> = Vector()
