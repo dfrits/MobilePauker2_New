@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.editcard.EditCard
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.card.Card.*
 import de.daniel.mobilepauker2.lesson.card.Card.Element.*

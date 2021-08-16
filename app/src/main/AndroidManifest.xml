@@ -51,6 +51,13 @@
             android:name=".search.Search"
             android:label="@string/search" />
 
+        <activity
+            android:name=".editcard.EditCard"
+            android:label="@string/edit_card"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
     </application>
 
 </manifest>

@@ -33,7 +33,6 @@ interface ApplicationSingletonComponent {
     fun inject(lessonImportAdapter: LessonImportAdapter)
     fun inject(mpEditText: MPEditText)
     fun inject(abstractEditCard: AbstractEditCard)
-    fun inject(addCard: AddCard)
     fun inject(editDescription: EditDescription)
     fun inject(mpTextView: MPTextView)
     fun inject(search: Search)

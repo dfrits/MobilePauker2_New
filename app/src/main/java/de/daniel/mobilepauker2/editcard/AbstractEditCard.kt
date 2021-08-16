@@ -19,6 +19,8 @@ import androidx.preference.PreferenceManager
 import com.rarepebble.colorpicker.ColorPickerView
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
+import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.card.FlashCard
 import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.models.view.MPEditText
@@ -53,6 +55,12 @@ abstract class AbstractEditCard : AppCompatActivity(R.layout.edit_card) {
 
     @Inject
     lateinit var toaster: Toaster
+
+    @Inject
+    lateinit var lessonManager: LessonManager
+
+    @Inject
+    lateinit var dataManager: DataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
