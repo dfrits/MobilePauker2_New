@@ -3,13 +3,15 @@ package de.daniel.mobilepauker2.models.view
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.AppCompatTextView
+import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.lesson.card.CardSide
 import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.models.ModelManager
 import javax.inject.Inject
 
-class MPTextView : AppCompatEditText {
+class MPTextView : AppCompatTextView {
 
     @Inject
     lateinit var modelManager: ModelManager

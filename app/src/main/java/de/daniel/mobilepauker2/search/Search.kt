@@ -209,8 +209,8 @@ class Search : AppCompatActivity() {
 
     private fun editCard(position: Int) {
         listView?.isEnabled = false
-        /*val intent = Intent(context, EditCard::class.java)
+        val intent = Intent(context, EditCard::class.java)
         intent.putExtra(Constants.CURSOR_POSITION, position)
-        startActivityForResult(intent, Constants.REQUEST_CODE_EDIT_CARD)*/ // TODO
+        startActivityForResult(intent, Constants.REQUEST_CODE_EDIT_CARD)
     }
 }
