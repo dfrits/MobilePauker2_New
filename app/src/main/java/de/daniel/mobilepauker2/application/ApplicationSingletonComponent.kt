@@ -2,6 +2,7 @@ package de.daniel.mobilepauker2.application
 
 import dagger.Component
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.data.saving.SaveAsDialog
 import de.daniel.mobilepauker2.data.saving.SaveManager
 import de.daniel.mobilepauker2.editcard.AbstractEditCard
 import de.daniel.mobilepauker2.lesson.EditDescription
@@ -37,4 +38,5 @@ interface ApplicationSingletonComponent {
     fun inject(mpTextView: MPTextView)
     fun inject(search: Search)
     fun inject(saveManager: SaveManager)
+    fun inject(saveAsDialog: SaveAsDialog)
 }
