@@ -28,7 +28,8 @@ class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+        (requireContext().applicationContext as PaukerApplication).applicationSingletonComponent
+            .inject(this)
 
         initView(view)
     }
@@ -44,15 +45,26 @@ class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment(
 
     private fun initView(view: View) {
         textField = view.findViewById(R.id.eTGiveLessonName)
-        addTextwatcher(textField)
 
         bCancel = view.findViewById(R.id.bCancel)
-        bCancel.setOnClickListener { saveAsCallback.cancelClicked() }
+        bCancel.setOnClickListener {
+            saveAsCallback.cancelClicked()
+            finish()
+        }
 
         bOK = view.findViewById(R.id.bOK)
-        bOK.setOnClickListener { saveAsCallback.okClicked(textField.text.toString()) }
+        bOK.setOnClickListener {
+            saveAsCallback.okClicked(textField.text.toString())
+            finish()
+        }
 
         errorHint = view.findViewById(R.id.tFileExistingHint)
+
+        addTextwatcher(textField)
+    }
+
+    private fun finish() {
+        activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
     }
 
     private fun addTextwatcher(textField: EditText) {
@@ -74,5 +86,6 @@ class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment(
                 bOK.isEnabled = (isEmptyString && isValidName && !isExisting)
             }
         })
+        textField.setText("")
     }
 }
