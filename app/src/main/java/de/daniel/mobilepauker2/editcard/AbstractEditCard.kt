@@ -27,6 +27,8 @@ import de.daniel.mobilepauker2.models.view.MPEditText
 import de.daniel.mobilepauker2.models.view.TextDrawable
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Toaster
+import de.daniel.mobilepauker2.utils.Utility.Companion.hideKeyboard
+import de.daniel.mobilepauker2.utils.Utility.Companion.showKeyboard
 import javax.inject.Inject
 
 abstract class AbstractEditCard : AppCompatActivity(R.layout.edit_card) {
@@ -74,11 +76,7 @@ abstract class AbstractEditCard : AppCompatActivity(R.layout.edit_card) {
 
     override fun onPause() {
         super.onPause()
-        val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        val currFocus = currentFocus
-        if (currFocus != null && imm.isAcceptingText) {
-            imm.hideSoftInputFromWindow(currFocus.windowToken, 0)
-        }
+        hideKeyboard()
     }
 
     override fun onBackPressed() {
@@ -242,8 +240,7 @@ abstract class AbstractEditCard : AppCompatActivity(R.layout.edit_card) {
             ) { dialog, which -> dialog.dismiss() }
         val dialog = builder.create()
         dialog.setOnShowListener {
-            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.showSoftInput(view, 0)
+            showKeyboard()
         }
         dialog.show()
     }

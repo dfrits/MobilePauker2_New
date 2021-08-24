@@ -14,6 +14,7 @@ import androidx.fragment.app.DialogFragment
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.utils.Utility.Companion.hideKeyboard
 import javax.inject.Inject
 
 class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment() {
@@ -64,6 +65,7 @@ class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment(
     }
 
     private fun finish() {
+        hideKeyboard()
         activity?.supportFragmentManager?.beginTransaction()?.remove(this)?.commit()
     }
 
