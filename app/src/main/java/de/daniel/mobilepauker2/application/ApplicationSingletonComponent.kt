@@ -2,8 +2,8 @@ package de.daniel.mobilepauker2.application
 
 import dagger.Component
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.data.saving.SaveManager
 import de.daniel.mobilepauker2.editcard.AbstractEditCard
-import de.daniel.mobilepauker2.editcard.AddCard
 import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.card.CardPackRamAdapter
@@ -36,4 +36,5 @@ interface ApplicationSingletonComponent {
     fun inject(editDescription: EditDescription)
     fun inject(mpTextView: MPTextView)
     fun inject(search: Search)
+    fun inject(saveManager: SaveManager)
 }

@@ -233,6 +233,12 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         }
     }
 
+    fun isNameValid(filename: String): Boolean {
+        return if (isNameEmpty(filename)) {
+            false
+        } else validateFileEnding(filename)
+    }
+
     @Deprecated("Wird durch neuen Sync ersetzt")
     private fun addLesson(fileName: String) {
         try {
@@ -269,12 +275,6 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         if (name.endsWith(".pau.gz") || name.endsWith(".xml.gz")) return name
 
         return "$name.pau.gz"
-    }
-
-    private fun isNameValid(filename: String): Boolean {
-        return if (isNameEmpty(filename)) {
-            false
-        } else validateFileEnding(filename)
     }
 
     private fun isNameEmpty(fileName: String): Boolean {
