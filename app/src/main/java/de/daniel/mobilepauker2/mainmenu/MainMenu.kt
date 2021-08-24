@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.SearchManager
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -28,6 +27,9 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.data.saving.SaveAsCallback
+import de.daniel.mobilepauker2.data.saving.SaveAsDialog
+import de.daniel.mobilepauker2.data.saving.SaveManager
 import de.daniel.mobilepauker2.editcard.AddCard
 import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
@@ -58,6 +60,9 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     @Inject
     lateinit var errorReporter: ErrorReporter
+
+    @Inject
+    lateinit var saveManager: SaveManager
 
     private val context = this
     private val RQ_WRITE_EXT_SAVE = 98
@@ -405,9 +410,31 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         }
     }
 
+    private fun saveLesson(fileName: String) {
+        if (saveManager.saveLesson(fileName)) {
+            // TODO
+        } else {
+            // TODO
+        }
+    }
+
     // Menu clicks
     fun mSaveFileClicked(menuItem: MenuItem) {
+        val fileName = dataManager.getReadableCurrentFileName()
+        if (fileName == Constants.DEFAULT_FILE_NAME) {
+            val saveAsDialog = SaveAsDialog(object : SaveAsCallback {
+                override fun okClicked(fileName: String) {
+                    saveLesson(fileName)
+                }
 
+                override fun cancelClicked() {
+                    TODO("Not yet implemented")
+                }
+            })
+            saveAsDialog.show(supportFragmentManager, "SaveAs")
+        } else {
+            saveLesson(fileName)
+        }
     }
 
     fun mOpenSearchClicked(menuItem: MenuItem) {
