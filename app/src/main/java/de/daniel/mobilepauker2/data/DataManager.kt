@@ -105,6 +105,14 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         lessonManager.setupLesson(lesson)
     }
 
+    fun writeLessonToFile(fileName: String): Boolean {
+        if (fileName == Constants.DEFAULT_FILE_NAME) {
+            return false
+        }
+
+        return false
+    }
+
     @Deprecated("Wird durch neuen Sync ersetzt. Lektion wird lediglich gelöscht.")
     fun deleteLesson(file: File): Boolean {
         val filename = file.name

@@ -1,4 +1,4 @@
-package de.daniel.mobilepauker2.data.saving
+package de.daniel.mobilepauker2.data
 
 import android.app.AlertDialog
 import android.os.Bundle
@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
-import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.utils.Utility.Companion.hideKeyboard
 import java.io.File
 import javax.inject.Inject
