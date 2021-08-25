@@ -24,10 +24,7 @@ class SaveManager @Inject constructor(var context: Context) {
     }
 
     private fun safeFile(fileName: String, checkOverWrite: Boolean): Boolean {
-        return false
-    }
 
-    private fun overwriteOK(fileName: String): Boolean {
-        return false
+        return false // dataManager.writeLessonToFile(File(fileName))
     }
 }

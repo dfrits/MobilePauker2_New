@@ -1,5 +1,6 @@
 package de.daniel.mobilepauker2.data.saving
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,6 +16,7 @@ import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.utils.Utility.Companion.hideKeyboard
+import java.io.File
 import javax.inject.Inject
 
 class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment() {
@@ -55,13 +57,33 @@ class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment(
 
         bOK = view.findViewById(R.id.bOK)
         bOK.setOnClickListener {
-            saveAsCallback.okClicked(textField.text.toString())
-            finish()
+            overwriteOK(textField.text.toString())
         }
 
         errorHint = view.findViewById(R.id.tFileExistingHint)
 
         addTextwatcher(textField)
+    }
+
+    private fun overwriteOK(fileName: String) {
+        val testFile = File(fileName)
+
+        if (testFile.exists()) { // TODO
+            AlertDialog.Builder(context)
+                .setTitle("Warning!")
+                .setMessage("Overwrite File?")
+                .setPositiveButton(R.string.yes) { _, _ -> fileNameChosen(fileName) }
+                .setNeutralButton(R.string.no) { dialog, _ -> dialog.dismiss() }
+                .create()
+                .show()
+        } else {
+            fileNameChosen(fileName)
+        }
+    }
+
+    private fun fileNameChosen(fileName: String) {
+        saveAsCallback.okClicked(fileName)
+        finish()
     }
 
     private fun finish() {
@@ -76,7 +98,7 @@ class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment(
 
             override fun afterTextChanged(s: Editable) {
                 var newName = s.toString()
-                val isEmptyString = newName.isNotEmpty()
+                val isEmptyString = newName.isEmpty()
 
                 if (!newName.endsWith(".pau.gz")) newName = "$newName.pau.gz"
 
@@ -85,7 +107,7 @@ class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment(
 
                 errorHint.visibility = if (isExisting) View.VISIBLE else View.GONE
 
-                bOK.isEnabled = (isEmptyString && isValidName && !isExisting)
+                bOK.isEnabled = (!isEmptyString && isValidName)
             }
         })
         textField.setText("")
