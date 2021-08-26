@@ -7,9 +7,11 @@ import android.widget.Toast
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.xml.FlashCardXMLPullFeedParser
+import de.daniel.mobilepauker2.data.xml.FlashCardXMLStreamWriter
 import de.daniel.mobilepauker2.lesson.Lesson
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
 import java.io.BufferedReader
 import java.io.File
@@ -24,6 +26,7 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     private var fileAbsolutePath: String = ""
     var saveRequired: Boolean = false
     var currentFileName = Constants.DEFAULT_FILE_NAME
+        private set
 
     @Inject
     lateinit var lessonManager: LessonManager
@@ -59,7 +62,11 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     @Throws(IOException::class)
     fun getFilePathForName(filename: String): File {
         if (!validateFileEnding(filename)) {
-            toaster.showToast(context as Activity, R.string.error_filename_invalid, Toast.LENGTH_LONG)
+            toaster.showToast(
+                context as Activity,
+                R.string.error_filename_invalid,
+                Toast.LENGTH_LONG
+            )
             throw IOException("Filename invalid")
         }
         val filePath = "${Environment.getExternalStorageDirectory()}" +
@@ -70,14 +77,15 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     @Throws(SecurityException::class)
     fun listFiles(): Array<File> {
         val appDirectory = File(
-            Environment.getExternalStorageDirectory().toString() + Constants.DEFAULT_APP_FILE_DIRECTORY
+            Environment.getExternalStorageDirectory()
+                .toString() + Constants.DEFAULT_APP_FILE_DIRECTORY
         )
 
         if (!appDirectory.exists() && !appDirectory.mkdir()) return emptyArray()
 
         if (appDirectory.exists() && appDirectory.isDirectory) {
-            val listFiles = appDirectory.listFiles {
-                    file -> isNameValid(file.name)
+            val listFiles = appDirectory.listFiles { file ->
+                isNameValid(file.name)
             }
             if (listFiles != null) return listFiles
         }
@@ -105,12 +113,24 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         lessonManager.setupLesson(lesson)
     }
 
-    fun writeLessonToFile(fileName: String): Boolean {
+    fun writeLessonToFile(fileName: String, isNewFile: Boolean): SaveResult {
         if (fileName == Constants.DEFAULT_FILE_NAME) {
-            return false
+            return SaveResult(false, "File name not set!") // TODO Strings auslagern
         }
 
-        return false
+        val result = FlashCardXMLStreamWriter(
+            getFilePathForName(fileName),
+            isNewFile,
+            lessonManager.lesson
+        ).writeLesson()
+
+        if (result.successful) {
+            saveRequired = false
+        } else {
+            Log.e("Save Lesson", result.errorMessage)
+        }
+
+        return result
     }
 
     @Deprecated("Wird durch neuen Sync ersetzt. Lektion wird lediglich gelöscht.")

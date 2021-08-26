@@ -25,7 +25,8 @@ import javax.inject.Singleton
 
 @Singleton
 class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Context) {
-    private var lesson: Lesson? = null
+    var lesson: Lesson? = null
+        private set
     var currentPack = mutableListOf<FlashCard>()
     var lessonDescription = lesson?.description ?: ""
 
@@ -332,7 +333,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
     }
 
     private fun shuffleCurrentPack() {
-        Collections.shuffle(currentPack)
+        currentPack.shuffle()
     }
 
     private fun doPackNeedShuffle(): Boolean {
