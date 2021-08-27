@@ -38,7 +38,9 @@ import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON
 import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_NORMAL
+import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_OPEN
 import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -61,6 +63,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     lateinit var errorReporter: ErrorReporter
 
     private val context = this
+    private val RQ_WRITE_EXT_SAVE_NEW = 97
     private val RQ_WRITE_EXT_SAVE = 98
     private val RQ_WRITE_EXT_OPEN = 99
     private var chartView: RecyclerView? = null
@@ -173,6 +176,9 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         }
         if (requestCode == RQ_WRITE_EXT_SAVE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             checkLessonNameThenSave(REQUEST_CODE_SAVE_DIALOG_NORMAL)
+        }
+        if (requestCode == RQ_WRITE_EXT_SAVE_NEW && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            checkLessonNameThenSave(REQUEST_CODE_SAVE_DIALOG_NEW_LESSON)
         }
     }
 
@@ -405,7 +411,11 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     private fun checkSavePermissionThenSave(requestCode: Int) {
         if (!hasPermission()) {
-            showPermissionDialog(RQ_WRITE_EXT_SAVE) // TODO Unterscheiden nach "normal" und "neue Lektion"
+            when (requestCode) {
+                REQUEST_CODE_SAVE_DIALOG_NORMAL -> showPermissionDialog(RQ_WRITE_EXT_SAVE)
+                REQUEST_CODE_SAVE_DIALOG_NEW_LESSON -> showPermissionDialog(RQ_WRITE_EXT_SAVE_NEW)
+                REQUEST_CODE_SAVE_DIALOG_OPEN -> showPermissionDialog(RQ_WRITE_EXT_OPEN)
+            }
         } else {
             checkLessonNameThenSave(requestCode)
         }
