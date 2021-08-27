@@ -97,6 +97,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         open.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
         if (viewModel.getBatchSize(BatchType.LESSON) > 0) {
             search?.isVisible = true
+            open.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
         } else {
             search?.isVisible = false
             if (!dataManager.saveRequired) {
@@ -355,7 +356,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     private fun requestPermission(requestCode: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val intent = Intent()
             intent.action = ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
             startActivity(intent)
@@ -368,7 +369,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     private fun showPermissionSettings() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val intent = Intent()
             intent.action = ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
             startActivity(intent)
