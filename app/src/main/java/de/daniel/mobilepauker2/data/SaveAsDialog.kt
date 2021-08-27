@@ -65,7 +65,7 @@ class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment(
     }
 
     private fun overwriteOK(fileName: String) {
-        val testFile = File(fileName)
+        val testFile = dataManager.getFilePathForName(dataManager.setCorrectFileEnding(fileName))
 
         if (testFile.exists()) { // TODO
             AlertDialog.Builder(context)
@@ -99,7 +99,7 @@ class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment(
                 var newName = s.toString()
                 val isEmptyString = newName.isEmpty()
 
-                if (!newName.endsWith(".pau.gz")) newName = "$newName.pau.gz"
+                newName = dataManager.setCorrectFileEnding(newName)
 
                 val isValidName: Boolean = dataManager.isNameValid(newName)
                 val isExisting: Boolean = dataManager.isFileExisting(newName)

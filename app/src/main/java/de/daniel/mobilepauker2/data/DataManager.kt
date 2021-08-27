@@ -266,6 +266,14 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         } else validateFileEnding(filename)
     }
 
+    fun setCorrectFileEnding(name: String): String {
+        if (name.endsWith(".pau")) return "$name.gz"
+
+        if (name.endsWith(".pau.gz") || name.endsWith(".xml.gz")) return name
+
+        return "$name.pau.gz"
+    }
+
     @Deprecated("Wird durch neuen Sync ersetzt")
     private fun addLesson(fileName: String) {
         try {
@@ -294,14 +302,6 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
             }
         } catch (ignored: IOException) {
         }
-    }
-
-    private fun setCorrectFileEnding(name: String): String {
-        if (name.endsWith(".pau")) return "$name.gz"
-
-        if (name.endsWith(".pau.gz") || name.endsWith(".xml.gz")) return name
-
-        return "$name.pau.gz"
     }
 
     private fun isNameEmpty(fileName: String): Boolean {
