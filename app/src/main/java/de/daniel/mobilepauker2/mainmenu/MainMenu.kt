@@ -27,9 +27,8 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
-import de.daniel.mobilepauker2.data.saving.SaveAsCallback
-import de.daniel.mobilepauker2.data.saving.SaveAsDialog
-import de.daniel.mobilepauker2.data.saving.SaveManager
+import de.daniel.mobilepauker2.data.SaveAsCallback
+import de.daniel.mobilepauker2.data.SaveAsDialog
 import de.daniel.mobilepauker2.editcard.AddCard
 import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
@@ -60,9 +59,6 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     @Inject
     lateinit var errorReporter: ErrorReporter
-
-    @Inject
-    lateinit var saveManager: SaveManager
 
     private val context = this
     private val RQ_WRITE_EXT_SAVE = 98
@@ -175,24 +171,26 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             openLesson()
         }
         if (requestCode == RQ_WRITE_EXT_SAVE && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            saveLesson(REQUEST_CODE_SAVE_DIALOG_NORMAL)
+            checkLessonNameThenSave(REQUEST_CODE_SAVE_DIALOG_NORMAL)
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_SAVE_DIALOG_NORMAL) {
-            if (resultCode == RESULT_OK) {
+    private fun saveFinished(requestCode: Int) {
+        when (requestCode) {
+            REQUEST_CODE_SAVE_DIALOG_NORMAL -> {
                 toaster.showToast(context as Activity, R.string.saving_success, Toast.LENGTH_SHORT)
                 dataManager.saveRequired = false
 
                 toaster.showExpireToast(context as Activity)
+                onResume()
+                invalidateOptionsMenu()
             }
-            invalidateOptionsMenu()
-        } else if (requestCode == Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON && resultCode == RESULT_OK) {
-            createNewLesson()
-        } else if (requestCode == Constants.REQUEST_CODE_SAVE_DIALOG_OPEN && resultCode == RESULT_OK) {
-            startActivity(Intent(context, LessonImport::class.java))
+            Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON -> {
+                createNewLesson()
+            }
+            Constants.REQUEST_CODE_SAVE_DIALOG_OPEN -> {
+                startActivity(Intent(context, LessonImport::class.java))
+            }
         }
     }
 
@@ -294,7 +292,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 builder.setTitle(R.string.lesson_not_saved_dialog_title)
                     .setMessage(R.string.save_lesson_before_question)
                     .setPositiveButton(R.string.save) { _, _ ->
-                        saveLesson(Constants.REQUEST_CODE_SAVE_DIALOG_OPEN)
+                        checkSavePermissionThenSave(Constants.REQUEST_CODE_SAVE_DIALOG_OPEN)
                     }
                     .setNeutralButton(R.string.open_lesson) { dialog, _ ->
                         startActivity(Intent(context, LessonImport::class.java))
@@ -303,12 +301,6 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 builder.create().show()
             } else startActivity(Intent(context, LessonImport::class.java))
         }
-    }
-
-    private fun saveLesson(requestCode: Int) {
-        if (!hasPermission()) {
-            showPermissionDialog(RQ_WRITE_EXT_SAVE)
-        } //else startActivityForResult(Intent(context, SaveDialog::class.java), requestCode) TODO
     }
 
     private fun createNewLesson() {
@@ -410,31 +402,50 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         }
     }
 
-    private fun saveLesson(fileName: String) {
-        if (saveManager.saveLesson(fileName)) {
-            // TODO
+    private fun checkSavePermissionThenSave(requestCode: Int) {
+        if (!hasPermission()) {
+            showPermissionDialog(RQ_WRITE_EXT_SAVE) // TODO Unterscheiden nach "normal" und "neue Lektion"
         } else {
-            // TODO
+            checkLessonNameThenSave(requestCode)
+        }
+    }
+
+    private fun checkLessonNameThenSave(requestCode: Int) {
+        val fileName = dataManager.getReadableCurrentFileName()
+        if (fileName == Constants.DEFAULT_FILE_NAME) {
+            val saveAsDialog = SaveAsDialog(object : SaveAsCallback {
+                override fun okClicked(fileName: String) {
+                    dataManager.setNewFileName(fileName)
+                    invalidateOptionsMenu()
+                    saveLesson(true, requestCode)
+                }
+
+                override fun cancelClicked() {
+                    // TODO
+                }
+            })
+            saveAsDialog.show(supportFragmentManager, "SaveAs")
+        } else {
+            saveLesson(false, requestCode)
+        }
+    }
+
+    private fun saveLesson(isNewFile: Boolean, requestCode: Int) {
+        val result = dataManager.writeLessonToFile(isNewFile)
+        if (result.successful) {
+            saveFinished(requestCode)
+        } else {
+            toaster.showToast(
+                context,
+                result.errorMessage ?: getString(R.string.saving_error),
+                Toast.LENGTH_LONG
+            )
         }
     }
 
     // Menu clicks
     fun mSaveFileClicked(menuItem: MenuItem) {
-        val fileName = dataManager.getReadableCurrentFileName()
-        if (fileName == Constants.DEFAULT_FILE_NAME) {
-            val saveAsDialog = SaveAsDialog(object : SaveAsCallback {
-                override fun okClicked(fileName: String) {
-                    saveLesson(fileName)
-                }
-
-                override fun cancelClicked() {
-                    TODO("Not yet implemented")
-                }
-            })
-            saveAsDialog.show(supportFragmentManager, "SaveAs")
-        } else {
-            saveLesson(fileName)
-        }
+        checkSavePermissionThenSave(REQUEST_CODE_SAVE_DIALOG_NORMAL)
     }
 
     fun mOpenSearchClicked(menuItem: MenuItem) {
@@ -451,7 +462,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             builder.setTitle(R.string.lesson_not_saved_dialog_title)
                 .setMessage(R.string.save_lesson_before_question)
                 .setPositiveButton(R.string.save) { _, _ ->
-                    saveLesson(Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON)
+                    checkSavePermissionThenSave(Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON)
                 }
                 .setNeutralButton(R.string.no) { _, _ -> createNewLesson() }
             builder.create().show()

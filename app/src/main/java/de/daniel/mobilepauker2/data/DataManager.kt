@@ -62,11 +62,6 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     @Throws(IOException::class)
     fun getFilePathForName(filename: String): File {
         if (!validateFileEnding(filename)) {
-            toaster.showToast(
-                context as Activity,
-                R.string.error_filename_invalid,
-                Toast.LENGTH_LONG
-            )
             throw IOException("Filename invalid")
         }
         val filePath = "${Environment.getExternalStorageDirectory()}" +
@@ -113,16 +108,20 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         lessonManager.setupLesson(lesson)
     }
 
-    fun writeLessonToFile(fileName: String, isNewFile: Boolean): SaveResult {
-        if (fileName == Constants.DEFAULT_FILE_NAME) {
-            return SaveResult(false, "File name not set!") // TODO Strings auslagern
+    fun writeLessonToFile(isNewFile: Boolean): SaveResult {
+        if (currentFileName == Constants.DEFAULT_FILE_NAME) {
+            return SaveResult(false, context.getString(R.string.error_filename_invalid))
         }
 
-        val result = FlashCardXMLStreamWriter(
-            getFilePathForName(fileName),
-            isNewFile,
-            lessonManager.lesson
-        ).writeLesson()
+        val result = try {
+            FlashCardXMLStreamWriter(
+                getFilePathForName(currentFileName),
+                isNewFile,
+                lessonManager.lesson
+            ).writeLesson()
+        } catch (e: IOException) {
+            SaveResult(false, context.getString(R.string.error_filename_invalid))
+        }
 
         if (result.successful) {
             saveRequired = false

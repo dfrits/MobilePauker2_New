@@ -41,7 +41,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
     }
 
     fun setupNewLesson() {
-        dataManager.get().currentFileName = Constants.DEFAULT_FILE_NAME
+        dataManager.get().setNewFileName(Constants.DEFAULT_FILE_NAME)
         lesson = Lesson()
     }
 
