@@ -1,6 +1,7 @@
 package de.daniel.mobilepauker2.data.xml
 
 import android.util.Xml
+import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.data.SaveResult
 import de.daniel.mobilepauker2.lesson.Lesson
 import de.daniel.mobilepauker2.lesson.batch.Batch
@@ -45,18 +46,18 @@ class FlashCardXMLStreamWriter(
     }
 
     @Throws(OutOfMemoryError::class)
-    private fun moveFile(tmpFile: File?): SaveResult { // TODO Strings auslagern
+    private fun moveFile(tmpFile: File?): SaveResult {
         val tmpOldFile = getTempFile("old")
         if (lessonFile.renameTo(tmpOldFile)) {
             if (tmpFile!!.renameTo(lessonFile)) {
                 if (!tmpOldFile.delete()) {
-                    return SaveResult(false, "Error removing File!")
+                    return SaveResult(false, null, R.string.error_removing_file)
                 }
             } else {
-                return SaveResult(false, "Error moving File")
+                return SaveResult(false, null, R.string.error_moving_file)
             }
         } else {
-            return SaveResult(false, "Error moving File")
+            return SaveResult(false, null, R.string.error_moving_file)
         }
         return SaveResult(true)
     }
@@ -310,9 +311,6 @@ class FlashCardXMLStreamWriter(
         } catch (e: Exception) {
             Log.e("FlashCardXMLStreamWriter::serialiseCard", "exception while serialising card!")
             return false
-            //throw new RuntimeException(e);
-            // TODO carry on at all costs in case we lose the pack
-            // TODO each serialiser call should have its own try catch
         } finally {
             try {
                 serializer.endTag("", "Card")

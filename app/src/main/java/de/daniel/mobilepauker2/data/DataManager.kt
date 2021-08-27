@@ -1,9 +1,7 @@
 package de.daniel.mobilepauker2.data
 
-import android.app.Activity
 import android.content.Context
 import android.os.Environment
-import android.widget.Toast
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.xml.FlashCardXMLPullFeedParser

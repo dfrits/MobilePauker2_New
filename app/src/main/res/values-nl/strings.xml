@@ -240,5 +240,9 @@
     <string name="auto_sync_enabled_download_summ">Synchronize every time before you open a lesson</string>
     <string name="synchro_canceled_by_user">Update canceled!</string>
     <string name="notifications">Benachrichtigungen</string>
+    <string name="error_removing_file">Error removing File!</string>
+    <string name="error_moving_file">Error moving File</string>
+    <string name="warning">Warning!</string>
+    <string name="overwrite_file_question">Overwrite File?</string>
     <!-- endregion -->
 </resources>

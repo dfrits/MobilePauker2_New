@@ -67,10 +67,10 @@ class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment(
     private fun overwriteOK(fileName: String) {
         val testFile = dataManager.getFilePathForName(dataManager.setCorrectFileEnding(fileName))
 
-        if (testFile.exists()) { // TODO
+        if (testFile.exists()) {
             AlertDialog.Builder(context)
-                .setTitle("Warning!")
-                .setMessage("Overwrite File?")
+                .setTitle(getString(R.string.warning))
+                .setMessage(getString(R.string.overwrite_file_question))
                 .setPositiveButton(R.string.yes) { _, _ -> fileNameChosen(fileName) }
                 .setNeutralButton(R.string.no) { dialog, _ -> dialog.dismiss() }
                 .create()
