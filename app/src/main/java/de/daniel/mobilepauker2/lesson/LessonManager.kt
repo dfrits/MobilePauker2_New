@@ -45,7 +45,8 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         lesson = Lesson()
     }
 
-    fun isLessonNotNew() = dataManager.get().currentFileName != Constants.DEFAULT_FILE_NAME
+    fun isLessonNotNew() =
+        dataManager.get().getReadableCurrentFileName() != Constants.DEFAULT_FILE_NAME
 
     fun addCard(flashCard: FlashCard, sideA: String, sideB: String) {
         flashCard.sideAText = sideA
