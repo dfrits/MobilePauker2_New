@@ -448,7 +448,8 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         } else {
             toaster.showToast(
                 context,
-                result.errorMessage ?: getString(R.string.saving_error),
+                result.errorMessage ?: result.errorMessageRes?.let { getString(it) }
+                ?: getString(R.string.saving_error),
                 Toast.LENGTH_LONG
             )
         }
