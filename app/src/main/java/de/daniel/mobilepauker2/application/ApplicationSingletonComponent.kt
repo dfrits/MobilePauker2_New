@@ -3,6 +3,7 @@ package de.daniel.mobilepauker2.application
 import dagger.Component
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.data.SaveAsDialog
+import de.daniel.mobilepauker2.dropbox.DropboxAccDialog
 import de.daniel.mobilepauker2.editcard.AbstractEditCard
 import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
@@ -37,4 +38,5 @@ interface ApplicationSingletonComponent {
     fun inject(mpTextView: MPTextView)
     fun inject(search: Search)
     fun inject(saveAsDialog: SaveAsDialog)
+    fun inject(dropboxAccDialog: DropboxAccDialog)
 }

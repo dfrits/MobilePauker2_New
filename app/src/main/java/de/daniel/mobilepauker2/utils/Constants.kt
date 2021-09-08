@@ -17,6 +17,8 @@ object Constants {
     const val DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN"
     const val DROPBOX_USER_ID = "DROPBOX_USER_ID"
     const val DROPBOX_PATH = ""
+    const val DROPBOX_AUTH_ACTION = "de.daniel.mobilepauker2.dropbox.auth"
+    const val DROPBOX_UNLINK_ACTION = "de.daniel.mobilepauker2.dropbox.unlink"
 
     @Deprecated("Wird durch neuen Sync ersetzt")
     // Datei, in der die Namen der lokal gelöschten Lektionen stehen

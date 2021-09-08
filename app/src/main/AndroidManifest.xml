@@ -3,9 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="de.daniel.mobilepauker2">
 
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".application.PaukerApplication"
@@ -17,7 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="LockedOrientationActivity" >
+        tools:ignore="LockedOrientationActivity">
 
         <activity
             android:name=".mainmenu.MainMenu"
@@ -33,9 +36,9 @@
         <activity
             android:name=".lessonimport.LessonImport"
             android:label="@string/lessons"
-            android:screenOrientation="portrait"
             android:parentActivityName=".mainmenu.MainMenu"
-            android:theme="@style/OpenLessonTheme"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/OpenLessonTheme" />
 
         <activity
             android:name=".editcard.AddCard"
@@ -57,6 +60,27 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
+
+        <activity
+            android:name="com.dropbox.core.android.AuthActivity"
+            android:configChanges="orientation|keyboard"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <!-- Change this to be db- followed by your app key -->
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="db-9rqxyyq8cty3cf1" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".dropbox.DropboxAccDialog"
+            android:theme="@android:style/Theme.DeviceDefault.Dialog.NoActionBar" />
 
     </application>
 

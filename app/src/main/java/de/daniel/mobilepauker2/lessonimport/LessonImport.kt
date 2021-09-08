@@ -20,6 +20,7 @@ import com.dropbox.core.android.Auth
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.dropbox.DropboxAccDialog
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.shortcut.ShortcutsManager
@@ -419,9 +420,9 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     fun syncManuallyClicked(item: MenuItem?) {
         accessToken = preferences.getString(Constants.DROPBOX_ACCESS_TOKEN, null)
         if (accessToken == null) {
-            //val assIntent = Intent(context, DropboxAccDialog::class.java) // TODO
-            //assIntent.putExtra(DropboxAccDialog.AUTH_MODE, true)
-            //startActivityForResult(assIntent, Constants.REQUEST_CODE_DB_ACC_DIALOG)
+            val assIntent = Intent(context, DropboxAccDialog::class.java)
+            assIntent.putExtra(Constants.DROPBOX_AUTH_ACTION, true)
+            startActivityForResult(assIntent, Constants.REQUEST_CODE_DB_ACC_DIALOG)
         } else {
             startSync()
         }
