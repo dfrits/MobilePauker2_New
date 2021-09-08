@@ -19,15 +19,8 @@ import javax.inject.Inject
 class AddCard : AbstractEditCard() {
     private lateinit var checkBox: MenuItem
 
-    @Inject
-    lateinit var lessonManager: LessonManager
-
-    @Inject
-    lateinit var dataManager: DataManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
         flashCard = FlashCard()
     }
 

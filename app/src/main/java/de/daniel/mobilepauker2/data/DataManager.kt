@@ -1,15 +1,15 @@
 package de.daniel.mobilepauker2.data
 
-import android.app.Activity
 import android.content.Context
 import android.os.Environment
-import android.widget.Toast
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.xml.FlashCardXMLPullFeedParser
+import de.daniel.mobilepauker2.data.xml.FlashCardXMLStreamWriter
 import de.daniel.mobilepauker2.lesson.Lesson
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
 import java.io.BufferedReader
 import java.io.File
@@ -24,6 +24,7 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     private var fileAbsolutePath: String = ""
     var saveRequired: Boolean = false
     var currentFileName = Constants.DEFAULT_FILE_NAME
+        private set
 
     @Inject
     lateinit var lessonManager: LessonManager
@@ -59,7 +60,6 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     @Throws(IOException::class)
     fun getFilePathForName(filename: String): File {
         if (!validateFileEnding(filename)) {
-            toaster.showToast(context as Activity, R.string.error_filename_invalid, Toast.LENGTH_LONG)
             throw IOException("Filename invalid")
         }
         val filePath = "${Environment.getExternalStorageDirectory()}" +
@@ -70,14 +70,15 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     @Throws(SecurityException::class)
     fun listFiles(): Array<File> {
         val appDirectory = File(
-            Environment.getExternalStorageDirectory().toString() + Constants.DEFAULT_APP_FILE_DIRECTORY
+            Environment.getExternalStorageDirectory()
+                .toString() + Constants.DEFAULT_APP_FILE_DIRECTORY
         )
 
         if (!appDirectory.exists() && !appDirectory.mkdir()) return emptyArray()
 
         if (appDirectory.exists() && appDirectory.isDirectory) {
-            val listFiles = appDirectory.listFiles {
-                    file -> isNameValid(file.name)
+            val listFiles = appDirectory.listFiles { file ->
+                isNameValid(file.name)
             }
             if (listFiles != null) return listFiles
         }
@@ -103,6 +104,30 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         currentFileName = file.name
         fileAbsolutePath = file.absolutePath
         lessonManager.setupLesson(lesson)
+    }
+
+    fun writeLessonToFile(isNewFile: Boolean): SaveResult {
+        if (currentFileName == Constants.DEFAULT_FILE_NAME) {
+            return SaveResult(false, context.getString(R.string.error_filename_invalid))
+        }
+
+        val result = try {
+            FlashCardXMLStreamWriter(
+                getFilePathForName(currentFileName),
+                isNewFile,
+                lessonManager.lesson
+            ).writeLesson()
+        } catch (e: IOException) {
+            SaveResult(false, context.getString(R.string.error_filename_invalid))
+        }
+
+        if (result.successful) {
+            saveRequired = false
+        } else {
+            Log.e("Save Lesson", result.errorMessage)
+        }
+
+        return result
     }
 
     @Deprecated("Wird durch neuen Sync ersetzt. Lektion wird lediglich gelöscht.")
@@ -233,6 +258,20 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         }
     }
 
+    fun isNameValid(filename: String): Boolean {
+        return if (isNameEmpty(filename)) {
+            false
+        } else validateFileEnding(filename)
+    }
+
+    fun setCorrectFileEnding(name: String): String {
+        if (name.endsWith(".pau")) return "$name.gz"
+
+        if (name.endsWith(".pau.gz") || name.endsWith(".xml.gz")) return name
+
+        return "$name.pau.gz"
+    }
+
     @Deprecated("Wird durch neuen Sync ersetzt")
     private fun addLesson(fileName: String) {
         try {
@@ -261,20 +300,6 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
             }
         } catch (ignored: IOException) {
         }
-    }
-
-    private fun setCorrectFileEnding(name: String): String {
-        if (name.endsWith(".pau")) return "$name.gz"
-
-        if (name.endsWith(".pau.gz") || name.endsWith(".xml.gz")) return name
-
-        return "$name.pau.gz"
-    }
-
-    private fun isNameValid(filename: String): Boolean {
-        return if (isNameEmpty(filename)) {
-            false
-        } else validateFileEnding(filename)
     }
 
     private fun isNameEmpty(fileName: String): Boolean {

@@ -258,5 +258,9 @@
 
     <!-- region Neue Strings -->
     <string name="New">Neu</string>
+    <string name="error_removing_file">Error removing File!</string>
+    <string name="error_moving_file">Error moving File</string>
+    <string name="warning">Warning!</string>
+    <string name="overwrite_file_question">Overwrite File?</string>
     <!-- endregion -->
 </resources>

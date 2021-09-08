@@ -3,25 +3,41 @@ package de.daniel.mobilepauker2.models.view
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.AppCompatTextView
+import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.application.PaukerApplication
+import de.daniel.mobilepauker2.lesson.card.CardSide
+import de.daniel.mobilepauker2.models.Font
+import de.daniel.mobilepauker2.models.ModelManager
+import javax.inject.Inject
 
-class MPTextView : AppCompatEditText {
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context!!, attrs, defStyleAttr
+class MPTextView : AppCompatTextView {
+
+    @Inject
+    lateinit var modelManager: ModelManager
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context, attrs, defStyleAttr
     ) {
+        (context.applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
     }
 
-    constructor(context: Context?, attrs: AttributeSet?) : super(
-        context!!, attrs
+    constructor(context: Context, attrs: AttributeSet?) : super(
+        context, attrs
     ) {
+        (context.applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
     }
 
-    constructor(context: Context?) : super(context!!) {} /*public void setCard(CardSide cardside) {
-        setText(cardside.getText());
-
-        setFont(cardside.getFont());
+    constructor(context: Context) : super(context) {
+        (context.applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
     }
 
-    public void setFont(@Nullable Font font) {
-        ModelManager.instance().setFont(font, this);
-    }*/
+    fun setCard(cardSide: CardSide) {
+        setText(cardSide.text)
+        setFont(cardSide.font)
+    }
+
+    fun setFont(font: Font?) {
+        modelManager.setFont(font, this)
+    }
 }

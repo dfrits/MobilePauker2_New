@@ -2,8 +2,9 @@ package de.daniel.mobilepauker2.application
 
 import dagger.Component
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.data.SaveAsDialog
 import de.daniel.mobilepauker2.editcard.AbstractEditCard
-import de.daniel.mobilepauker2.editcard.AddCard
+import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.card.CardPackRamAdapter
 import de.daniel.mobilepauker2.lesson.card.FlashCardCursor
@@ -11,6 +12,8 @@ import de.daniel.mobilepauker2.lessonimport.LessonImport
 import de.daniel.mobilepauker2.lessonimport.LessonImportAdapter
 import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.models.view.MPEditText
+import de.daniel.mobilepauker2.models.view.MPTextView
+import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.utils.Toaster
 import javax.inject.Singleton
@@ -30,5 +33,8 @@ interface ApplicationSingletonComponent {
     fun inject(lessonImportAdapter: LessonImportAdapter)
     fun inject(mpEditText: MPEditText)
     fun inject(abstractEditCard: AbstractEditCard)
-    fun inject(addCard: AddCard)
+    fun inject(editDescription: EditDescription)
+    fun inject(mpTextView: MPTextView)
+    fun inject(search: Search)
+    fun inject(saveAsDialog: SaveAsDialog)
 }
