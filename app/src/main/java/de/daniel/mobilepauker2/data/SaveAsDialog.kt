@@ -18,7 +18,13 @@ import de.daniel.mobilepauker2.utils.Utility.Companion.hideKeyboard
 import java.io.File
 import javax.inject.Inject
 
-class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment() {
+class SaveAsDialog(private val saveAsCallback: SaveAsCallback) :
+    DialogFragment(R.layout.give_lesson_name_dialog) {
+
+    init {
+        setStyle(STYLE_NO_TITLE, R.style.NamingDialogTheme)
+    }
+
     private lateinit var textField: EditText
     private lateinit var bOK: Button
     private lateinit var bCancel: Button
@@ -34,15 +40,6 @@ class SaveAsDialog(private val saveAsCallback: SaveAsCallback) : DialogFragment(
             .inject(this)
 
         initView(view)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        dialog!!.window!!.requestFeature(Window.FEATURE_NO_TITLE)
-        return inflater.inflate(R.layout.give_lesson_name_dialog, null, false)
     }
 
     private fun initView(view: View) {
