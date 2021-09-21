@@ -1,14 +1,13 @@
 package de.daniel.mobilepauker2.dropbox
 
-import android.app.Activity
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import com.dropbox.core.android.Auth
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
@@ -18,7 +17,7 @@ import de.daniel.mobilepauker2.utils.Toaster
 import javax.inject.Inject
 
 class DropboxAccDialog : AppCompatActivity(R.layout.progress_dialog) {
-    private var prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+    private var prefs: SharedPreferences? = null
     private var assStarted = false
     private var firstStart = true
 
@@ -29,11 +28,12 @@ class DropboxAccDialog : AppCompatActivity(R.layout.progress_dialog) {
         super.onCreate(savedInstanceState)
 
         (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
+        prefs = PreferenceManager.getDefaultSharedPreferences(this)
 
         val progressBar = findViewById<RelativeLayout>(R.id.pFrame)
         progressBar.visibility = View.VISIBLE
         val title = findViewById<TextView>(R.id.pTitle)
-        val accessToken = prefs.getString(Constants.DROPBOX_ACCESS_TOKEN, null)
+        val accessToken = prefs?.getString(Constants.DROPBOX_ACCESS_TOKEN, null)
 
         when (intent.action) {
             Constants.DROPBOX_AUTH_ACTION -> {
@@ -53,7 +53,7 @@ class DropboxAccDialog : AppCompatActivity(R.layout.progress_dialog) {
                     toaster.showToast(this, "Nicht möglich", Toast.LENGTH_SHORT)
                     setResult(RESULT_CANCELED)
                 } else {
-                    prefs.edit().remove(Constants.DROPBOX_ACCESS_TOKEN).apply()
+                    prefs?.edit()?.remove(Constants.DROPBOX_ACCESS_TOKEN)?.apply()
                     toaster.showToast(this, "Dropbox getrennt", Toast.LENGTH_SHORT)
                     Log.d("SettingsFragment::initSyncPrefs", "accessTocken = null")
                     setResult(RESULT_OK)
@@ -69,7 +69,7 @@ class DropboxAccDialog : AppCompatActivity(R.layout.progress_dialog) {
         if (!firstStart && assStarted) {
             val accessToken = Auth.getOAuth2Token()
             if (accessToken != null) {
-                prefs.edit().putString(Constants.DROPBOX_ACCESS_TOKEN, accessToken).apply()
+                prefs?.edit()?.putString(Constants.DROPBOX_ACCESS_TOKEN, accessToken)?.apply()
                 toaster.showToast(this, "Verbunden", Toast.LENGTH_SHORT)
                 setResult(RESULT_OK)
             } else {

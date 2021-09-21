@@ -57,4 +57,11 @@ object Constants {
     // Shortcut
     const val SHORTCUT_ACTION = "com.daniel.mobilepauker2.activities.ShortcutReceiver"
     const val SHORTCUT_EXTRA = "Filename"
+
+    // Sync
+    const val ACCESS_TOKEN = "ACCESS_TOKEN"
+    const val FILES = "FILES"
+    const val SYNC_ALL_ACTION = "SYNC_ALL_ACTION"
+    const val UPLOAD_FILE_ACTION = "UPLOAD_FILE_ACTION"
+    const val SYNC_FILE_ACTION = "SYNC_FILE_ACTION"
 }

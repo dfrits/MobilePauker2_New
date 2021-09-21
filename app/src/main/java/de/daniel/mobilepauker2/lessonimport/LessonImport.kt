@@ -21,6 +21,7 @@ import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.dropbox.DropboxAccDialog
+import de.daniel.mobilepauker2.dropbox.SyncDialog
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.shortcut.ShortcutsManager
@@ -299,11 +300,11 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     }
 
     private fun startSync() {
-        /*val syncIntent = Intent(context, SyncDialog::class.java) // TODO
-        syncIntent.putExtra(SyncDialog.ACCESS_TOKEN, accessToken)
-        syncIntent.putExtra(SyncDialog.FILES, files)
-        syncIntent.action = SyncDialog.SYNC_ALL_ACTION
-        startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG)*/
+        val syncIntent = Intent(context, SyncDialog::class.java)
+        syncIntent.putExtra(Constants.ACCESS_TOKEN, accessToken)
+        syncIntent.putExtra(Constants.FILES, files)
+        syncIntent.action = Constants.SYNC_ALL_ACTION
+        startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG)
     }
 
     private fun deleteLesson(position: Int) {
@@ -421,7 +422,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
         accessToken = preferences.getString(Constants.DROPBOX_ACCESS_TOKEN, null)
         if (accessToken == null) {
             val assIntent = Intent(context, DropboxAccDialog::class.java)
-            assIntent.putExtra(Constants.DROPBOX_AUTH_ACTION, true)
+            assIntent.action = Constants.DROPBOX_AUTH_ACTION
             startActivityForResult(assIntent, Constants.REQUEST_CODE_DB_ACC_DIALOG)
         } else {
             startSync()

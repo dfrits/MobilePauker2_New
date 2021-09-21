@@ -80,7 +80,11 @@
 
         <activity
             android:name=".dropbox.DropboxAccDialog"
-            android:theme="@android:style/Theme.DeviceDefault.Dialog.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar.Dialog" />
+
+        <activity
+            android:name=".dropbox.SyncDialog"
+            android:theme="@style/AppTheme.NoActionBar.Dialog" />
 
     </application>
 
