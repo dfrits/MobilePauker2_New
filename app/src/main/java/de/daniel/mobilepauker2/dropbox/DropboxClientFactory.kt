@@ -18,9 +18,9 @@ internal object DropboxClientFactory {
         }
     }
 
-    val client: DbxClientV2?
+    val client: DbxClientV2
         get() {
             checkNotNull(sDbxClient) { "Client not initialized." }
-            return sDbxClient
+            return sDbxClient!!
         }
 }

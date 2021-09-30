@@ -10,12 +10,13 @@ import de.daniel.mobilepauker2.utils.CoroutinesAsyncTask
  */
 class ListFolderTask internal constructor(
     private val mDbxClient: DbxClientV2,
+    private val cachedCursor: String?,
     private val mCallback: Callback
 ) : CoroutinesAsyncTask<String?, Void?, ListFolderResult?>("ListFolderTask") {
     private var mException: DbxException? = null
 
     interface Callback {
-        fun onDataLoaded(result: ListFolderResult?)
+        fun onDataLoaded(listFolderResult: ListFolderResult?)
         fun onError(e: DbxException?)
     }
 
@@ -30,11 +31,15 @@ class ListFolderTask internal constructor(
 
     override fun doInBackground(vararg params: String?): ListFolderResult? {
         mException = try {
-            return mDbxClient.files()
-                .listFolderBuilder(params[0])
-                .withRecursive(false)
-                .withIncludeDeleted(true)
-                .start()
+            return if (cachedCursor == null) {
+                mDbxClient.files()
+                    .listFolderBuilder(params[0])
+                    .withRecursive(false)
+                    .withIncludeDeleted(false)
+                    .start()
+            } else {
+                mDbxClient.files().listFolderContinue(cachedCursor)
+            }
         } catch (e: DbxException) {
             e
         }

@@ -1,23 +1,30 @@
 package de.daniel.mobilepauker2.dropbox
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
+import androidx.preference.PreferenceManager
+import com.dropbox.core.DbxException
+import com.dropbox.core.v2.files.FileMetadata
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
-import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.utils.*
 import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
 import de.daniel.mobilepauker2.utils.Constants.FILES
-import de.daniel.mobilepauker2.utils.Log
-import de.daniel.mobilepauker2.utils.Toaster
 import java.io.File
 import java.io.Serializable
 import java.util.*
@@ -25,53 +32,136 @@ import javax.inject.Inject
 
 class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     private val context: Context = this
-    private val files: Array<File>? = null
-    private val timeout: Timer? = null
-    private val timerTask: TimerTask? = null
+    private val lifecycleOwner: LifecycleOwner = this
+    private var files: List<File>? = null
+    private var timeout: Timer? = null
+    private var timerTask: TimerTask? = null
+    private var cancelButton: Button? = null
+    private var accessToken: String? = null
+    private val tasks: MutableList<CoroutinesAsyncTask<*, *, *>> = mutableListOf()
+
+    private var networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onLost(network: Network) {
+            toaster.showToast(
+                context as Activity,
+                "Internetverbindung prüfen!", //TODO Strings
+                Toast.LENGTH_LONG
+            )
+            finishDialog(RESULT_CANCELED)
+        }
+
+        override fun onAvailable(network: Network) {
+            DropboxClientFactory.init(accessToken)
+            val serializableExtra = intent.getSerializableExtra(FILES)
+            viewModel.errorLiveData.observe(lifecycleOwner) { errorOccured(it) }
+            startSync(intent, serializableExtra!!)
+        }
+
+        override fun onUnavailable() {
+            toaster.showToast(
+                context as Activity,
+                "Internetverbindung prüfen!", // TODO Strings
+                Toast.LENGTH_LONG
+            )
+            finishDialog(RESULT_CANCELED)
+        }
+    }
 
     @Inject
     lateinit var toaster: Toaster
+
+    @Inject
+    lateinit var errorReporter: ErrorReporter
+
+    @Inject
+    lateinit var dataManager: DataManager
+
+    @Inject
+    lateinit var viewModel: SyncDialogViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
 
+        val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (!isInternetAvailable(cm)) {
+            toaster.showToast(context as Activity, "Internetverbindung prüfen!", Toast.LENGTH_LONG)
+            finishDialog(RESULT_CANCELED)
+        }
+
         val intent = intent
-        val accessToken = intent.getStringExtra(ACCESS_TOKEN)
+        accessToken = intent.getStringExtra(ACCESS_TOKEN)
         if (accessToken == null) {
             Log.d("SyncDialog::OnCreate", "Synchro mit accessToken = null gestartet")
             finishDialog(RESULT_CANCELED)
             return
         }
-        val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        cm.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
-            override fun onLost(network: Network) {
-                toaster.showToast(
-                    context as Activity,
-                    "Internetverbindung prüfen!", //TODO Strings
-                    Toast.LENGTH_LONG
-                )
-                finishDialog(RESULT_CANCELED)
-            }
-
-            override fun onAvailable(network: Network) {
-                DropboxClientFactory.init(accessToken)
-                val serializableExtra = intent.getSerializableExtra(FILES)
-                startSync(intent, serializableExtra!!)
-            }
-        })
+        cm.registerDefaultNetworkCallback(networkCallback)
 
         val title = findViewById<TextView>(R.id.pTitle)
         title.setText(R.string.synchronizing)
     }
 
+    // Touchevents und Backbutton blockieren, dass er nicht minimiert werden kann
+    override fun onBackPressed() {}
+
+    override fun onResume() {
+        super.onResume()
+        timeout?.let {
+            if (timerTask != null) {
+                it.cancel()
+                startTimer()
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        timeout?.let {
+            if (timerTask != null) {
+                it.cancel()
+            }
+        }
+
+        val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        cm.unregisterNetworkCallback(networkCallback)
+
+        cancelTasks()
+        super.onDestroy()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        Log.d("SyncDialog::TouchEvent", "Touched")
+        cancelButton?.let { cancelButton ->
+            val pos = IntArray(2)
+            cancelButton.getLocationInWindow(pos)
+            if (ev.y <= pos[1] + cancelButton.height && ev.x > pos[0]
+                && ev.y > pos[1] && ev.x <= pos[0] + cancelButton.width
+                && ev.action == MotionEvent.ACTION_UP
+            ) {
+                cancelClicked(cancelButton)
+            }
+        }
+        return false
+    }
+
+    fun cancelClicked(view: View) {
+        Log.d("SyncDialog::cancelClicked", "Cancel Sync")
+        view.isEnabled = false
+        toaster.showToast(
+            context as Activity,
+            R.string.synchro_canceled_by_user,
+            Toast.LENGTH_LONG
+        )
+        finishDialog(RESULT_CANCELED)
+    }
+
     private fun startSync(intent: Intent, serializableExtra: Serializable) {
         val action = intent.action
         if (Constants.SYNC_ALL_ACTION == action && serializableExtra is Array<*>) {
-            syncAllFiles(serializableExtra as Array<File>)
-        } else if (serializableExtra is File) {
+            syncAllFiles(convertExtraToList(serializableExtra))
+        } else if (serializableExtra is File && action != null) {
             syncFile(serializableExtra, action)
         } else {
             Log.d("SyncDialog::OnCreate", "Synchro mit falschem Extra gestartet")
@@ -84,11 +174,15 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         finish()
     }
 
-    private fun syncAllFiles(serializableExtra: Array<File>) {
-
+    private fun syncAllFiles(serializableExtra: List<File>) {
+        showProgressbar()
+        files = serializableExtra
+        startTimer()
+        initObserver()
+        files?.let { tasks.add(viewModel.loadDataFromDropbox(it)) }
     }
 
-    private fun syncFile(serializableExtra: File, action: String?) {
+    private fun syncFile(serializableExtra: File, action: String) {
 
     }
 
@@ -97,5 +191,119 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         progressBar.visibility = View.VISIBLE
         val title = findViewById<TextView>(R.id.pTitle)
         title.setText(R.string.synchronizing)
+    }
+
+    private fun convertExtraToList(serializableExtra: Array<*>): List<File> {
+        val list = mutableListOf<File>()
+        serializableExtra.forEach {
+            list.add(it as File)
+        }
+        return list.toList()
+    }
+
+    private fun showCancelButton() {
+        cancelButton = findViewById(R.id.cancel_button)
+        cancelButton?.visibility = View.VISIBLE
+        Log.d("SyncDialog::showCancelButton", "Button is enabled: " + cancelButton?.isEnabled)
+    }
+
+    private fun getFileIndex(file: File, list: Collection<File>): Int =
+        list.indexOfFirst { it.name == file.name }
+
+    private fun getFileIndex(fileName: String, list: Collection<String>): Int =
+        list.indexOfFirst { it == fileName }
+
+    private fun startTimer() {
+        timeout = Timer()
+        timerTask = object : TimerTask() {
+            override fun run() {
+                runOnUiThread {
+                    toaster.showToast(
+                        context as Activity,
+                        R.string.synchro_timeout,
+                        Toast.LENGTH_SHORT
+                    )
+                }
+                finishDialog(RESULT_CANCELED)
+            }
+        }
+        timeout?.schedule(timerTask, 60000)
+    }
+
+    private fun cancelTasks() {
+        for (task in tasks) {
+            if (task.status != CoroutinesAsyncTask.Status.FINISHED) {
+                task.cancel(false)
+                tasks.remove(task)
+            }
+        }
+    }
+
+    private fun initObserver() {
+        viewModel.downloadList.observe(this) { downloadFiles(it) }
+        viewModel.uploadList.observe(this) { uploadFiles(it) }
+        viewModel.deleteLocalList.observe(this) { deleteLocalFiles(it) }
+        viewModel.deleteServerList.observe(this) { deleteFilesOnServer(it) }
+    }
+
+    private fun downloadFiles(list: List<FileMetadata>) {
+
+    }
+
+    private fun uploadFiles(list: List<File>) {
+
+    }
+
+    private fun deleteLocalFiles(list: List<File>) {
+
+    }
+
+    private fun deleteFilesOnServer(list: List<File>) {
+
+    }
+
+    private fun errorOccured(e: DbxException) {
+        toaster.showToast(
+            context as Activity,
+            R.string.simple_error_message,
+            Toast.LENGTH_SHORT
+        )
+        cancelTasks()
+        if (e.requestId != null && e.requestId == "401") {
+            val builder = AlertDialog.Builder(context)
+            builder.setTitle("Dropbox token is invalid!")
+                .setMessage(
+                    "There is something wrong with the dropbox token. Maybe it is " +
+                            "solved by the next try." // TODO Strings
+                )
+                .setPositiveButton(R.string.ok, null)
+                .setNeutralButton("Send E-Mail") { _, _ ->
+                    errorReporter.init()
+                    errorReporter.uncaughtException(null, e)
+                    errorReporter.checkErrorAndSendMail()
+                }
+                .setOnDismissListener {
+                    PreferenceManager.getDefaultSharedPreferences(context)
+                        .edit()
+                        .putString(Constants.DROPBOX_ACCESS_TOKEN, null).apply()
+                    finishDialog(AppCompatActivity.RESULT_CANCELED)
+                }
+                .setCancelable(false)
+            builder.create().show()
+        } else {
+            finishDialog(AppCompatActivity.RESULT_CANCELED)
+        }
+    }
+
+    private fun isInternetAvailable(cm: ConnectivityManager): Boolean {
+        val networkCapabilities = cm.activeNetwork ?: return false
+        val actNw = cm.getNetworkCapabilities(networkCapabilities) ?: return false
+
+        return when {
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+            else -> false
+        }
     }
 }
