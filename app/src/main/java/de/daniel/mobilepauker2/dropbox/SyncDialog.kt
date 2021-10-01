@@ -10,10 +10,7 @@ import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Button
-import android.widget.RelativeLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.preference.PreferenceManager
@@ -27,6 +24,7 @@ import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
 import de.daniel.mobilepauker2.utils.Constants.FILES
 import java.io.File
 import java.io.Serializable
+import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
 
@@ -38,7 +36,6 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     private var timerTask: TimerTask? = null
     private var cancelButton: Button? = null
     private var accessToken: String? = null
-    private val tasks: MutableList<CoroutinesAsyncTask<*, *, *>> = mutableListOf()
 
     private var networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onLost(network: Network) {
@@ -127,7 +124,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         cm.unregisterNetworkCallback(networkCallback)
 
-        cancelTasks()
+        viewModel.cancelTasks()
         super.onDestroy()
     }
 
@@ -175,20 +172,20 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     }
 
     private fun syncAllFiles(serializableExtra: List<File>) {
-        showProgressbar()
+        showDialog()
         files = serializableExtra
         startTimer()
         initObserver()
-        files?.let { tasks.add(viewModel.loadDataFromDropbox(it)) }
+        files?.let { viewModel.loadDataFromDropbox(it) }
     }
 
     private fun syncFile(serializableExtra: File, action: String) {
 
     }
 
-    private fun showProgressbar() {
-        val progressBar = findViewById<RelativeLayout>(R.id.pFrame)
-        progressBar.visibility = View.VISIBLE
+    private fun showDialog() {
+        val dialogFrame = findViewById<RelativeLayout>(R.id.pFrame)
+        dialogFrame.visibility = View.VISIBLE
         val title = findViewById<TextView>(R.id.pTitle)
         title.setText(R.string.synchronizing)
     }
@@ -230,24 +227,49 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         timeout?.schedule(timerTask, 60000)
     }
 
-    private fun cancelTasks() {
-        for (task in tasks) {
-            if (task.status != CoroutinesAsyncTask.Status.FINISHED) {
-                task.cancel(false)
-                tasks.remove(task)
-            }
-        }
-    }
-
     private fun initObserver() {
-        viewModel.downloadList.observe(this) { downloadFiles(it) }
+        viewModel.downloadList.observe(this) { downloadFiles(it, viewModel.downloadSize) }
         viewModel.uploadList.observe(this) { uploadFiles(it) }
         viewModel.deleteLocalList.observe(this) { deleteLocalFiles(it) }
         viewModel.deleteServerList.observe(this) { deleteFilesOnServer(it) }
     }
 
-    private fun downloadFiles(list: List<FileMetadata>) {
+    private fun downloadFiles(list: List<FileMetadata>, downloadSize: Long) {
+        val progressBar = findViewById<ProgressBar>(R.id.pBar)
+        viewModel.downloadFiles(list, object : DownloadFileTask.Callback {
+            override fun onDownloadStartet() {
+                Log.d("SyncDialog:downloadFiles", "Download startet")
+                progressBar.max = downloadSize.toInt()
+                progressBar.isIndeterminate = false
+            }
 
+            override fun onProgressUpdate(metadata: FileMetadata) {
+                Log.d(
+                    "SyncDialog:downloadFiles",
+                    "Download update: " + progressBar.progress + metadata.size
+                )
+                progressBar.progress = (progressBar.getProgress() + metadata.size).toInt()
+            }
+
+            override fun onDownloadComplete(result: List<File>) {
+                Log.d("SyncDialog:downloadFiles", "Download complete")
+                progressBar.isIndeterminate = true
+                finishDialog(RESULT_OK)
+            }
+
+            override fun onError(e: Exception?) {
+                Log.e(
+                    "LessonImportActivity::downloadFiles",
+                    "Failed to download file.", e
+                )
+                toaster.showToast(
+                    context as Activity,
+                    R.string.simple_error_message,
+                    Toast.LENGTH_SHORT
+                )
+                finishDialog(RESULT_CANCELED)
+            }
+        })
     }
 
     private fun uploadFiles(list: List<File>) {
@@ -268,7 +290,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
             R.string.simple_error_message,
             Toast.LENGTH_SHORT
         )
-        cancelTasks()
+        viewModel.cancelTasks()
         if (e.requestId != null && e.requestId == "401") {
             val builder = AlertDialog.Builder(context)
             builder.setTitle("Dropbox token is invalid!")

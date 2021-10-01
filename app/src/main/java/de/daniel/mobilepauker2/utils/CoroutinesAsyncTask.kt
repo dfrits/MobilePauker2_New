@@ -14,7 +14,7 @@ abstract class CoroutinesAsyncTask<Params, Progress, Result>(val taskName: Strin
     var preJob: Job? = null
     var bgJob: Deferred<Result>? = null
     abstract fun doInBackground(vararg params: Params?): Result
-    open fun onProgressUpdate(vararg values: Progress?) {}
+    open fun onProgressUpdate(vararg values: Progress) {}
     open fun onPostExecute(result: Result) {}
     open fun onPreExecute() {}
     open fun onCancelled(result: Result?) {}

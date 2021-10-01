@@ -1,5 +1,6 @@
 package de.daniel.mobilepauker2.dropbox
 
+import android.content.res.TypedArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dropbox.core.DbxException
@@ -9,12 +10,18 @@ import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.Metadata
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.CoroutinesAsyncTask
 import de.daniel.mobilepauker2.utils.Log
 import okhttp3.internal.readFieldOrNull
 import java.io.File
 import javax.inject.Inject
 
 class SyncDialogViewModel @Inject constructor(private val dataManager: DataManager) {
+    private val tasks: MutableList<CoroutinesAsyncTask<*, *, *>> = mutableListOf()
+    private val _tasksLiveData: MutableLiveData<List<CoroutinesAsyncTask<*, *, *>>> =
+        MutableLiveData()
+    val tasksLiveData: LiveData<List<CoroutinesAsyncTask<*, *, *>>> = _tasksLiveData
+
     private val _errorLiveData = MutableLiveData<DbxException>()
     val errorLiveData: LiveData<DbxException> = _errorLiveData
 
@@ -30,7 +37,9 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
     private val _deleteServerList = MutableLiveData<List<File>>()
     val deleteServerList: LiveData<List<File>> = _deleteServerList
 
-    fun loadDataFromDropbox(files: List<File>): ListFolderTask {
+    var downloadSize = 0L
+
+    fun loadDataFromDropbox(files: List<File>) {
         val listFolderTask =
             ListFolderTask(DropboxClientFactory.client, getCachedCursor(),
                 object : ListFolderTask.Callback {
@@ -52,7 +61,32 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
                     }
                 })
         listFolderTask.execute(Constants.DROPBOX_PATH)
-        return listFolderTask
+        addTask(listFolderTask)
+    }
+
+    fun addTask(task: CoroutinesAsyncTask<*, *, *>) {
+        tasks.add(task)
+        _tasksLiveData.postValue(tasks)
+    }
+
+    fun removeTask(task: CoroutinesAsyncTask<*, *, *>) {
+        tasks.remove(task)
+        _tasksLiveData.postValue(tasks)
+    }
+
+    fun cancelTasks() {
+        for (task in tasks) {
+            if (task.status != CoroutinesAsyncTask.Status.FINISHED) {
+                task.cancel(false)
+                tasks.remove(task)
+            }
+        }
+        _tasksLiveData.postValue(tasks)
+    }
+
+    fun downloadFiles(list: List<FileMetadata>, callback: DownloadFileTask.Callback) {
+        val task = DownloadFileTask(DropboxClientFactory.client, callback)
+        task.execute(*list.toTypedArray())
     }
 
     private fun getCachedCursor(): String? { // TODO
@@ -115,6 +149,7 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
             val cachedFile = cachedFiles?.find(dbFile)
             if (localFile == null && cachedFile == null) {
                 filesToDownload.add(dbFile)
+                downloadSize += dbFile.size
             } else if (localFile != null) {
                 val localModified = localFile.lastModified()
                 val cachedModified = cachedFile?.lastModified() ?: localModified

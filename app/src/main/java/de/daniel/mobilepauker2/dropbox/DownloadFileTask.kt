@@ -27,7 +27,7 @@ class DownloadFileTask internal constructor(
         mCallback.onDownloadStartet()
     }
 
-    override fun onProgressUpdate(vararg values: FileMetadata?) {
+    override fun onProgressUpdate(vararg values: FileMetadata) {
         super.onProgressUpdate(*values)
         mCallback.onProgressUpdate(values[0])
     }
@@ -80,7 +80,7 @@ class DownloadFileTask internal constructor(
 
     interface Callback {
         fun onDownloadStartet()
-        fun onProgressUpdate(metadata: FileMetadata?)
+        fun onProgressUpdate(metadata: FileMetadata)
         fun onDownloadComplete(result: List<File>)
         fun onError(e: Exception?)
     }
