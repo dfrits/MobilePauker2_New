@@ -84,9 +84,14 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         _tasksLiveData.postValue(tasks)
     }
 
-    fun downloadFiles(list: List<FileMetadata>, callback: DownloadFileTask.Callback) {
+    fun downloadFiles(
+        list: List<FileMetadata>,
+        callback: DownloadFileTask.Callback
+    ): CoroutinesAsyncTask<*, *, *> {
         val task = DownloadFileTask(DropboxClientFactory.client, callback)
         task.execute(*list.toTypedArray())
+        addTask(task)
+        return task
     }
 
     private fun getCachedCursor(): String? { // TODO

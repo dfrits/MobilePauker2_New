@@ -236,7 +236,9 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
     private fun downloadFiles(list: List<FileMetadata>, downloadSize: Long) {
         val progressBar = findViewById<ProgressBar>(R.id.pBar)
-        viewModel.downloadFiles(list, object : DownloadFileTask.Callback {
+        var task :CoroutinesAsyncTask<*,*,*>? = null
+
+        task = viewModel.downloadFiles(list, object : DownloadFileTask.Callback {
             override fun onDownloadStartet() {
                 Log.d("SyncDialog:downloadFiles", "Download startet")
                 progressBar.max = downloadSize.toInt()
@@ -248,13 +250,13 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
                     "SyncDialog:downloadFiles",
                     "Download update: " + progressBar.progress + metadata.size
                 )
-                progressBar.progress = (progressBar.getProgress() + metadata.size).toInt()
+                progressBar.progress = (progressBar.progress + metadata.size).toInt()
             }
 
             override fun onDownloadComplete(result: List<File>) {
                 Log.d("SyncDialog:downloadFiles", "Download complete")
                 progressBar.isIndeterminate = true
-                finishDialog(RESULT_OK)
+                viewModel.removeTask(task!!)
             }
 
             override fun onError(e: Exception?) {
@@ -267,7 +269,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
                     R.string.simple_error_message,
                     Toast.LENGTH_SHORT
                 )
-                finishDialog(RESULT_CANCELED)
+                errorOccured(e)
             }
         })
     }
@@ -284,14 +286,14 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
     }
 
-    private fun errorOccured(e: DbxException) {
+    private fun errorOccured(e: Exception?) {
         toaster.showToast(
             context as Activity,
             R.string.simple_error_message,
             Toast.LENGTH_SHORT
         )
         viewModel.cancelTasks()
-        if (e.requestId != null && e.requestId == "401") {
+        if (e is DbxException && e.requestId == "401") {
             val builder = AlertDialog.Builder(context)
             builder.setTitle("Dropbox token is invalid!")
                 .setMessage(
