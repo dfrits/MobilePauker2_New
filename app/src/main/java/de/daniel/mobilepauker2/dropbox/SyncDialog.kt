@@ -267,7 +267,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     }
 
     private fun deleteLocalFiles(list: List<File>) {
-
+        viewModel.deleteFilesOnPhone(list)
     }
 
     private fun deleteFilesOnServer(list: List<File>) {

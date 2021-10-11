@@ -140,6 +140,10 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         addTask(task)
     }
 
+    fun deleteFilesOnPhone(list: List<File>) {
+        list.forEach { it.delete() }
+    }
+
     private fun getCachedCursor(): String? { // TODO
         return null
     }
