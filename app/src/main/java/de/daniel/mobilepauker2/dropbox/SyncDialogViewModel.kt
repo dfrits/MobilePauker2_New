@@ -3,10 +3,7 @@ package de.daniel.mobilepauker2.dropbox
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dropbox.core.DbxException
-import com.dropbox.core.v2.files.DeletedMetadata
-import com.dropbox.core.v2.files.FileMetadata
-import com.dropbox.core.v2.files.ListFolderResult
-import com.dropbox.core.v2.files.Metadata
+import com.dropbox.core.v2.files.*
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.CoroutinesAsyncTask
@@ -20,8 +17,8 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         MutableLiveData()
     val tasksLiveData: LiveData<List<CoroutinesAsyncTask<*, *, *>>> = _tasksLiveData
 
-    private val _errorLiveData = MutableLiveData<DbxException>()
-    val errorLiveData: LiveData<DbxException> = _errorLiveData
+    private val _errorLiveData = MutableLiveData<Exception>()
+    val errorLiveData: LiveData<Exception> = _errorLiveData
 
     private val _uploadList = MutableLiveData<List<File>>()
     val uploadList: LiveData<List<File>> = _uploadList
@@ -67,7 +64,7 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         _tasksLiveData.postValue(tasks)
     }
 
-    fun removeTask(task: CoroutinesAsyncTask<*, *, *>) {
+    fun removeTask(task: CoroutinesAsyncTask<*, *, *>?) {
         tasks.remove(task)
         _tasksLiveData.postValue(tasks)
     }
@@ -92,11 +89,36 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         return task
     }
 
-    fun uploadFiles(list: List<File>, callback: UploadFileTask.Callback): UploadFileTask {
-        val task = UploadFileTask(DropboxClientFactory.client, callback)
+    fun uploadFiles(list: List<File>): UploadFileTask {
+        var task: UploadFileTask? = null
+        task = UploadFileTask(DropboxClientFactory.client, object : UploadFileTask.Callback {
+            override fun onUploadComplete(result: List<Metadata?>?) {
+                removeTask(task)
+            }
+
+            override fun onError(e: Exception?) {
+                _errorLiveData.postValue(e)
+            }
+        })
         task.execute(*list.toTypedArray())
         addTask(task)
         return task
+    }
+
+    fun deleteFilesOnDB(list: List<File>) {
+        var task: DeleteFileTask? = null
+        task = DeleteFileTask(DropboxClientFactory.client, object : DeleteFileTask.Callback {
+            override fun onDeleteComplete(result: List<DeleteResult>) {
+                removeTask(task)
+            }
+
+            override fun onError(e: Exception?) {
+                _errorLiveData.postValue(e)
+            }
+
+        })
+        task.execute(*list.toTypedArray())
+        addTask(task)
     }
 
     private fun getCachedCursor(): String? { // TODO

@@ -16,7 +16,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.preference.PreferenceManager
 import com.dropbox.core.DbxException
 import com.dropbox.core.v2.files.FileMetadata
-import com.dropbox.core.v2.files.Metadata
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
@@ -275,16 +274,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     }
 
     private fun uploadFiles(list: List<File>) {
-        var task: CoroutinesAsyncTask<File?, Void?, List<Metadata>>? = null
-        task = viewModel.uploadFiles(list, object : UploadFileTask.Callback{
-            override fun onUploadComplete(result: List<Metadata?>?) {
-                viewModel.removeTask(task!!)
-            }
-
-            override fun onError(e: Exception?) {
-                errorOccured(e)
-            }
-        })
+        viewModel.uploadFiles(list)
     }
 
     private fun deleteLocalFiles(list: List<File>) {
@@ -292,7 +282,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     }
 
     private fun deleteFilesOnServer(list: List<File>) {
-
+        viewModel.deleteFilesOnDB(list)
     }
 
     private fun errorOccured(e: Exception?) { // TODO Andere Exceptions einpflegen
