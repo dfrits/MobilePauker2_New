@@ -16,6 +16,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.preference.PreferenceManager
 import com.dropbox.core.DbxException
 import com.dropbox.core.v2.files.FileMetadata
+import com.dropbox.core.v2.files.Metadata
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
@@ -24,7 +25,6 @@ import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
 import de.daniel.mobilepauker2.utils.Constants.FILES
 import java.io.File
 import java.io.Serializable
-import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
 
@@ -236,7 +236,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
     private fun downloadFiles(list: List<FileMetadata>, downloadSize: Long) {
         val progressBar = findViewById<ProgressBar>(R.id.pBar)
-        var task :CoroutinesAsyncTask<*,*,*>? = null
+        var task: CoroutinesAsyncTask<FileMetadata, FileMetadata, List<File>>? = null
 
         task = viewModel.downloadFiles(list, object : DownloadFileTask.Callback {
             override fun onDownloadStartet() {
@@ -275,7 +275,16 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     }
 
     private fun uploadFiles(list: List<File>) {
+        var task: CoroutinesAsyncTask<File?, Void?, List<Metadata>>? = null
+        task = viewModel.uploadFiles(list, object : UploadFileTask.Callback{
+            override fun onUploadComplete(result: List<Metadata?>?) {
+                viewModel.removeTask(task!!)
+            }
 
+            override fun onError(e: Exception?) {
+                errorOccured(e)
+            }
+        })
     }
 
     private fun deleteLocalFiles(list: List<File>) {
@@ -286,7 +295,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
     }
 
-    private fun errorOccured(e: Exception?) {
+    private fun errorOccured(e: Exception?) { // TODO Andere Exceptions einpflegen
         toaster.showToast(
             context as Activity,
             R.string.simple_error_message,

@@ -1,6 +1,5 @@
 package de.daniel.mobilepauker2.dropbox
 
-import android.content.res.TypedArray
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dropbox.core.DbxException
@@ -12,7 +11,6 @@ import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.CoroutinesAsyncTask
 import de.daniel.mobilepauker2.utils.Log
-import okhttp3.internal.readFieldOrNull
 import java.io.File
 import javax.inject.Inject
 
@@ -87,8 +85,15 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
     fun downloadFiles(
         list: List<FileMetadata>,
         callback: DownloadFileTask.Callback
-    ): CoroutinesAsyncTask<*, *, *> {
+    ): DownloadFileTask {
         val task = DownloadFileTask(DropboxClientFactory.client, callback)
+        task.execute(*list.toTypedArray())
+        addTask(task)
+        return task
+    }
+
+    fun uploadFiles(list: List<File>, callback: UploadFileTask.Callback): UploadFileTask {
+        val task = UploadFileTask(DropboxClientFactory.client, callback)
         task.execute(*list.toTypedArray())
         addTask(task)
         return task
