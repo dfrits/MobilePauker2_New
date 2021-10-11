@@ -79,14 +79,33 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         _tasksLiveData.postValue(tasks)
     }
 
-    fun downloadFiles(
-        list: List<FileMetadata>,
-        callback: DownloadFileTask.Callback
-    ): DownloadFileTask {
-        val task = DownloadFileTask(DropboxClientFactory.client, callback)
+    fun downloadFiles(list: List<FileMetadata>, callback: DownloadFileTask.Callback) {
+        var task: DownloadFileTask? = null
+        task = DownloadFileTask(DropboxClientFactory.client, object : DownloadFileTask.Callback {
+            override fun onDownloadStartet() {
+                callback.onDownloadStartet()
+            }
+
+            override fun onProgressUpdate(metadata: FileMetadata) {
+                callback.onProgressUpdate(metadata)
+            }
+
+            override fun onDownloadComplete(result: List<File>) {
+                callback.onDownloadComplete(result)
+                removeTask(task)
+            }
+
+            override fun onError(e: Exception?) {
+                Log.e(
+                    "LessonImportActivity::downloadFiles",
+                    "Failed to download file.", e
+                )
+                _errorLiveData.postValue(e)
+            }
+
+        })
         task.execute(*list.toTypedArray())
         addTask(task)
-        return task
     }
 
     fun uploadFiles(list: List<File>): UploadFileTask {

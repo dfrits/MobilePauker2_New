@@ -19,9 +19,12 @@ import com.dropbox.core.v2.files.FileMetadata
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
-import de.daniel.mobilepauker2.utils.*
+import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
 import de.daniel.mobilepauker2.utils.Constants.FILES
+import de.daniel.mobilepauker2.utils.ErrorReporter
+import de.daniel.mobilepauker2.utils.Log
+import de.daniel.mobilepauker2.utils.Toaster
 import java.io.File
 import java.io.Serializable
 import java.util.*
@@ -235,9 +238,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
     private fun downloadFiles(list: List<FileMetadata>, downloadSize: Long) {
         val progressBar = findViewById<ProgressBar>(R.id.pBar)
-        var task: CoroutinesAsyncTask<FileMetadata, FileMetadata, List<File>>? = null
-
-        task = viewModel.downloadFiles(list, object : DownloadFileTask.Callback {
+        viewModel.downloadFiles(list, object : DownloadFileTask.Callback {
             override fun onDownloadStartet() {
                 Log.d("SyncDialog:downloadFiles", "Download startet")
                 progressBar.max = downloadSize.toInt()
@@ -255,21 +256,9 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
             override fun onDownloadComplete(result: List<File>) {
                 Log.d("SyncDialog:downloadFiles", "Download complete")
                 progressBar.isIndeterminate = true
-                viewModel.removeTask(task!!)
             }
 
-            override fun onError(e: Exception?) {
-                Log.e(
-                    "LessonImportActivity::downloadFiles",
-                    "Failed to download file.", e
-                )
-                toaster.showToast(
-                    context as Activity,
-                    R.string.simple_error_message,
-                    Toast.LENGTH_SHORT
-                )
-                errorOccured(e)
-            }
+            override fun onError(e: Exception?) {}
         })
     }
 
