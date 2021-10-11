@@ -231,9 +231,6 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
     private fun initObserver() {
         viewModel.downloadList.observe(this) { downloadFiles(it, viewModel.downloadSize) }
-        viewModel.uploadList.observe(this) { uploadFiles(it) }
-        viewModel.deleteLocalList.observe(this) { deleteLocalFiles(it) }
-        viewModel.deleteServerList.observe(this) { deleteFilesOnServer(it) }
     }
 
     private fun downloadFiles(list: List<FileMetadata>, downloadSize: Long) {
@@ -260,18 +257,6 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
             override fun onError(e: Exception?) {}
         })
-    }
-
-    private fun uploadFiles(list: List<File>) {
-        viewModel.uploadFiles(list)
-    }
-
-    private fun deleteLocalFiles(list: List<File>) {
-        viewModel.deleteFilesOnPhone(list)
-    }
-
-    private fun deleteFilesOnServer(list: List<File>) {
-        viewModel.deleteFilesOnDB(list)
     }
 
     private fun errorOccured(e: Exception?) { // TODO Andere Exceptions einpflegen

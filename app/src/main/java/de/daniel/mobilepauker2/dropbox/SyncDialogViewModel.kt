@@ -20,17 +20,8 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
     private val _errorLiveData = MutableLiveData<Exception>()
     val errorLiveData: LiveData<Exception> = _errorLiveData
 
-    private val _uploadList = MutableLiveData<List<File>>()
-    val uploadList: LiveData<List<File>> = _uploadList
-
     private val _downloadList = MutableLiveData<List<FileMetadata>>()
     val downloadList: LiveData<List<FileMetadata>> = _downloadList
-
-    private val _deleteLocalList = MutableLiveData<List<File>>()
-    val deleteLocalList: LiveData<List<File>> = _deleteLocalList
-
-    private val _deleteServerList = MutableLiveData<List<File>>()
-    val deleteServerList: LiveData<List<File>> = _deleteServerList
 
     var downloadSize = 0L
 
@@ -46,27 +37,15 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
                     }
 
                     override fun onError(e: DbxException?) {
-                        e?.let {
-                            Log.d(
-                                "LessonImportActivity::loadData::onError",
-                                "Error loading Files: " + e.message
-                            )
-                            _errorLiveData.postValue(e)
-                        }
+                        Log.d(
+                            "LessonImportActivity::loadData::onError",
+                            "Error loading Files: " + e?.message
+                        )
+                        _errorLiveData.postValue(e)
                     }
                 })
         listFolderTask.execute(Constants.DROPBOX_PATH)
         addTask(listFolderTask)
-    }
-
-    fun addTask(task: CoroutinesAsyncTask<*, *, *>) {
-        tasks.add(task)
-        _tasksLiveData.postValue(tasks)
-    }
-
-    fun removeTask(task: CoroutinesAsyncTask<*, *, *>?) {
-        tasks.remove(task)
-        _tasksLiveData.postValue(tasks)
     }
 
     fun cancelTasks() {
@@ -146,6 +125,16 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
 
     private fun getCachedCursor(): String? { // TODO
         return null
+    }
+
+    private fun addTask(task: CoroutinesAsyncTask<*, *, *>) {
+        tasks.add(task)
+        _tasksLiveData.postValue(tasks)
+    }
+
+    private fun removeTask(task: CoroutinesAsyncTask<*, *, *>?) {
+        tasks.remove(task)
+        _tasksLiveData.postValue(tasks)
     }
 
     private fun getEntries(listFolderResult: ListFolderResult): List<Metadata> {
@@ -228,9 +217,9 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         }
 
         _downloadList.postValue(filesToDownload)
-        _uploadList.postValue(filesToUpload)
-        _deleteLocalList.postValue(filesToDeleteLocal)
-        _deleteServerList.postValue(filesToDeleteServer)
+        uploadFiles(filesToUpload)
+        deleteFilesOnPhone(filesToDeleteLocal)
+        deleteFilesOnDB(filesToDeleteServer)
     }
 
     private fun List<Metadata>.find(file: File): Metadata? = find { it.name == file.name }
