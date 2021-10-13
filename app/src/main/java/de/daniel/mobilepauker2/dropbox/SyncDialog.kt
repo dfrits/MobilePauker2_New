@@ -16,6 +16,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.preference.PreferenceManager
 import com.dropbox.core.DbxException
 import com.dropbox.core.v2.files.FileMetadata
+import com.dropbox.core.v2.files.ListFolderResult
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
@@ -178,7 +179,24 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         files = serializableExtra
         startTimer()
         initObserver()
-        files?.let { viewModel.loadDataFromDropbox(it) }
+        files?.let {
+            val callback = object : ListFolderTask.Callback {
+                override fun onDataLoaded(listFolderResult: ListFolderResult?) {
+                    listFolderResult?.cursor?.let {
+                        dataManager.cacheCursor(it)
+                    }
+                }
+
+                override fun onError(e: DbxException?) {}
+
+            }
+            viewModel.loadDataFromDropbox(
+                it,
+                callback,
+                dataManager.getCachedFiles(),
+                dataManager.getCachedCursor()
+            )
+        }
     }
 
     private fun syncFile(serializableExtra: File, action: String) {
@@ -231,6 +249,11 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
     private fun initObserver() {
         viewModel.downloadList.observe(this) { downloadFiles(it, viewModel.downloadSize) }
+        viewModel.tasksLiveData.observe(this) { if (it.isEmpty()) syncFinished() }
+    }
+
+    private fun syncFinished() {
+
     }
 
     private fun downloadFiles(list: List<FileMetadata>, downloadSize: Long) {
@@ -283,12 +306,12 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
                     PreferenceManager.getDefaultSharedPreferences(context)
                         .edit()
                         .putString(Constants.DROPBOX_ACCESS_TOKEN, null).apply()
-                    finishDialog(AppCompatActivity.RESULT_CANCELED)
+                    finishDialog(RESULT_CANCELED)
                 }
                 .setCancelable(false)
             builder.create().show()
         } else {
-            finishDialog(AppCompatActivity.RESULT_CANCELED)
+            finishDialog(RESULT_CANCELED)
         }
     }
 

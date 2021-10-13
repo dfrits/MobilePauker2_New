@@ -2,12 +2,15 @@ package de.daniel.mobilepauker2.data
 
 import android.content.Context
 import android.os.Environment
+import androidx.preference.PreferenceManager
+import com.google.gson.Gson
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.xml.FlashCardXMLPullFeedParser
 import de.daniel.mobilepauker2.data.xml.FlashCardXMLStreamWriter
 import de.daniel.mobilepauker2.lesson.Lesson
 import de.daniel.mobilepauker2.lesson.LessonManager
+import de.daniel.mobilepauker2.models.CacheFile
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -270,6 +273,41 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         if (name.endsWith(".pau.gz") || name.endsWith(".xml.gz")) return name
 
         return "$name.pau.gz"
+    }
+
+    private fun cacheFiles() {
+        val currentFiles: MutableList<CacheFile> = mutableListOf()
+        listFiles().forEach {
+            currentFiles.add(CacheFile(it.path, it.lastModified()))
+        }
+        val json = Gson().toJson(currentFiles)
+        PreferenceManager.getDefaultSharedPreferences(context)
+            .edit()
+            .putString(Constants.CACHED_FILES, json)
+            .apply()
+    }
+
+    fun getCachedFiles(): List<File>? {
+        val json = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(Constants.CACHED_FILES, null) ?: return null
+
+        val files = mutableListOf<File>()
+
+        Gson().fromJson(json, Array<CacheFile>::class.java).forEach {
+            val file = File(it.path)
+            file.setLastModified(it.lastModified)
+            files.add(file)
+        }
+
+        return files
+    }
+
+    fun cacheCursor(cursor: String) {
+
+    }
+
+    fun getCachedCursor(): String? {
+        TODO("Not yet implemented")
     }
 
     @Deprecated("Wird durch neuen Sync ersetzt")

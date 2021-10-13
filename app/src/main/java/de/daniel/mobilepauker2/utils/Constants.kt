@@ -64,4 +64,7 @@ object Constants {
     const val SYNC_ALL_ACTION = "SYNC_ALL_ACTION"
     const val UPLOAD_FILE_ACTION = "UPLOAD_FILE_ACTION"
     const val SYNC_FILE_ACTION = "SYNC_FILE_ACTION"
+
+    // Cache
+    const val CACHED_FILES = "CACHED_FILES"
 }

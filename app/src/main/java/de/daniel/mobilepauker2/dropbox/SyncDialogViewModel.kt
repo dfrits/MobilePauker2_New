@@ -25,14 +25,20 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
 
     var downloadSize = 0L
 
-    fun loadDataFromDropbox(files: List<File>) {
+    fun loadDataFromDropbox(
+        files: List<File>,
+        callback: ListFolderTask.Callback,
+        cachedFiles: List<File>?,
+        cachedCursor: String?
+    ) {
         val listFolderTask =
-            ListFolderTask(DropboxClientFactory.client, getCachedCursor(),
+            ListFolderTask(DropboxClientFactory.client, cachedCursor,
                 object : ListFolderTask.Callback {
                     override fun onDataLoaded(listFolderResult: ListFolderResult?) {
                         if (listFolderResult == null) onError(DbxException("Result is null"))
                         else {
-                            compareFiles(files, getEntries(listFolderResult), getCachedList())
+                            callback.onDataLoaded(listFolderResult)
+                            compareFiles(files, getEntries(listFolderResult), cachedFiles)
                         }
                     }
 
@@ -87,7 +93,7 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         addTask(task)
     }
 
-    fun uploadFiles(list: List<File>): UploadFileTask {
+    private fun uploadFiles(list: List<File>): UploadFileTask {
         var task: UploadFileTask? = null
         task = UploadFileTask(DropboxClientFactory.client, object : UploadFileTask.Callback {
             override fun onUploadComplete(result: List<Metadata?>?) {
@@ -103,7 +109,7 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         return task
     }
 
-    fun deleteFilesOnDB(list: List<File>) {
+    private fun deleteFilesOnDB(list: List<File>) {
         var task: DeleteFileTask? = null
         task = DeleteFileTask(DropboxClientFactory.client, object : DeleteFileTask.Callback {
             override fun onDeleteComplete(result: List<DeleteResult>) {
@@ -119,12 +125,8 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         addTask(task)
     }
 
-    fun deleteFilesOnPhone(list: List<File>) {
+    private fun deleteFilesOnPhone(list: List<File>) {
         list.forEach { it.delete() }
-    }
-
-    private fun getCachedCursor(): String? { // TODO
-        return null
     }
 
     private fun addTask(task: CoroutinesAsyncTask<*, *, *>) {
@@ -158,10 +160,6 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
             }
         }
         return dbFiles.toList()
-    }
-
-    private fun getCachedList(): List<File>? { // TODO
-        return null
     }
 
     private fun compareFiles(
