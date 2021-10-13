@@ -67,4 +67,5 @@ object Constants {
 
     // Cache
     const val CACHED_FILES = "CACHED_FILES"
+    const val CACHED_CURSOR = "CACHED_CURSOR"
 }

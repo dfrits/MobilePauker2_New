@@ -303,12 +303,14 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     }
 
     fun cacheCursor(cursor: String) {
-
+        PreferenceManager.getDefaultSharedPreferences(context)
+            .edit()
+            .putString(Constants.CACHED_CURSOR, cursor)
+            .apply()
     }
 
-    fun getCachedCursor(): String? {
-        TODO("Not yet implemented")
-    }
+    fun getCachedCursor(): String? = PreferenceManager.getDefaultSharedPreferences(context)
+        .getString(Constants.CACHED_CURSOR, null)
 
     @Deprecated("Wird durch neuen Sync ersetzt")
     private fun addLesson(fileName: String) {
