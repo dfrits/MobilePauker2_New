@@ -58,12 +58,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onLost(network: Network) {
-            toaster.showToast(
-                context as Activity,
-                "Internetverbindung prüfen!", //TODO Strings
-                Toast.LENGTH_LONG
-            )
-            finishDialog(RESULT_CANCELED)
+            errorOccured(Exception(getString(R.string.check_internet_connection)))
         }
 
         override fun onAvailable(network: Network) {
@@ -73,12 +68,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         }
 
         override fun onUnavailable() {
-            toaster.showToast(
-                context as Activity,
-                "Internetverbindung prüfen!", // TODO Strings
-                Toast.LENGTH_LONG
-            )
-            finishDialog(RESULT_CANCELED)
+            errorOccured(Exception(getString(R.string.check_internet_connection)))
         }
     }
 
@@ -89,15 +79,14 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
         val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         if (!isInternetAvailable(cm)) {
-            toaster.showToast(context as Activity, "Internetverbindung prüfen!", Toast.LENGTH_LONG)
-            finishDialog(RESULT_CANCELED)
+            errorOccured(Exception(getString(R.string.check_internet_connection)))
         }
 
         val intent = intent
         accessToken = intent.getStringExtra(ACCESS_TOKEN)
         if (accessToken == null) {
             Log.d("SyncDialog::OnCreate", "Synchro mit accessToken = null gestartet")
-            finishDialog(RESULT_CANCELED)
+            errorOccured()
             return
         }
 
@@ -152,12 +141,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     fun cancelClicked(view: View) {
         Log.d("SyncDialog::cancelClicked", "Cancel Sync")
         view.isEnabled = false
-        toaster.showToast(
-            context as Activity,
-            R.string.synchro_canceled_by_user,
-            Toast.LENGTH_LONG
-        )
-        finishDialog(RESULT_CANCELED)
+        errorOccured(Exception(getString(R.string.synchro_canceled_by_user)))
     }
 
     private fun startSync(intent: Intent, serializableExtra: Serializable) {
@@ -168,7 +152,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
             syncFile(serializableExtra, action)
         } else {
             Log.d("SyncDialog::OnCreate", "Synchro mit falschem Extra gestartet")
-            finishDialog(RESULT_CANCELED)
+            errorOccured()
         }
     }
 
@@ -237,14 +221,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         timeout = Timer()
         timerTask = object : TimerTask() {
             override fun run() {
-                runOnUiThread {
-                    toaster.showToast(
-                        context as Activity,
-                        R.string.synchro_timeout,
-                        Toast.LENGTH_SHORT
-                    )
-                }
-                finishDialog(RESULT_CANCELED)
+                errorOccured(Exception(getString(R.string.synchro_timeout)))
             }
         }
         timeout?.schedule(timerTask, 60000)
@@ -295,19 +272,21 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         })
     }
 
-    private fun errorOccured(e: Exception?) { // TODO Andere Exceptions einpflegen
+    private fun errorOccured(e: Exception? = null) {
+        val errorMessage = e?.message ?: getString(R.string.simple_error_message)
         toaster.showToast(
             context as Activity,
-            R.string.simple_error_message,
+            errorMessage,
             Toast.LENGTH_SHORT
         )
+
         viewModel.cancelTasks()
+
         if (e is DbxException && e.requestId == "401") {
             val builder = AlertDialog.Builder(context)
             builder.setTitle("Dropbox token is invalid!")
                 .setMessage(
-                    "There is something wrong with the dropbox token. Maybe it is " +
-                            "solved by the next try." // TODO Strings
+                    getString(R.string.error_invalid_token_message)
                 )
                 .setPositiveButton(R.string.ok, null)
                 .setNeutralButton("Send E-Mail") { _, _ ->

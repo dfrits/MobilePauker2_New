@@ -58,10 +58,9 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         for (task in tasks) {
             if (task.status != CoroutinesAsyncTask.Status.FINISHED) {
                 task.cancel(false)
-                tasks.remove(task)
             }
         }
-        _tasksLiveData.postValue(tasks)
+        tasks.clear()
     }
 
     fun downloadFiles(list: List<FileMetadata>, callback: DownloadFileTask.Callback) {
