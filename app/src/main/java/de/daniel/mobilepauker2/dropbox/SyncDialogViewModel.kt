@@ -180,7 +180,7 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
             } else if (dbFile != null) {
                 val clientModified = dbFile.clientModified.time
                 val cachedModified = cachedFile?.lastModified() ?: clientModified
-                if (clientModified == cachedModified && localFile.lastModified() > clientModified) {
+                if (clientModified == cachedModified && localFile.lastModified() < clientModified) {
                     filesToUpload.add(localFile)
                 }
             }

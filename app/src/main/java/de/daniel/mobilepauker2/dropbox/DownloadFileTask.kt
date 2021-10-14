@@ -1,5 +1,6 @@
 package de.daniel.mobilepauker2.dropbox
 
+import android.os.Environment
 import com.dropbox.core.DbxException
 import com.dropbox.core.v2.DbxClientV2
 import com.dropbox.core.v2.files.FileMetadata
@@ -38,7 +39,7 @@ class DownloadFileTask internal constructor(
             val list: MutableList<File> = mutableListOf()
             for (metadata in params) {
                 metadata?.let {
-                    val path = File(Constants.DEFAULT_APP_FILE_DIRECTORY)
+                    val path = File("${Environment.getExternalStorageDirectory()}${Constants.DEFAULT_APP_FILE_DIRECTORY}")
                     val file = File(path, metadata.name)
 
                     // Make sure the Downloads directory exists.
