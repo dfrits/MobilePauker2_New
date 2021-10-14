@@ -243,7 +243,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     }
 
     private fun syncFinished() {
-        println()
+        finishDialog(RESULT_OK)
     }
 
     private fun downloadFiles(list: List<FileMetadata>, downloadSize: Long) {
