@@ -13,6 +13,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.dropbox.core.DbxException
 import com.dropbox.core.v2.files.FileMetadata
@@ -26,6 +27,9 @@ import de.daniel.mobilepauker2.utils.Constants.FILES
 import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.Serializable
 import java.util.*
@@ -40,7 +44,19 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     private var cancelButton: Button? = null
     private var accessToken: String? = null
 
-    private var networkCallback = object : ConnectivityManager.NetworkCallback() {
+    @Inject
+    lateinit var toaster: Toaster
+
+    @Inject
+    lateinit var errorReporter: ErrorReporter
+
+    @Inject
+    lateinit var dataManager: DataManager
+
+    @Inject
+    lateinit var viewModel: SyncDialogViewModel
+
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onLost(network: Network) {
             toaster.showToast(
                 context as Activity,
@@ -53,7 +69,6 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         override fun onAvailable(network: Network) {
             DropboxClientFactory.init(accessToken)
             val serializableExtra = intent.getSerializableExtra(FILES)
-            viewModel.errorLiveData.observe(lifecycleOwner) { errorOccured(it) }
             startSync(intent, serializableExtra!!)
         }
 
@@ -66,18 +81,6 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
             finishDialog(RESULT_CANCELED)
         }
     }
-
-    @Inject
-    lateinit var toaster: Toaster
-
-    @Inject
-    lateinit var errorReporter: ErrorReporter
-
-    @Inject
-    lateinit var dataManager: DataManager
-
-    @Inject
-    lateinit var viewModel: SyncDialogViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -179,11 +182,11 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         files = serializableExtra
         startTimer()
         initObserver()
-        files?.let {
+        files?.let { list ->
             val callback = object : ListFolderTask.Callback {
                 override fun onDataLoaded(listFolderResult: ListFolderResult?) {
-                    listFolderResult?.cursor?.let {
-                        dataManager.cacheCursor(it)
+                    listFolderResult?.cursor?.let { cursor ->
+                        dataManager.cacheCursor(cursor)
                     }
                 }
 
@@ -191,7 +194,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
             }
             viewModel.loadDataFromDropbox(
-                it,
+                list,
                 callback,
                 dataManager.getCachedFiles(),
                 dataManager.getCachedCursor()
@@ -248,12 +251,22 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     }
 
     private fun initObserver() {
-        viewModel.downloadList.observe(this) { downloadFiles(it, viewModel.downloadSize) }
-        viewModel.tasksLiveData.observe(this) { if (it.isEmpty()) syncFinished() }
+        lifecycleScope.launch {
+            withContext(Dispatchers.Main) {
+                viewModel.downloadList.observe(lifecycleOwner) {
+                    downloadFiles(
+                        it,
+                        viewModel.downloadSize
+                    )
+                }
+                viewModel.tasksLiveData.observe(lifecycleOwner) { if (it.isEmpty()) syncFinished() }
+                viewModel.errorLiveData.observe(lifecycleOwner) { errorOccured(it) }
+            }
+        }
     }
 
     private fun syncFinished() {
-
+        println()
     }
 
     private fun downloadFiles(list: List<FileMetadata>, downloadSize: Long) {
