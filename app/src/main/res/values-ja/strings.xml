@@ -250,5 +250,6 @@
     <string name="overwrite_file_question">Overwrite File?</string>
     <string name="check_internet_connection">Internetverbindung prüfen!</string>
     <string name="error_invalid_token_message">There is something wrong with the dropbox token. Maybe it is solved by the next try.</string>
+    <string name="sync_success">Synchronized successfully</string>
     <!-- endregion -->
 </resources>

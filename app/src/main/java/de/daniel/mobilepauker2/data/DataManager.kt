@@ -275,7 +275,7 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         return "$name.pau.gz"
     }
 
-    private fun cacheFiles() {
+    fun cacheFiles() {
         val currentFiles: MutableList<CacheFile> = mutableListOf()
         listFiles().forEach {
             currentFiles.add(CacheFile(it.path, it.lastModified()))

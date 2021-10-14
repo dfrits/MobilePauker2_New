@@ -31,25 +31,26 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         cachedFiles: List<File>?,
         cachedCursor: String?
     ) {
-        val listFolderTask =
-            ListFolderTask(DropboxClientFactory.client, cachedCursor,
-                object : ListFolderTask.Callback {
-                    override fun onDataLoaded(listFolderResult: ListFolderResult?) {
-                        if (listFolderResult == null) onError(DbxException("Result is null"))
-                        else {
-                            callback.onDataLoaded(listFolderResult)
-                            compareFiles(files, getEntries(listFolderResult), cachedFiles)
-                        }
+        var listFolderTask: ListFolderTask? = null
+        listFolderTask = ListFolderTask(DropboxClientFactory.client, cachedCursor,
+            object : ListFolderTask.Callback {
+                override fun onDataLoaded(listFolderResult: ListFolderResult?) {
+                    if (listFolderResult == null) onError(DbxException("Result is null"))
+                    else {
+                        callback.onDataLoaded(listFolderResult)
+                        compareFiles(files, getEntries(listFolderResult), cachedFiles)
                     }
+                    removeTask(listFolderTask)
+                }
 
-                    override fun onError(e: DbxException?) {
-                        Log.d(
-                            "LessonImportActivity::loadData::onError",
-                            "Error loading Files: " + e?.message
-                        )
-                        _errorLiveData.postValue(e)
-                    }
-                })
+                override fun onError(e: DbxException?) {
+                    Log.d(
+                        "LessonImportActivity::loadData::onError",
+                        "Error loading Files: " + e?.message
+                    )
+                    _errorLiveData.postValue(e)
+                }
+            })
         listFolderTask.execute(Constants.DROPBOX_PATH)
         addTask(listFolderTask)
     }

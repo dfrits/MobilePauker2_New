@@ -243,6 +243,8 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     }
 
     private fun syncFinished() {
+        toaster.showToast(context as Activity, R.string.sync_success, Toast.LENGTH_SHORT)
+        dataManager.cacheFiles()
         finishDialog(RESULT_OK)
     }
 
