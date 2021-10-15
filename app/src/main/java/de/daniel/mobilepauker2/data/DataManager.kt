@@ -302,7 +302,7 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         return files
     }
 
-    fun cacheCursor(cursor: String) {
+    fun cacheCursor(cursor: String?) {
         PreferenceManager.getDefaultSharedPreferences(context)
             .edit()
             .putString(Constants.CACHED_CURSOR, cursor)

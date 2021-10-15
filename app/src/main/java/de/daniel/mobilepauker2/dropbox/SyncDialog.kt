@@ -17,7 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.dropbox.core.DbxException
 import com.dropbox.core.v2.files.FileMetadata
-import com.dropbox.core.v2.files.ListFolderResult
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
@@ -167,19 +166,8 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         startTimer()
         initObserver()
         files?.let { list ->
-            val callback = object : ListFolderTask.Callback {
-                override fun onDataLoaded(listFolderResult: ListFolderResult?) {
-                    listFolderResult?.cursor?.let { cursor ->
-                        dataManager.cacheCursor(cursor)
-                    }
-                }
-
-                override fun onError(e: DbxException?) {}
-
-            }
             viewModel.loadDataFromDropbox(
                 list,
-                callback,
                 dataManager.getCachedFiles(),
                 dataManager.getCachedCursor()
             )
@@ -245,6 +233,7 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     private fun syncFinished() {
         toaster.showToast(context as Activity, R.string.sync_success, Toast.LENGTH_SHORT)
         dataManager.cacheFiles()
+        dataManager.cacheCursor(viewModel.cursor)
         finishDialog(RESULT_OK)
     }
 
