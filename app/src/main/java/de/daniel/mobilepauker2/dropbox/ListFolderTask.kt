@@ -35,7 +35,7 @@ class ListFolderTask internal constructor(
                 mDbxClient.files()
                     .listFolderBuilder(params[0])
                     .withRecursive(false)
-                    .withIncludeDeleted(false)
+                    .withIncludeDeleted(true)
                     .start()
             } else {
                 mDbxClient.files().listFolderContinue(cachedCursor)
