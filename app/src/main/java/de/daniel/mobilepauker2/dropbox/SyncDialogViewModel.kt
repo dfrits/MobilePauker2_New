@@ -24,10 +24,10 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
     val downloadList: LiveData<List<FileMetadata>> = _downloadList
 
     var downloadSize = 0L
+    var cursor: String? = null
 
     fun loadDataFromDropbox(
         files: List<File>,
-        callback: ListFolderTask.Callback,
         cachedFiles: List<File>?,
         cachedCursor: String?
     ) {
@@ -35,9 +35,9 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         listFolderTask = ListFolderTask(DropboxClientFactory.client, cachedCursor,
             object : ListFolderTask.Callback {
                 override fun onDataLoaded(listFolderResult: ListFolderResult?) {
+                    cursor = listFolderResult?.cursor
                     if (listFolderResult == null) onError(DbxException("Result is null"))
                     else {
-                        callback.onDataLoaded(listFolderResult)
                         compareFiles(files, getEntries(listFolderResult), cachedFiles)
                     }
                     removeTask(listFolderTask)
@@ -146,7 +146,7 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         while (true) {
             val entries: List<Metadata> = result.entries
             for (entry in entries) {
-                if (dataManager.isNameValid(entry.name) && entry !is DeletedMetadata) {
+                if (dataManager.isNameValid(entry.name)) {
                     dbFiles.add(entry)
                 }
             }
@@ -172,32 +172,36 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         val filesToDeleteLocal = mutableListOf<File>()
         val filesToDeleteServer = mutableListOf<File>()
 
+        dbFiles.forEach { dbFile ->
+            if (dbFile is DeletedMetadata) {
+                lokalFiles.find(dbFile)?.let { filesToDeleteLocal.add(it) }
+            } else {
+                val localFile = lokalFiles.find(dbFile as FileMetadata)
+                val cachedFile = cachedFiles?.find(dbFile)
+                if (localFile == null && cachedFile == null) {
+                    filesToDownload.add(dbFile)
+                    downloadSize += dbFile.size
+                } else if (localFile != null) {
+                    val localModified = localFile.lastModified()
+                    val cachedModified = cachedFile?.lastModified() ?: localModified
+                    if (localModified == cachedModified
+                        && localModified < dbFile.clientModified.time
+                    ) {
+                        filesToUpload.add(localFile)
+                    }
+                }
+            }
+        }
+
         lokalFiles.forEach { localFile ->
             val dbFile = dbFiles.find(localFile) as FileMetadata?
             val cachedFile = cachedFiles?.find(localFile)
-            if (dbFile == null && cachedFile == null) {
+            if (dbFile == null && cachedFile == null && filesToDeleteLocal.find(localFile) == null) {
                 filesToUpload.add(localFile)
             } else if (dbFile != null) {
                 val clientModified = dbFile.clientModified.time
                 val cachedModified = cachedFile?.lastModified() ?: clientModified
                 if (clientModified == cachedModified && localFile.lastModified() < clientModified) {
-                    filesToUpload.add(localFile)
-                }
-            }
-        }
-
-        dbFiles.forEach { dbFile ->
-            val localFile = lokalFiles.find(dbFile as FileMetadata)
-            val cachedFile = cachedFiles?.find(dbFile)
-            if (localFile == null && cachedFile == null) {
-                filesToDownload.add(dbFile)
-                downloadSize += dbFile.size
-            } else if (localFile != null) {
-                val localModified = localFile.lastModified()
-                val cachedModified = cachedFile?.lastModified() ?: localModified
-                if (localModified == cachedModified
-                    && localModified < dbFile.clientModified.time
-                ) {
                     filesToUpload.add(localFile)
                 }
             }
@@ -209,8 +213,6 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
 
             if (localFile == null && dbFile != null) {
                 filesToDeleteServer.add(cachedFile)
-            } else if (localFile != null && dbFile == null) {
-                filesToDeleteLocal.add(cachedFile)
             }
         }
 
@@ -220,9 +222,11 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
         deleteFilesOnDB(filesToDeleteServer)
     }
 
-    private fun List<Metadata>.find(file: File): Metadata? = find { it.name == file.name }
+    private fun List<Metadata>.find(file: File): Metadata? = find {
+        it is FileMetadata && it.name == file.name
+    }
 
-    private fun List<File>.find(metadata: FileMetadata): File? = find { it.name == metadata.name }
+    private fun List<File>.find(metadata: Metadata): File? = find { it.name == metadata.name }
 
     private fun List<File>.find(file: File): File? = find { it.name == file.name }
 }
