@@ -42,7 +42,7 @@ class DropboxAccDialog : AppCompatActivity(R.layout.progress_dialog) {
                     Auth.startOAuth2Authentication(this, Constants.DROPBOX_APP_KEY)
                     assStarted = true
                 } else {
-                    toaster.showToast(this, "Bereits verbunden", Toast.LENGTH_SHORT) //TODO Strings
+                    toaster.showToast(this, R.string.already_connected, Toast.LENGTH_SHORT)
                     setResult(RESULT_CANCELED)
                     finish()
                 }

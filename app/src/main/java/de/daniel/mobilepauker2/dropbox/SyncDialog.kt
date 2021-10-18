@@ -23,6 +23,8 @@ import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
 import de.daniel.mobilepauker2.utils.Constants.FILES
+import de.daniel.mobilepauker2.utils.Constants.SYNC_FILE_ACTION
+import de.daniel.mobilepauker2.utils.Constants.UPLOAD_FILE_ACTION
 import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -175,7 +177,19 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
     }
 
     private fun syncFile(serializableExtra: File, action: String) {
-
+        if (serializableExtra.exists()) {
+            Log.d("SyncDialog:syncFile", "File exists")
+            Log.d("SyncDialog:syncFile", "Syncaction: $action")
+            if (UPLOAD_FILE_ACTION == action) {
+                Log.d("SyncDialog:syncFile", "Upload just one file")
+                viewModel.uploadFile(serializableExtra)
+                finishDialog(RESULT_OK)
+            } else if (SYNC_FILE_ACTION == action) {
+                showDialog()
+                showCancelButton()
+                viewModel.compareFileAndDownload(serializableExtra)
+            }
+        }
     }
 
     private fun showDialog() {
@@ -198,12 +212,6 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
         cancelButton?.visibility = View.VISIBLE
         Log.d("SyncDialog::showCancelButton", "Button is enabled: " + cancelButton?.isEnabled)
     }
-
-    private fun getFileIndex(file: File, list: Collection<File>): Int =
-        list.indexOfFirst { it.name == file.name }
-
-    private fun getFileIndex(fileName: String, list: Collection<String>): Int =
-        list.indexOfFirst { it == fileName }
 
     private fun startTimer() {
         timeout = Timer()

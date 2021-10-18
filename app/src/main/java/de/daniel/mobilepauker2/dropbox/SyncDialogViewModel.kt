@@ -1,14 +1,18 @@
 package de.daniel.mobilepauker2.dropbox
 
+import android.app.Activity
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dropbox.core.DbxException
 import com.dropbox.core.v2.files.*
+import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.CoroutinesAsyncTask
 import de.daniel.mobilepauker2.utils.Log
 import java.io.File
+import java.util.ArrayList
 import javax.inject.Inject
 
 class SyncDialogViewModel @Inject constructor(private val dataManager: DataManager) {
@@ -90,6 +94,39 @@ class SyncDialogViewModel @Inject constructor(private val dataManager: DataManag
 
         })
         task.execute(*list.toTypedArray())
+        addTask(task)
+    }
+
+    fun uploadFile(file: File) {
+        uploadFiles(listOf(file))
+    }
+
+    fun compareFileAndDownload(file: File) {
+        var task: ListFileTask? = null
+        task = ListFileTask(DropboxClientFactory.client, object : ListFileTask.Callback {
+            override fun onDataLoaded(metadata: Metadata?) {
+                Log.d("SyncDialog:syncFile::onDataLoaded", "Data loaded")
+                if (metadata is FileMetadata) {
+                    if (file.lastModified() < metadata.clientModified.time) {
+                        Log.d("SyncDialog:syncFile::onDataLoaded", "File wird runtergeladen")
+                        val metadataList: MutableList<FileMetadata> = ArrayList()
+                        metadataList.add(metadata)
+                        _downloadList.postValue(metadataList)
+                    } else {
+                        Log.d("SyncDialog:syncFile::onDataLoaded", "File wird NICHT runtergeladen")
+                        _errorLiveData.postValue(DefaultException(R.string.error_dropbox_file_older_than_local))
+                    }
+                } else if (metadata is DeletedMetadata) {
+                    _errorLiveData.postValue(DefaultException(R.string.error_dropbox_file_not_found))
+                }
+                removeTask(task)
+            }
+
+            override fun onError(e: DbxException?) {
+                _errorLiveData.postValue(e)
+            }
+        })
+        task.execute("${Constants.DROPBOX_PATH}//${file.name}")
         addTask(task)
     }
 
