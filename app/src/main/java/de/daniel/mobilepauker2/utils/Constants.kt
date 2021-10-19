@@ -20,14 +20,6 @@ object Constants {
     const val DROPBOX_AUTH_ACTION = "de.daniel.mobilepauker2.dropbox.auth"
     const val DROPBOX_UNLINK_ACTION = "de.daniel.mobilepauker2.dropbox.unlink"
 
-    @Deprecated("Wird durch neuen Sync ersetzt")
-    // Datei, in der die Namen der lokal gelöschten Lektionen stehen
-    const val DELETED_FILES_NAMES_FILE_NAME = "trash"
-
-    @Deprecated("Wird durch neuen Sync ersetzt")
-    // Datei, in der die Namen der lokal neuhinzugefügten Lektionen stehen
-    const val ADDED_FILES_NAMES_FILE_NAME = "news"
-
     // Name einer neuen, nicht gespeicherten Lektion
     const val DEFAULT_FILE_NAME = "NONE"
 
