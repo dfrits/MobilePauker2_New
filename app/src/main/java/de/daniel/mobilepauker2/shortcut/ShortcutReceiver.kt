@@ -11,12 +11,17 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.dropbox.SyncDialog
 import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
+import de.daniel.mobilepauker2.utils.Constants.FILES
 import de.daniel.mobilepauker2.utils.Constants.SHORTCUT_EXTRA
+import de.daniel.mobilepauker2.utils.Constants.SYNC_FILE_ACTION
 import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -90,17 +95,17 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
         if (settingsManager.getBoolPreference(SettingsManager.Keys.AUTO_DOWNLOAD)
         ) {
             Log.d("ShortcutReceiver::openLesson", "Check for newer version on DB")
-            /*val accessToken = PreferenceManager.getDefaultSharedPreferences(context)
+            val accessToken = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(Constants.DROPBOX_ACCESS_TOKEN, null)
-            val syncIntent = Intent(context, SyncDialog::class.java) // TODO
+            val syncIntent = Intent(context, SyncDialog::class.java)
             try {
-                syncIntent.putExtra(SyncDialog.FILES, paukerManager.getFilePath(context, filename))
+                syncIntent.putExtra(FILES, dataManager.getFilePathForName(filename))
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-            syncIntent.putExtra(SyncDialog.ACCESS_TOKEN, accessToken)
-            syncIntent.action = SyncDialog.SYNC_FILE_ACTION
-            startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG_BEFORE_OPEN)*/
+            syncIntent.putExtra(ACCESS_TOKEN, accessToken)
+            syncIntent.action = SYNC_FILE_ACTION
+            startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG_BEFORE_OPEN)
         } else {
             openLesson(filename)
         }
