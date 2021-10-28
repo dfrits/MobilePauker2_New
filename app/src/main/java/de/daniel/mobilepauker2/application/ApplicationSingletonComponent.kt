@@ -16,6 +16,7 @@ import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.models.view.MPEditText
 import de.daniel.mobilepauker2.models.view.MPTextView
 import de.daniel.mobilepauker2.search.Search
+import de.daniel.mobilepauker2.shortcut.ShortcutReceiver
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.utils.Toaster
 import javax.inject.Singleton
@@ -41,4 +42,5 @@ interface ApplicationSingletonComponent {
     fun inject(saveAsDialog: SaveAsDialog)
     fun inject(dropboxAccDialog: DropboxAccDialog)
     fun inject(syncDialog: SyncDialog)
+    fun inject(shortcutReceiver: ShortcutReceiver)
 }
