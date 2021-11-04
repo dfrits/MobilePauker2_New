@@ -1,7 +1,5 @@
 package de.daniel.mobilepauker2.dropbox
 
-import android.app.Activity
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.dropbox.core.DbxException
@@ -12,7 +10,7 @@ import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.CoroutinesAsyncTask
 import de.daniel.mobilepauker2.utils.Log
 import java.io.File
-import java.util.ArrayList
+import java.util.*
 import javax.inject.Inject
 
 class SyncDialogViewModel @Inject constructor(private val dataManager: DataManager) {

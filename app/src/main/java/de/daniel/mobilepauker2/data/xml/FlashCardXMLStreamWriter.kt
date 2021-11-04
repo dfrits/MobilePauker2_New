@@ -13,10 +13,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
-import java.lang.Exception
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
-import java.lang.NullPointerException
 import java.util.zip.GZIPOutputStream
 
 class FlashCardXMLStreamWriter(

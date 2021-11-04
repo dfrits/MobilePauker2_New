@@ -2,7 +2,6 @@ package de.daniel.mobilepauker2.lesson.card
 
 import android.content.Context
 import android.database.Cursor
-import javax.inject.Inject
 
 abstract class CardPackAdapter(protected val context: Context) {
 

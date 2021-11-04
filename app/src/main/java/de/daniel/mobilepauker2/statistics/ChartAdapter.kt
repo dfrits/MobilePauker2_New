@@ -1,6 +1,5 @@
 package de.daniel.mobilepauker2.statistics
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +9,6 @@ import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
-import de.daniel.mobilepauker2.models.ModelManager
 import java.util.*
 import javax.inject.Inject
 

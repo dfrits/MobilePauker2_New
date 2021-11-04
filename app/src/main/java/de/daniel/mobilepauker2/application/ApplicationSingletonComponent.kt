@@ -6,6 +6,7 @@ import de.daniel.mobilepauker2.data.SaveAsDialog
 import de.daniel.mobilepauker2.dropbox.DropboxAccDialog
 import de.daniel.mobilepauker2.dropbox.SyncDialog
 import de.daniel.mobilepauker2.editcard.AbstractEditCard
+import de.daniel.mobilepauker2.editcard.AddCard
 import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.card.CardPackRamAdapter
@@ -16,9 +17,8 @@ import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.models.view.MPEditText
 import de.daniel.mobilepauker2.models.view.MPTextView
 import de.daniel.mobilepauker2.search.Search
-import de.daniel.mobilepauker2.shortcut.ShortcutReceiver
-import de.daniel.mobilepauker2.settings.PaukerSettings
 import de.daniel.mobilepauker2.settings.SettingsFragment
+import de.daniel.mobilepauker2.shortcut.ShortcutReceiver
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.utils.Toaster
 import javax.inject.Singleton

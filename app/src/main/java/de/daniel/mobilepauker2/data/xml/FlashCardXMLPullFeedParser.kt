@@ -1,7 +1,7 @@
 package de.daniel.mobilepauker2.data.xml
 
 import android.util.Xml
-import de.daniel.mobilepauker2.lesson.*
+import de.daniel.mobilepauker2.lesson.Lesson
 import de.daniel.mobilepauker2.lesson.batch.Batch
 import de.daniel.mobilepauker2.lesson.batch.LongTermBatch
 import de.daniel.mobilepauker2.lesson.card.ComponentOrientation

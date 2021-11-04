@@ -21,7 +21,6 @@ import de.daniel.mobilepauker2.lesson.card.Card.Element.*
 import de.daniel.mobilepauker2.lesson.card.FlashCard
 import de.daniel.mobilepauker2.search.SearchResultMultiChoiceModeListener.*
 import de.daniel.mobilepauker2.utils.Constants
-import de.daniel.mobilepauker2.utils.Log
 import java.util.*
 import javax.inject.Inject
 

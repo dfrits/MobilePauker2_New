@@ -4,10 +4,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.Window
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -15,7 +12,6 @@ import androidx.fragment.app.DialogFragment
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.utils.Utility.Companion.hideKeyboard
-import java.io.File
 import javax.inject.Inject
 
 class SaveAsDialog(private val saveAsCallback: SaveAsCallback) :

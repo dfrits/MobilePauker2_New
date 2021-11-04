@@ -14,10 +14,8 @@ import de.daniel.mobilepauker2.models.CacheFile
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
-import java.io.BufferedReader
 import java.io.File
 import java.io.IOException
-import java.io.InputStreamReader
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton

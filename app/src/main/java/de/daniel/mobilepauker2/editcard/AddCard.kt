@@ -9,12 +9,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.preference.PreferenceManager
 import de.daniel.mobilepauker2.R
-import de.daniel.mobilepauker2.application.PaukerApplication
-import de.daniel.mobilepauker2.data.DataManager
-import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.card.FlashCard
 import de.daniel.mobilepauker2.utils.Constants
-import javax.inject.Inject
 
 class AddCard : AbstractEditCard() {
     private lateinit var checkBox: MenuItem

@@ -3,7 +3,6 @@ package de.daniel.mobilepauker2.dropbox
 import com.dropbox.core.DbxException
 import com.dropbox.core.v2.DbxClientV2
 import com.dropbox.core.v2.files.DeleteResult
-import com.dropbox.core.v2.files.FileMetadata
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.CoroutinesAsyncTask
 import java.io.File
