@@ -128,7 +128,9 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                     return false
                 }
             })
-            searchView.setOnQueryTextFocusChangeListener { v, hasFocus -> if (!hasFocus) searchView.clearFocus() }
+            searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) searchView.clearFocus()
+            }
         }
         return true
     }
@@ -264,15 +266,13 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 it.overScrollMode = View.OVER_SCROLL_NEVER
                 it.isScrollContainer = true
                 it.isNestedScrollingEnabled = true
-                runOnUiThread {
-                    val onClickListener: ChartAdapterCallback = object : ChartAdapterCallback {
-                        override fun onClick(position: Int) {
-                            showBatchDetails(position)
-                        }
+                val onClickListener: ChartAdapterCallback = object : ChartAdapterCallback {
+                    override fun onClick(position: Int) {
+                        runOnUiThread { showBatchDetails(position) }
                     }
-                    val adapter = ChartAdapter(application as PaukerApplication, onClickListener)
-                    it.adapter = adapter
                 }
+                val adapter = ChartAdapter(application as PaukerApplication, onClickListener)
+                it.adapter = adapter
             }
         }.run()
     }
