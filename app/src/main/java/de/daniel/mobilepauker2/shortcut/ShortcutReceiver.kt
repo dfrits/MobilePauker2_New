@@ -5,18 +5,26 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.dropbox.SyncDialog
 import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
+import de.daniel.mobilepauker2.utils.Constants.FILES
 import de.daniel.mobilepauker2.utils.Constants.SHORTCUT_EXTRA
+import de.daniel.mobilepauker2.utils.Constants.SYNC_FILE_ACTION
 import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -40,12 +48,14 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
+
         setContentView(R.layout.progress_dialog)
+
         val progressBar = findViewById<RelativeLayout>(R.id.pFrame)
         progressBar.visibility = View.VISIBLE
         val title = findViewById<TextView>(R.id.pTitle)
         title.setText(R.string.open_lesson_hint)
-        val intent = intent
         if (Constants.SHORTCUT_ACTION == intent.action) {
             handleShortcut(intent)
         }
@@ -78,7 +88,11 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
             )
             return
         }*/
-        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager())
+            || (Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+                    && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED)
+        ) {
             toaster.showToast(
                 context as Activity,
                 R.string.shortcut_open_error_permission,
@@ -90,17 +104,17 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
         if (settingsManager.getBoolPreference(SettingsManager.Keys.AUTO_DOWNLOAD)
         ) {
             Log.d("ShortcutReceiver::openLesson", "Check for newer version on DB")
-            /*val accessToken = PreferenceManager.getDefaultSharedPreferences(context)
+            val accessToken = PreferenceManager.getDefaultSharedPreferences(context)
                 .getString(Constants.DROPBOX_ACCESS_TOKEN, null)
-            val syncIntent = Intent(context, SyncDialog::class.java) // TODO
+            val syncIntent = Intent(context, SyncDialog::class.java)
             try {
-                syncIntent.putExtra(SyncDialog.FILES, paukerManager.getFilePath(context, filename))
+                syncIntent.putExtra(FILES, dataManager.getFilePathForName(filename))
             } catch (e: IOException) {
                 e.printStackTrace()
             }
-            syncIntent.putExtra(SyncDialog.ACCESS_TOKEN, accessToken)
-            syncIntent.action = SyncDialog.SYNC_FILE_ACTION
-            startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG_BEFORE_OPEN)*/
+            syncIntent.putExtra(ACCESS_TOKEN, accessToken)
+            syncIntent.action = SYNC_FILE_ACTION
+            startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG_BEFORE_OPEN)
         } else {
             openLesson(filename)
         }

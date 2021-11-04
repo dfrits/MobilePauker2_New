@@ -25,7 +25,8 @@ import javax.inject.Singleton
 
 @Singleton
 class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Context) {
-    private var lesson: Lesson? = null
+    var lesson: Lesson? = null
+        private set
     var currentPack = mutableListOf<FlashCard>()
     var lessonDescription = lesson?.description ?: ""
 
@@ -40,11 +41,12 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
     }
 
     fun setupNewLesson() {
-        dataManager.get().currentFileName = Constants.DEFAULT_FILE_NAME
+        dataManager.get().setNewFileName(Constants.DEFAULT_FILE_NAME)
         lesson = Lesson()
     }
 
-    fun isLessonNotNew() = dataManager.get().currentFileName != Constants.DEFAULT_FILE_NAME
+    fun isLessonNotNew() =
+        dataManager.get().getReadableCurrentFileName() != Constants.DEFAULT_FILE_NAME
 
     fun addCard(flashCard: FlashCard, sideA: String, sideB: String) {
         flashCard.sideAText = sideA
@@ -222,13 +224,14 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         lesson = Lesson()
     }
 
-    fun sortBatch(stackIndex: Int, sortByElement: Card.Element, asc_direction: Boolean) {
+    fun sortBatch(stackIndex: Int, sortByElement: Card.Element, asc_direction: Boolean): Boolean {
         val batch: Batch? = when (stackIndex) {
             0 -> lesson?.summaryBatch
             1 -> lesson?.unlearnedBatch
             else -> lesson?.getLongTermBatchFromIndex(stackIndex - 2)
         }
-        batch?.sortCards(sortByElement, asc_direction)
+
+        return batch?.sortCards(sortByElement, asc_direction) ?: false
     }
 
     fun deleteCard(position: Int): Boolean {
@@ -331,7 +334,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
     }
 
     private fun shuffleCurrentPack() {
-        Collections.shuffle(currentPack)
+        currentPack.shuffle()
     }
 
     private fun doPackNeedShuffle(): Boolean {
@@ -465,6 +468,24 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
             // Fill the current pack
             fillCurrentPack(cardIterator)
         }
+    }
+
+    fun setCurrentPack(stackIndex: Int): MutableList<FlashCard> {
+        val cardIterator: Iterator<Card>
+        lesson?.let { lesson ->
+            if (getBatchSize(BatchType.LESSON) > 0) {
+                currentPack.clear()
+                cardIterator = when (stackIndex) {
+                    0 -> lesson.summaryBatch.cards.iterator()
+                    1 -> lesson.unlearnedBatch.cards.iterator()
+                    else -> lesson.getLongTermBatchFromIndex(stackIndex - 2).cards.iterator()
+                }
+
+                // Fill the current pack
+                fillCurrentPack(cardIterator)
+            }
+        }
+        return currentPack
     }
 
     private fun fillCurrentPack(cardIterator: Iterator<Card>) {

@@ -20,10 +20,15 @@ import com.dropbox.core.android.Auth
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.dropbox.DropboxAccDialog
+import de.daniel.mobilepauker2.dropbox.SyncDialog
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.shortcut.ShortcutsManager
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
+import de.daniel.mobilepauker2.utils.Constants.FILES
+import de.daniel.mobilepauker2.utils.Constants.SYNC_FILE_ACTION
 import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -298,11 +303,11 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     }
 
     private fun startSync() {
-        /*val syncIntent = Intent(context, SyncDialog::class.java) // TODO
-        syncIntent.putExtra(SyncDialog.ACCESS_TOKEN, accessToken)
-        syncIntent.putExtra(SyncDialog.FILES, files)
-        syncIntent.action = SyncDialog.SYNC_ALL_ACTION
-        startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG)*/
+        val syncIntent = Intent(context, SyncDialog::class.java)
+        syncIntent.putExtra(Constants.ACCESS_TOKEN, accessToken)
+        syncIntent.putExtra(Constants.FILES, files)
+        syncIntent.action = Constants.SYNC_ALL_ACTION
+        startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG)
     }
 
     private fun deleteLesson(position: Int) {
@@ -339,11 +344,11 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
         try {
             if (settingsManager.getBoolPreference(SettingsManager.Keys.AUTO_DOWNLOAD)) {
                 val accessToken = preferences.getString(Constants.DROPBOX_ACCESS_TOKEN, null)
-                /*val syncIntent = Intent(context, SyncDialog::class.java)
-                syncIntent.putExtra(SyncDialog.FILES, paukerManager.getFilePath(context, filename))
-                syncIntent.putExtra(SyncDialog.ACCESS_TOKEN, accessToken)
-                syncIntent.action = SyncDialog.SYNC_FILE_ACTION
-                startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG_BEFORE_OPEN)*/ // TODO
+                val syncIntent = Intent(context, SyncDialog::class.java)
+                syncIntent.putExtra(FILES, dataManager.getFilePathForName(filename))
+                syncIntent.putExtra(ACCESS_TOKEN, accessToken)
+                syncIntent.action = SYNC_FILE_ACTION
+                startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG_BEFORE_OPEN)
                 Log.d("LessonImportActivity:openLesson", "Check for newer version on DB")
             } else {
                 toaster.showToast(
@@ -419,9 +424,9 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     fun syncManuallyClicked(item: MenuItem?) {
         accessToken = preferences.getString(Constants.DROPBOX_ACCESS_TOKEN, null)
         if (accessToken == null) {
-            //val assIntent = Intent(context, DropboxAccDialog::class.java) // TODO
-            //assIntent.putExtra(DropboxAccDialog.AUTH_MODE, true)
-            //startActivityForResult(assIntent, Constants.REQUEST_CODE_DB_ACC_DIALOG)
+            val assIntent = Intent(context, DropboxAccDialog::class.java)
+            assIntent.action = Constants.DROPBOX_AUTH_ACTION
+            startActivityForResult(assIntent, Constants.REQUEST_CODE_DB_ACC_DIALOG)
         } else {
             startSync()
         }

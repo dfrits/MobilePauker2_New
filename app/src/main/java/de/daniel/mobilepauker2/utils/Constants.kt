@@ -17,14 +17,8 @@ object Constants {
     const val DROPBOX_ACCESS_TOKEN = "DROPBOX_ACCESS_TOKEN"
     const val DROPBOX_USER_ID = "DROPBOX_USER_ID"
     const val DROPBOX_PATH = ""
-
-    @Deprecated("Wird durch neuen Sync ersetzt")
-    // Datei, in der die Namen der lokal gelöschten Lektionen stehen
-    const val DELETED_FILES_NAMES_FILE_NAME = "trash"
-
-    @Deprecated("Wird durch neuen Sync ersetzt")
-    // Datei, in der die Namen der lokal neuhinzugefügten Lektionen stehen
-    const val ADDED_FILES_NAMES_FILE_NAME = "news"
+    const val DROPBOX_AUTH_ACTION = "de.daniel.mobilepauker2.dropbox.auth"
+    const val DROPBOX_UNLINK_ACTION = "de.daniel.mobilepauker2.dropbox.unlink"
 
     // Name einer neuen, nicht gespeicherten Lektion
     const val DEFAULT_FILE_NAME = "NONE"
@@ -55,4 +49,15 @@ object Constants {
     // Shortcut
     const val SHORTCUT_ACTION = "com.daniel.mobilepauker2.activities.ShortcutReceiver"
     const val SHORTCUT_EXTRA = "Filename"
+
+    // Sync
+    const val ACCESS_TOKEN = "ACCESS_TOKEN"
+    const val FILES = "FILES"
+    const val SYNC_ALL_ACTION = "SYNC_ALL_ACTION"
+    const val UPLOAD_FILE_ACTION = "UPLOAD_FILE_ACTION"
+    const val SYNC_FILE_ACTION = "SYNC_FILE_ACTION"
+
+    // Cache
+    const val CACHED_FILES = "CACHED_FILES"
+    const val CACHED_CURSOR = "CACHED_CURSOR"
 }

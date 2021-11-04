@@ -110,7 +110,7 @@ open class Batch internal constructor(val cards: MutableList<Card>) {
      * @param cardElement the card element that must be used for sorting the cards
      * @param ascending   if true the cards are sorted ascending otherwise descending
      */
-    fun sortCards(cardElement: Card.Element?, ascending: Boolean) {
+    fun sortCards(cardElement: Card.Element?, ascending: Boolean): Boolean {
         var comparator: AbstractCardComparator<Card>? = null
         when (cardElement) {
             Card.Element.FRONT_SIDE -> comparator = frontSideComparator
@@ -124,7 +124,10 @@ open class Batch internal constructor(val cards: MutableList<Card>) {
         if (comparator != null) {
             comparator.setAscending(ascending)
             Collections.sort(cards, comparator)
+            return true
         }
+
+        return false
     }
 
     fun getNumberOfCards(): Int = cards.size
