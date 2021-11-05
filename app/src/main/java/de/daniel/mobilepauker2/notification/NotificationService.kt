@@ -41,12 +41,12 @@ class NotificationService(val context: Context, workerParams: WorkerParameters) 
             "Newest Time: " + newestTime + ". Now is: " + System.currentTimeMillis()
         )
 
-        /*if (newestTime > -1 && alarmManager != null) {
-            alarmIntent = Intent(this, AlarmNotificationReceiver::class.java)
-            pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0)
+        if (newestTime > -1 && alarmManager != null) {
+            alarmIntent = Intent(context, AlarmNotificationReceiver::class.java)
+            pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0)
             alarmManager[AlarmManager.RTC_WAKEUP, newestTime] = pendingIntent
             Log.d("NotificationService::setAlarm", "Alarm set")
-        }*/
+        }
 
         return Result.success()
     }
