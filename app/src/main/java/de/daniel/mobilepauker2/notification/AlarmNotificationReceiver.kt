@@ -7,15 +7,26 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.lessonimport.LessonImport
 import de.daniel.mobilepauker2.mainmenu.MainMenu
+import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_CHANNEL_ID
+import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_ID
 import de.daniel.mobilepauker2.utils.Log
+import de.daniel.mobilepauker2.utils.Utility
+import javax.inject.Inject
 
 class AlarmNotificationReceiver : BroadcastReceiver() {
 
+    @Inject
+    lateinit var settingsManager: SettingsManager
+
     override fun onReceive(context: Context, intent: Intent?) {
         Log.d("AlamNotificationReceiver::onReceive", "Alarm received")
+
+        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+
         val builder: NotificationCompat.Builder =
             NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
         val intents = arrayOf(
@@ -35,14 +46,16 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
             .setContentIntent(pendingIntent)
             .setContentText(context.getString(R.string.cards_expire_notify_msg))
         Log.d("AlamNotificationReceiver::onReceive", "Notification build")
+
+        val isAppRunning = Utility.isAppRunning(context)
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        /*Log.d("AlamNotificationReceiver::onReceive", "PaukerActive: " + MainMenu.isPaukerActive)
-        val shNotify: Boolean = SettingsManager.instance()
-            .getBoolPreference(context, SettingsManager.Keys.SHOW_CARD_NOTIFY)
-        if (!MainMenu.isPaukerActive && showNotify) {
+        Log.d("AlamNotificationReceiver::onReceive", "PaukerActive: $isAppRunning")
+        val showNotify: Boolean =
+            settingsManager.getBoolPreference(SettingsManager.Keys.SHOW_CARD_NOTIFY)
+        if (!isAppRunning && showNotify) {
             notificationManager.notify(NOTIFICATION_ID, builder.build())
             Log.d("AlamNotificationReceiver::onReceive", "Notification send")
-        }*/
+        }
     }
 }
