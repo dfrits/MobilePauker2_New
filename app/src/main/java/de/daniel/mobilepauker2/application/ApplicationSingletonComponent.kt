@@ -16,6 +16,7 @@ import de.daniel.mobilepauker2.lessonimport.LessonImportAdapter
 import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.models.view.MPEditText
 import de.daniel.mobilepauker2.models.view.MPTextView
+import de.daniel.mobilepauker2.notification.NotificationService
 import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.settings.SettingsFragment
 import de.daniel.mobilepauker2.shortcut.ShortcutReceiver
@@ -47,4 +48,5 @@ interface ApplicationSingletonComponent {
     fun inject(dropboxAccDialog: DropboxAccDialog)
     fun inject(syncDialog: SyncDialog)
     fun inject(shortcutReceiver: ShortcutReceiver)
+    fun inject(notificationService: NotificationService)
 }
