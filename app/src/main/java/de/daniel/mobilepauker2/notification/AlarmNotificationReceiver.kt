@@ -25,7 +25,7 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         Log.d("AlamNotificationReceiver::onReceive", "Alarm received")
 
-        (context as PaukerApplication).applicationSingletonComponent.inject(this)
+        //(context as PaukerApplication).applicationSingletonComponent.inject(this)
 
         val builder: NotificationCompat.Builder =
             NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
@@ -51,9 +51,9 @@ class AlarmNotificationReceiver : BroadcastReceiver() {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         Log.d("AlamNotificationReceiver::onReceive", "PaukerActive: $isAppRunning")
-        val showNotify: Boolean =
-            settingsManager.getBoolPreference(SettingsManager.Keys.SHOW_CARD_NOTIFY)
-        if (!isAppRunning && showNotify) {
+        //val showNotify: Boolean =
+          //  settingsManager.getBoolPreference(SettingsManager.Keys.SHOW_CARD_NOTIFY)
+        if (!isAppRunning /*&& showNotify*/) {
             notificationManager.notify(NOTIFICATION_ID, builder.build())
             Log.d("AlamNotificationReceiver::onReceive", "Notification send")
         }

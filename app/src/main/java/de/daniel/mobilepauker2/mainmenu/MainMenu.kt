@@ -32,6 +32,7 @@ import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lessonimport.LessonImport
+import de.daniel.mobilepauker2.notification.NotificationService
 import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.settings.PaukerSettings
 import de.daniel.mobilepauker2.statistics.ChartAdapter
@@ -185,6 +186,11 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         if (requestCode == RQ_WRITE_EXT_SAVE_NEW && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             checkLessonNameThenSave(REQUEST_CODE_SAVE_DIALOG_NEW_LESSON)
         }
+    }
+
+    override fun onDestroy() {
+        NotificationService.enqueueWork(context)
+        super.onDestroy()
     }
 
     private fun saveFinished(requestCode: Int) {
