@@ -1,9 +1,7 @@
 package de.daniel.mobilepauker2.mainmenu
 
 import android.Manifest
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.SearchManager
+import android.app.*
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -39,9 +37,11 @@ import de.daniel.mobilepauker2.settings.PaukerSettings
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_CHANNEL_ID
 import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON
 import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_NORMAL
 import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_OPEN
+import de.daniel.mobilepauker2.utils.Constants.TIMER_BAR_CHANNEL_ID
 import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -75,6 +75,8 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         super.onCreate(savedInstanceState)
 
         (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
+
+        createNotificationChannels()
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
 
@@ -545,5 +547,58 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     fun repeatCards(view: View) {
 
+    }
+
+    // Notification
+    fun createNotificationChannels() {
+        // Für Notification
+        createNotificationChannel(
+            getString(R.string.channel_notify_name_other),
+            null,
+            NotificationManager.IMPORTANCE_DEFAULT,
+            NOTIFICATION_CHANNEL_ID,
+            true
+        )
+
+        // Timerbar
+        createNotificationChannel(
+            getString(R.string.channel_timerbar_name),
+            getString(R.string.channel_timerbar_description),
+            NotificationManager.IMPORTANCE_LOW,
+            TIMER_BAR_CHANNEL_ID,
+            false
+        )
+
+        // Falls der TimerChannel noch existiert
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        if (notificationManager != null) {
+            notificationManager.deleteNotificationChannel("Timers")
+            Log.d("MainMenu::createNotificationChannel", "Timer channel deleted")
+        }
+    }
+
+    private fun createNotificationChannel(
+        channelName: String,
+        description: String?,
+        importance: Int,
+        ID: String,
+        playSound: Boolean
+    ) {
+        val channel = NotificationChannel(ID, channelName, importance)
+
+        if (description != null) {
+            channel.description = description
+        }
+
+        if (!playSound) {
+            channel.setSound(null, null)
+        }
+
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager?.createNotificationChannel(channel)
+        Log.d(
+            "AlamNotificationReceiver::createNotificationChannel",
+            "Channel created: $channelName"
+        )
     }
 }
