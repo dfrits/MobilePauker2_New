@@ -45,8 +45,6 @@ class Utility {
                 context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
             val listRunningApps = activityManager?.runningAppProcesses
 
-            Toast.makeText(context, "testing apps", Toast.LENGTH_LONG).show()
-
             if (listRunningApps.isNullOrEmpty())
                 Toast.makeText(context, "current null", Toast.LENGTH_LONG).show()
 
