@@ -76,7 +76,8 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
         (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
 
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false)
+        PreferenceManager.setDefaultValues(this, R.xml.preferences_main, false)
+        PreferenceManager.setDefaultValues(this, R.xml.preferences_dropbox, false)
 
         setContentView(R.layout.main_menu)
 

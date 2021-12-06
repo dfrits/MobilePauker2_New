@@ -17,7 +17,8 @@ import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.models.view.MPEditText
 import de.daniel.mobilepauker2.models.view.MPTextView
 import de.daniel.mobilepauker2.search.Search
-import de.daniel.mobilepauker2.settings.SettingsFragment
+import de.daniel.mobilepauker2.settings.SettingsFragmentDropbox
+import de.daniel.mobilepauker2.settings.SettingsFragmentMain
 import de.daniel.mobilepauker2.shortcut.ShortcutReceiver
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.utils.Toaster
@@ -39,7 +40,8 @@ interface ApplicationSingletonComponent {
     fun inject(mpEditText: MPEditText)
     fun inject(abstractEditCard: AbstractEditCard)
     fun inject(addCard: AddCard)
-    fun inject(settingsFragment: SettingsFragment)
+    fun inject(settingsFragmentMain: SettingsFragmentMain)
+    fun inject(settingsFragmentDropbox: SettingsFragmentDropbox)
     fun inject(editDescription: EditDescription)
     fun inject(mpTextView: MPTextView)
     fun inject(search: Search)

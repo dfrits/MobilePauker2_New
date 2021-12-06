@@ -6,6 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 class PaukerSettings : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        supportFragmentManager.beginTransaction().replace(android.R.id.content, SettingsFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(android.R.id.content, SettingsFragmentMain()).commit()
     }
 }
