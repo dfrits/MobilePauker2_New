@@ -101,30 +101,28 @@ class SettingsFragmentMain : PreferenceFragmentCompat(),
     }
 
     private fun updatePrefSummary(preference: Preference?) {
-        if (preference == null) return
+        preference?.summary?.let { summ ->
+            var newSumm = summ
 
-        var summ = preference.summary
-
-        if (summ != null) {
             if (preference is EditTextPreference) {
                 if (preference.key == settingsManager.getSettingsKey(USTM))
-                    summ = getString(R.string.ustm_summ)
+                    newSumm = getString(R.string.ustm_summ)
                 else if (preference.key == settingsManager.getSettingsKey(STM))
-                    summ = getString(R.string.stm_summ)
-                preference.summary = String.format(summ.toString(), preference.text)
+                    newSumm = getString(R.string.stm_summ)
+                preference.summary = String.format(newSumm.toString(), preference.text)
             } else if (preference is ListPreference) {
                 when (preference.key) {
                     settingsManager.getSettingsKey(REPEAT_CARDS) -> {
-                        summ = getString(R.string.repeat_cards_summ)
+                        newSumm = getString(R.string.repeat_cards_summ)
                     }
                     settingsManager.getSettingsKey(RETURN_FORGOTTEN_CARDS) -> {
-                        summ = getString(R.string.return_forgotten_cards_summ)
+                        newSumm = getString(R.string.return_forgotten_cards_summ)
                     }
                     settingsManager.getSettingsKey(FLIP_CARD_SIDES) -> {
-                        summ = getString(R.string.flip_card_sides_summ)
+                        newSumm = getString(R.string.flip_card_sides_summ)
                     }
                 }
-                preference.summary = String.format(summ.toString(), preference.entry)
+                preference.summary = String.format(newSumm.toString(), preference.entry)
             }
         }
     }

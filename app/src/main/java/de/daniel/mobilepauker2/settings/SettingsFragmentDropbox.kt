@@ -1,11 +1,8 @@
 package de.daniel.mobilepauker2.settings
 
 import android.app.Activity
-import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.media.RingtoneManager
 import android.os.Bundle
 import androidx.preference.*
 import de.daniel.mobilepauker2.R
@@ -118,15 +115,6 @@ class SettingsFragmentDropbox : PreferenceFragmentCompat(),
         preference?.key?.let { preferenceKey ->
             if (preferenceKey == settingsManager.getSettingsKey(SettingsManager.Keys.DB_PREFERENCE)) {
                 initSyncPrefs()
-            } else if (preferenceKey == settingsManager.getSettingsKey(SettingsManager.Keys.RING_TONE)) {
-                val notificationManager =
-                    context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                val ringtonePath =
-                    notificationManager.getNotificationChannel(Constants.NOTIFICATION_CHANNEL_ID)?.sound
-                ringtonePath?.let {
-                    val ringtone = RingtoneManager.getRingtone(context, it)
-                    preference.summary = ringtone.getTitle(context)
-                }
             }
         }
     }

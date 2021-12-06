@@ -78,6 +78,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences_main, false)
         PreferenceManager.setDefaultValues(this, R.xml.preferences_dropbox, false)
+        PreferenceManager.setDefaultValues(this, R.xml.preferences_notifications, false)
 
         setContentView(R.layout.main_menu)
 
