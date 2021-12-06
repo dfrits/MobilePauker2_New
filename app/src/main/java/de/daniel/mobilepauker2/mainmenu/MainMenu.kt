@@ -1,9 +1,7 @@
 package de.daniel.mobilepauker2.mainmenu
 
 import android.Manifest
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.SearchManager
+import android.app.*
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -34,14 +32,17 @@ import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lessonimport.LessonImport
+import de.daniel.mobilepauker2.notification.NotificationService
 import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.settings.PaukerSettings
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_CHANNEL_ID
 import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON
 import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_NORMAL
 import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_OPEN
+import de.daniel.mobilepauker2.utils.Constants.TIMER_BAR_CHANNEL_ID
 import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -79,6 +80,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         PreferenceManager.setDefaultValues(this, R.xml.preferences_main, false)
         PreferenceManager.setDefaultValues(this, R.xml.preferences_dropbox, false)
         PreferenceManager.setDefaultValues(this, R.xml.preferences_notifications, false)
+        createNotificationChannels()
 
         setContentView(R.layout.main_menu)
 
@@ -130,7 +132,9 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                     return false
                 }
             })
-            searchView.setOnQueryTextFocusChangeListener { v, hasFocus -> if (!hasFocus) searchView.clearFocus() }
+            searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) searchView.clearFocus()
+            }
         }
         return true
     }
@@ -183,6 +187,11 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         if (requestCode == RQ_WRITE_EXT_SAVE_NEW && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             checkLessonNameThenSave(REQUEST_CODE_SAVE_DIALOG_NEW_LESSON)
         }
+    }
+
+    override fun onDestroy() {
+        NotificationService.enqueueWork(context)
+        super.onDestroy()
     }
 
     private fun saveFinished(requestCode: Int) {
@@ -266,15 +275,13 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 it.overScrollMode = View.OVER_SCROLL_NEVER
                 it.isScrollContainer = true
                 it.isNestedScrollingEnabled = true
-                runOnUiThread {
-                    val onClickListener: ChartAdapterCallback = object : ChartAdapterCallback {
-                        override fun onClick(position: Int) {
-                            showBatchDetails(position)
-                        }
+                val onClickListener: ChartAdapterCallback = object : ChartAdapterCallback {
+                    override fun onClick(position: Int) {
+                        runOnUiThread { showBatchDetails(position) }
                     }
-                    val adapter = ChartAdapter(application as PaukerApplication, onClickListener)
-                    it.adapter = adapter
                 }
+                val adapter = ChartAdapter(application as PaukerApplication, onClickListener)
+                it.adapter = adapter
             }
         }.run()
     }
@@ -547,5 +554,58 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     fun repeatCards(view: View) {
 
+    }
+
+    // Notification
+    fun createNotificationChannels() {
+        // Für Notification
+        createNotificationChannel(
+            getString(R.string.channel_notify_name_other),
+            null,
+            NotificationManager.IMPORTANCE_DEFAULT,
+            NOTIFICATION_CHANNEL_ID,
+            true
+        )
+
+        // Timerbar
+        createNotificationChannel(
+            getString(R.string.channel_timerbar_name),
+            getString(R.string.channel_timerbar_description),
+            NotificationManager.IMPORTANCE_LOW,
+            TIMER_BAR_CHANNEL_ID,
+            false
+        )
+
+        // Falls der TimerChannel noch existiert
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        if (notificationManager != null) {
+            notificationManager.deleteNotificationChannel("Timers")
+            Log.d("MainMenu::createNotificationChannel", "Timer channel deleted")
+        }
+    }
+
+    private fun createNotificationChannel(
+        channelName: String,
+        description: String?,
+        importance: Int,
+        ID: String,
+        playSound: Boolean
+    ) {
+        val channel = NotificationChannel(ID, channelName, importance)
+
+        if (description != null) {
+            channel.description = description
+        }
+
+        if (!playSound) {
+            channel.setSound(null, null)
+        }
+
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager?.createNotificationChannel(channel)
+        Log.d(
+            "AlamNotificationReceiver::createNotificationChannel",
+            "Channel created: $channelName"
+        )
     }
 }
