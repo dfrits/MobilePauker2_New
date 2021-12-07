@@ -262,6 +262,7 @@ class ErrorReporter @Inject constructor(private val context: Context) :
             Intent.EXTRA_SUBJECT,
             context.getString(R.string.crash_report_mail_subject)
         )
+        emailIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
         context.startActivity(
             Intent.createChooser(
