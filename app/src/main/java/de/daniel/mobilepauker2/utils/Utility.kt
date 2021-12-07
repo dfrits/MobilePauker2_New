@@ -55,8 +55,6 @@ class Utility {
                         "current foreground App ${runAppProccess.processName}",
                         Toast.LENGTH_LONG
                     ).show()
-                } else {
-                    Toast.makeText(context, "current background App ${runAppProccess.processName}", Toast.LENGTH_LONG).show()
                 }
             }
             return false
