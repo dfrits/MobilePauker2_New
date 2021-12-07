@@ -87,6 +87,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         viewModel.checkLessonIsSetup()
 
         errorReporter.init()
+        checkErrors()
 
         initButtons()
         initView()
@@ -400,8 +401,8 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     private fun checkErrors() {
         if (errorReporter.isThereAnyErrorsToReport) {
-            val alt_bld = AlertDialog.Builder(this)
-            alt_bld.setTitle(getString(R.string.crash_report_title))
+            val altBld = AlertDialog.Builder(this)
+            altBld.setTitle(getString(R.string.crash_report_title))
                 .setMessage(getString(R.string.crash_report_message))
                 .setCancelable(false)
                 .setPositiveButton(
@@ -413,7 +414,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                     errorReporter.deleteErrorFiles()
                     dialog.cancel()
                 }
-            val alert = alt_bld.create()
+            val alert = altBld.create()
             alert.setIcon(R.mipmap.ic_launcher)
             alert.show()
         }
