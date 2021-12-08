@@ -5,7 +5,6 @@ import com.dropbox.core.v2.DbxClientV2
 import com.dropbox.core.v2.files.Metadata
 import com.dropbox.core.v2.files.WriteMode
 import de.daniel.mobilepauker2.utils.Constants
-import de.daniel.mobilepauker2.utils.CoroutinesAsyncTask
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
