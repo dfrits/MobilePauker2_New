@@ -96,6 +96,8 @@
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar.Dialog" />
 
+        <service android:name=".learning.TimerService" />
+
         <!-- Notification -->
 
         <receiver android:name=".notification.AlarmNotificationReceiver" />
