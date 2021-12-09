@@ -98,11 +98,6 @@ class FlashCardCursor(context: Context) : AbstractCursor() {
 
     override fun getColumnCount(): Int = columnNames.size
 
-    // Create new Cursor
-    /*override fun requery(): Boolean {
-        return super.requery()
-    }*/
-
     override fun getCount(): Int = lessonManager.getBatchSize(BatchType.CURRENT)
 
     override fun getColumnNames(): Array<String> = arrayOf(
