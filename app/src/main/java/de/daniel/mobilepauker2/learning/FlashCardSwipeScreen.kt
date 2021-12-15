@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.Loader
 import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lesson.card.CardPackRamAdapter
@@ -21,7 +22,7 @@ abstract class FlashCardSwipeScreen : AppCompatActivity(R.layout.learn_cards),
     LoaderManager.LoaderCallbacks<Cursor> {
 
     protected val INSTANCESTATE_CURSOR_POSITION = "INSTANCESTATE_CURSOR_POSITION"
-    protected var mCardCursor: Cursor? = null
+    protected lateinit var mCardCursor: Cursor
     protected var currentCard: FlashCard = FlashCard()
     protected var gestureDetector: GestureDetector? = null
     protected var mCardPackAdapter: CardPackRamAdapter? = null
@@ -35,6 +36,9 @@ abstract class FlashCardSwipeScreen : AppCompatActivity(R.layout.learn_cards),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
+
         mCardPackAdapter = CardPackRamAdapter(this)
 
         // Setup the cursor
