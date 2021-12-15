@@ -2,15 +2,16 @@ package de.daniel.mobilepauker2.learning
 
 import android.app.Service
 import android.content.Intent
+import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
+import android.os.PowerManager
+import android.provider.Settings
+import de.daniel.mobilepauker2.BuildConfig.APPLICATION_ID
 import de.daniel.mobilepauker2.utils.Log
 import java.util.*
 
 class TimerService: Service() {
-    val USTM_TOTAL_TIME = "USTM_TOTAL_TIME"
-    val STM_TOTAL_TIME = "STM_TOTAL_TIME"
-
     val timerService = this
 
     //Broadcast
@@ -36,9 +37,19 @@ class TimerService: Service() {
     private var stm_timerPaused = false
     private var stm_timerFinished = true
 
+    private var wakeLock: PowerManager.WakeLock? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PeriSecure:MyWakeLock")
+    }
+
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        ustm_totalTime = intent.getIntExtra(USTM_TOTAL_TIME, -1)
-        stm_totalTime = intent.getIntExtra(STM_TOTAL_TIME, -1)
+        wakeLock?.acquire(stm_totalTime + 6000L)
+
+        ustm_totalTime = intent.getIntExtra(Companion.USTM_TOTAL_TIME, -1)
+        stm_totalTime = intent.getIntExtra(Companion.STM_TOTAL_TIME, -1)
         if (ustm_totalTime == -1 || stm_totalTime == -1) {
             Log.d("TimerService::onStartCommand", "Invalid total time: USTM= "
                 + ustm_totalTime + "; STM= " + stm_totalTime)
@@ -61,6 +72,11 @@ class TimerService: Service() {
     override fun onUnbind(intent: Intent?): Boolean {
         stopSelf()
         return false
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        wakeLock?.release()
     }
 
     private fun onUstmTimerTick() {
@@ -228,5 +244,10 @@ class TimerService: Service() {
     inner class LocalBinder : Binder() {
         val serviceInstance: TimerService
             get() = this@TimerService
+    }
+
+    companion object {
+        val USTM_TOTAL_TIME = "USTM_TOTAL_TIME"
+        val STM_TOTAL_TIME = "STM_TOTAL_TIME"
     }
 }
