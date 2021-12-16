@@ -268,5 +268,7 @@
     <string name="already_connected">Bereits verbunden</string>
     <string name="error_dropbox_file_not_found">Datei ist nicht länger verfügbar auf Dropbox</string>
     <string name="error_dropbox_file_older_than_local">File on Dropbox is older than this!</string>
+    <string name="tap_enter_answer">Tap to enter your answer.</string>
+    <string name="deleting_impossible">Löschen nicht möglich!</string>
     <!-- endregion -->
 </resources>

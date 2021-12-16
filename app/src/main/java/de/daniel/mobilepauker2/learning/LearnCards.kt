@@ -7,36 +7,44 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.RelativeLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import com.danilomendes.progressbar.InvertedTextProgressbar
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
-import de.daniel.mobilepauker2.learning.TimerService.*
+import de.daniel.mobilepauker2.editcard.EditCard
+import de.daniel.mobilepauker2.learning.TimerService.LocalBinder
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lesson.card.CardPackAdapter
-import de.daniel.mobilepauker2.lesson.card.FlashCard.SideShowing.*
+import de.daniel.mobilepauker2.lesson.card.FlashCard.SideShowing.SIDE_A
+import de.daniel.mobilepauker2.lesson.card.FlashCard.SideShowing.SIDE_B
+import de.daniel.mobilepauker2.models.Font
 import de.daniel.mobilepauker2.models.LearningPhase
 import de.daniel.mobilepauker2.models.LearningPhase.*
 import de.daniel.mobilepauker2.models.LearningPhase.Companion.currentPhase
-import de.daniel.mobilepauker2.models.LearningPhase.Companion.setLearningPhase
+import de.daniel.mobilepauker2.models.view.MPEditText
+import de.daniel.mobilepauker2.models.view.MPTextView
 import de.daniel.mobilepauker2.settings.SettingsManager
-import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
+import de.daniel.mobilepauker2.settings.SettingsManager.Keys.STM
+import de.daniel.mobilepauker2.settings.SettingsManager.Keys.USTM
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
+import java.util.*
 import javax.inject.Inject
 
 class LearnCards : FlashCardSwipeScreen() {
     private val context: Context = this
     private var pendingIntent: Intent? = null
     private var notificationManager: NotificationManagerCompat? = null
-    private val flipCardSides = false
-    private val completedLearning = false
+    private var flipCardSides = false
+    private var completedLearning = false
     private var repeatingLTM = false
     private var stopWaiting = false
     private var firstStart = true
@@ -45,17 +53,14 @@ class LearnCards : FlashCardSwipeScreen() {
     private lateinit var timerServiceIntent: Intent
     private lateinit var ustmTimerBar: InvertedTextProgressbar
     private lateinit var stmTimerBar: InvertedTextProgressbar
-    private val bNext: Button? = null
-    private val bShowMe: Button? = null
-    private val lRepeatButtons: RelativeLayout? = null
-    private val lSkipWaiting: RelativeLayout? = null
+    private var bNext: Button? = null
+    private var bShowMe: Button? = null
+    private var lRepeatButtons: RelativeLayout? = null
+    private var lSkipWaiting: RelativeLayout? = null
     private var pauseButton: MenuItem? = null
     private var restartButton: MenuItem? = null
     private var timerAnimation: RelativeLayout? = null
     private val ustmTimerText: String? = null
-
-    @Inject
-    lateinit var viewModel: LearnCardsViewModel
 
     @Inject
     lateinit var errorReporter: ErrorReporter
@@ -84,7 +89,8 @@ class LearnCards : FlashCardSwipeScreen() {
 
         if (currentPhase !== REPEATING_LTM
             && (currentPhase !== SIMPLE_LEARNING
-                || currentPhase !== NOTHING)) {
+                || currentPhase !== NOTHING)
+        ) {
             // A check on mActivitySetupOk is done here as onCreate is called even if the
             // super (FlashCardSwipeScreenActivity) onCreate fails to find any cards and calls finish()
             if (mActivitySetupOk) {
@@ -105,11 +111,18 @@ class LearnCards : FlashCardSwipeScreen() {
             } else {
                 currentCard.sideAText = ""
                 currentCard.sideBText = ""
-                Log.d("FlashCardSwipeScreenActivity::updateCurrentCard", "Card Cursor not available")
+                Log.d(
+                    "FlashCardSwipeScreenActivity::updateCurrentCard",
+                    "Card Cursor not available"
+                )
             }
         } catch (e: Exception) {
             Log.e("FlashCardSwipeScreenActivity::updateCurrentCard", "Caught Exception")
-            toaster.showToast(context as Activity, R.string.load_card_data_error, Toast.LENGTH_SHORT)
+            toaster.showToast(
+                context as Activity,
+                R.string.load_card_data_error,
+                Toast.LENGTH_SHORT
+            )
             errorReporter.addCustomData("LearnCardsActivity::updateCurrentCard", "cursor problem?")
             finish()
         }
@@ -118,9 +131,7 @@ class LearnCards : FlashCardSwipeScreen() {
     override fun screenTouched() {
         if (timerService.isUstmTimerPaused() || timerService.isStmTimerPaused()) return
 
-        val learningPhase: LearningPhase = currentPhase
-
-        if (learningPhase == REPEATING_LTM || learningPhase == REPEATING_STM || learningPhase == REPEATING_USTM) {
+        if (currentPhase == REPEATING_LTM || currentPhase == REPEATING_STM || currentPhase == REPEATING_USTM) {
             if (lessonManager.getCardFromCurrentPack(mCardCursor.position)!!.isRepeatedByTyping) {
                 showInputDialog()
             } else {
@@ -138,13 +149,20 @@ class LearnCards : FlashCardSwipeScreen() {
 
     override fun fillData() {
         // Prüfen, ob getauscht werden soll
-        val flipCardSides: Boolean = hasCardsToBeFlipped()
+        flipCardSides = hasCardsToBeFlipped()
+        if (flipCardSides) {
+            currentCard.side = SIDE_B
+        } else {
+            currentCard.side = SIDE_A
+        }
         fillInData(flipCardSides)
     }
 
     override fun cursorLoaded() {
-        Log.d("LearnCardsActivity::cursorLoaded", "cursor loaded: " +
-            "savedPos= " + mSavedCursorPosition)
+        Log.d(
+            "LearnCardsActivity::cursorLoaded", "cursor loaded: " +
+                "savedPos= " + mSavedCursorPosition
+        )
         if (mSavedCursorPosition == -1) {
             setCursorToFirst()
             updateCurrentCard()
@@ -156,8 +174,9 @@ class LearnCards : FlashCardSwipeScreen() {
             fillInData(flipCardSides)
             if (bShowMe!!.visibility == View.VISIBLE
                 && (flipCardSides && currentCard.side == SIDE_A
-                    || !flipCardSides && currentCard.side == SIDE_B)) {
-                bShowMe.visibility = View.GONE
+                    || !flipCardSides && currentCard.side == SIDE_B)
+            ) {
+                bShowMe!!.visibility = View.GONE
                 lRepeatButtons!!.visibility = View.VISIBLE
             }
         }
@@ -169,10 +188,11 @@ class LearnCards : FlashCardSwipeScreen() {
             updateCurrentCard()
             fillInData(flipCardSides)
             setButtonsVisibility()
-            if (bShowMe!!.visibility == View.VISIBLE
+            if (bShowMe?.visibility == View.VISIBLE
                 && (flipCardSides && currentCard.side == SIDE_A
-                    || !flipCardSides && currentCard.side == SIDE_B)) {
-                bShowMe.visibility = View.GONE
+                    || !flipCardSides && currentCard.side == SIDE_B)
+            ) {
+                bShowMe!!.visibility = View.GONE
                 lRepeatButtons!!.visibility = View.VISIBLE
             }
         } else if (requestCode == Constants.REQUEST_CODE_SAVE_DIALOG_NORMAL) {
@@ -199,7 +219,7 @@ class LearnCards : FlashCardSwipeScreen() {
                 Log.d("LearnCardsActivity::onBackPressed", "Finish and Timer stopped")
                 finish()
             }
-            .setNeutralButton(R.string.cancel) { dialog, which -> dialog.cancel() }
+            .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
             .create().show()
     }
 
@@ -207,7 +227,7 @@ class LearnCards : FlashCardSwipeScreen() {
         super.onPause()
         mSavedCursorPosition = try {
             mCardCursor.position
-        } catch (e: java.lang.Exception) {
+        } catch (e: Exception) {
             -1
         }
     }
@@ -245,7 +265,8 @@ class LearnCards : FlashCardSwipeScreen() {
         pauseButton = menu.findItem(R.id.mPauseButton)
         restartButton = menu.findItem(R.id.mRestartButton)
         if (currentPhase === REPEATING_LTM || currentPhase === SIMPLE_LEARNING
-            || currentPhase === NOTHING || currentPhase === REPEATING_STM) {
+            || currentPhase === NOTHING || currentPhase === REPEATING_STM
+        ) {
             pauseButton?.isVisible = false
             restartButton?.isVisible = false
         }
@@ -269,7 +290,7 @@ class LearnCards : FlashCardSwipeScreen() {
                 registerListener()
                 timerService.startUstmTimer()
                 timerService.startStmTimer()
-                findViewById<RelativeLayout>(R.id.lTimerFrame).setVisibility(View.VISIBLE)
+                findViewById<RelativeLayout>(R.id.lTimerFrame).visibility = View.VISIBLE
                 timerAnimation = findViewById(R.id.timerAnimationPanel)
             }
 
@@ -288,11 +309,31 @@ class LearnCards : FlashCardSwipeScreen() {
         bindService(timerServiceIntent, timerServiceConnection!!, BIND_AUTO_CREATE)
     }
 
-    private fun registerListener() {
+    private fun registerListener() { // TODO
         /*registerReceiver(ustmTimeBroadcastReceiver, IntentFilter(TimerService.ustm_receiver))
         registerReceiver(stmTimeBroadcastReceiver, IntentFilter(TimerService.stm_receiver))
         registerReceiver(ustmFinishedBroadcastReceiver, IntentFilter(TimerService.ustm_finished_receiver))
         registerReceiver(stmFinishedBroadcastReceiver, IntentFilter(TimerService.stm_finished_receiver))*/
+    }
+
+    private fun hasCardsToBeFlipped(): Boolean {
+        val flipMode = settingsManager.getStringPreference(SettingsManager.Keys.FLIP_CARD_SIDES)
+
+        return if (currentPhase == REPEATING_LTM
+            || currentPhase == REPEATING_STM
+            || currentPhase == REPEATING_USTM
+        ) {
+            when (flipMode) {
+                "1" -> true
+                "2" -> {
+                    val rand = Random()
+                    rand.nextBoolean()
+                }
+                else -> false
+            }
+        } else {
+            false
+        }
     }
 
     private fun pauseTimer() {
@@ -321,7 +362,6 @@ class LearnCards : FlashCardSwipeScreen() {
             zeroSTMCards = true
         }
         when (currentPhase) {
-            NOTHING -> {}
             SIMPLE_LEARNING -> {
                 if (completedLearning) {
                     finishLearning()
@@ -410,47 +450,350 @@ class LearnCards : FlashCardSwipeScreen() {
         }
     }
 
-    fun showInputDialog() {
-
+    private fun setLearningPhase(newLearningsPhase: LearningPhase) {
+        //Neue Phase dem Modelmanager mitteilen und Deck aktualisieren
+        LearningPhase.setLearningPhase(newLearningsPhase)
+        //Cursor an erste Stelle setzen
+        mSavedCursorPosition = -1
+        refreshCursor()
     }
 
-    fun showHideTimerAnimation() {
-
+    private fun initButtons() {
+        bNext = findViewById(R.id.bNext)
+        bShowMe = findViewById(R.id.bShowMe)
+        lRepeatButtons = findViewById(R.id.lBRepeat)
+        lSkipWaiting = findViewById(R.id.lBSkipWaiting)
+        setButtonsVisibility()
     }
 
-    fun finishLearning() {
-
+    private fun showHideTimerAnimation() {
+        if (timerAnimation == null) return
+        timerAnimation!!.visibility = if (stopWaiting) View.GONE else View.VISIBLE
+        setButtonsVisibility()
     }
 
-    fun pushCursorToNext() {
-
+    private fun finishLearning() {
+        dataManager.saveRequired = true
+        finish()
     }
 
-    fun setButtonsVisibility() {
-
+    private fun setButtonsVisibility() {
+        if (currentPhase === WAITING_FOR_USTM || currentPhase === WAITING_FOR_STM) {
+            setButtonVisibilityWaiting()
+        } else if (currentPhase === SIMPLE_LEARNING || currentPhase === REPEATING_USTM || currentPhase === REPEATING_STM || currentPhase === REPEATING_LTM) {
+            setButtonVisibilityRepeating()
+        } else if (currentPhase === FILLING_USTM) {
+            setButtonVisibilityFilling()
+        }
     }
 
-    fun setButtonVisibilityFilling() {
-
+    private fun setButtonVisibilityWaiting() {
+        bNext?.visibility = View.GONE
+        bShowMe?.visibility = View.GONE
+        lRepeatButtons?.visibility = View.GONE
+        lSkipWaiting?.visibility = View.VISIBLE
     }
 
-    fun setButtonVisibilityRepeating() {
-
+    private fun setButtonVisibilityFilling() {
+        bNext!!.visibility = View.VISIBLE
+        bShowMe!!.visibility = View.GONE
+        lRepeatButtons!!.visibility = View.GONE
+        lSkipWaiting!!.visibility = View.GONE
     }
 
-    fun enableButtons() {
+    private fun setButtonVisibilityRepeating() {
+        bNext!!.visibility = View.GONE
+        bShowMe!!.visibility = View.VISIBLE
+        val currentCard = lessonManager.getCardFromCurrentPack(mCardCursor.position)
+        val text: String =
+            if (currentCard?.isRepeatedByTyping == true) getString(R.string.enter_answer)
+            else getString(R.string.show_me)
 
+        bShowMe!!.text = text
+        lRepeatButtons!!.visibility = View.GONE
+        lSkipWaiting!!.visibility = View.GONE
     }
 
-    fun disableButtons() {
-
+    private fun disableButtons() {
+        bNext!!.isEnabled = false
+        bShowMe!!.isEnabled = false
+        findViewById<Button>(R.id.bYes).isEnabled = false
+        findViewById<Button>(R.id.bNo).isEnabled = false
+        findViewById<Button>(R.id.bSkipWaiting).isEnabled = false
     }
 
-    fun fillInData(flipCardSides: Boolean) {
-
+    private fun enableButtons() {
+        bNext!!.isEnabled = true
+        bShowMe!!.isEnabled = true
+        findViewById<Button>(R.id.bYes).isEnabled = true
+        findViewById<Button>(R.id.bNo).isEnabled = true
+        findViewById<Button>(R.id.bSkipWaiting).isEnabled = true
     }
 
-    fun hasCardsToBeFlipped(): Boolean {
-        return false
+    private fun showInputDialog() {
+        val builder = AlertDialog.Builder(context)
+        val view = layoutInflater.inflate(R.layout.dialog_input, null)
+        val inputField: MPEditText = view.findViewById(R.id.eTInput)
+        builder.setView(view)
+            .setPositiveButton(R.string.proof) { dialog, _ ->
+                val cardText: String = if (flipCardSides) {
+                    currentCard.sideAText
+                } else {
+                    currentCard.sideBText
+                }
+                val caseSensitive =
+                    settingsManager.getBoolPreference(SettingsManager.Keys.CASE_SENSITIV)
+                val input: String = inputField.text.toString()
+                if (caseSensitive && cardText == input) {
+                    yesClicked(null)
+                } else if (cardText.equals(input, ignoreCase = true)) {
+                    yesClicked(null)
+                } else showResultDialog(cardText, input)
+                dialog.dismiss()
+            }
+            .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+            .setOnDismissListener {
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                if (currentFocus != null && imm.isAcceptingText) {
+                    imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+                }
+            }
+        if (flipCardSides) {
+            inputField.setFont(
+                lessonManager.getCardFont(
+                    CardPackAdapter.KEY_SIDEA_ID,
+                    mCardCursor.position
+                )
+            )
+        } else {
+            inputField.setFont(
+                lessonManager.getCardFont(
+                    CardPackAdapter.KEY_SIDEB_ID,
+                    mCardCursor.position
+                )
+            )
+        }
+        builder.create().show()
+    }
+
+    private fun showResultDialog(cardText: String, input: String) {
+        val builder = AlertDialog.Builder(context, R.style.ResultDialogTheme)
+        val view = layoutInflater.inflate(R.layout.dialog_result, null)
+        builder.setView(view)
+            .setPositiveButton(R.string.put_further) { _, _ -> yesClicked(null) }
+            .setNeutralButton(R.string.put_back) { _, _ -> noClicked(null) }
+            .setCancelable(false)
+        (view.findViewById<View>(R.id.tVRightAnswerText) as TextView).text = cardText
+        (view.findViewById<View>(R.id.tVInputText) as TextView).text = input
+        builder.create().show()
+    }
+
+    private fun fillInData(flipCardSides: Boolean) {
+        // Daten setzen
+        val fontA: Font =
+            lessonManager.getCardFont(CardPackAdapter.KEY_SIDEA_ID, mCardCursor.position)
+        val fontB: Font =
+            lessonManager.getCardFont(CardPackAdapter.KEY_SIDEB_ID, mCardCursor.position)
+
+        // Layoutcontents setzen
+        if (flipCardSides) {
+            fillSideA(R.string.back, currentCard.sideBText, fontB)
+            var sideAText: String = ""
+            if (currentCard.side == SIDE_A || currentPhase == SIMPLE_LEARNING
+                || currentPhase == FILLING_USTM
+            ) {
+                sideAText = currentCard.sideAText
+            } else if (lessonManager.getCardFromCurrentPack(mCardCursor.position)?.isRepeatedByTyping == true) {
+                sideAText = getString(R.string.tap_enter_answer)
+            }
+            fillSideB(R.string.front, sideAText, fontA)
+        } else {
+            // Card sides not flipped so show side A in top box!
+            fillSideA(R.string.front, currentCard.sideAText, fontA)
+            var sideBText: String = ""
+            if (currentCard.side == SIDE_B || currentPhase == SIMPLE_LEARNING
+                || currentPhase == FILLING_USTM
+            ) {
+                sideBText = currentCard.sideBText
+            } else if (lessonManager.getCardFromCurrentPack(mCardCursor.position)?.isRepeatedByTyping == true) {
+                sideBText = "Tap to enter your answer."
+            }
+            fillSideB(R.string.back, sideBText, fontB)
+        }
+        fillHeader()
+    }
+
+    private fun fillSideA(titleResource: Int, text: String, font: Font) {
+        findViewById<TextView>(R.id.titelCardSideA).text = getString(titleResource)
+        val sideA: MPTextView = findViewById(R.id.tCardSideA)
+        sideA.setFont(font)
+        sideA.text = text
+    }
+
+    private fun fillSideB(titleResource: Int, text: String, font: Font) {
+        findViewById<TextView>(R.id.titelCardSideB).text = getString(titleResource)
+        val sideB: MPTextView = findViewById(R.id.tCardSideB_TV)
+        if (text.isEmpty()
+            || lessonManager.getCardFromCurrentPack(mCardCursor.position)?.isRepeatedByTyping == true
+        ) {
+            sideB.hint = getString(R.string.learncards_show_hint)
+            sideB.setFont(Font())
+        } else {
+            sideB.setFont(font)
+        }
+        sideB.text = text
+    }
+
+    private fun fillHeader() {
+        val allCards: TextView = findViewById(R.id.tAllCards)
+        val ustmCards: TextView = findViewById(R.id.tUKZGCards)
+        val stmCards: TextView = findViewById(R.id.tKZGCards)
+        var text = ""
+        if (repeatingLTM) {
+            text = "${getString(R.string.expired)}:%d"
+            text = String.format(text, mCardCursor.count - mCardCursor.position)
+            allCards.text = text
+            ustmCards.visibility = View.GONE
+            stmCards.visibility = View.GONE
+        } else {
+            text = "${getString(R.string.untrained)}:%d"
+            text = String.format(text, lessonManager.getBatchSize(BatchType.UNLEARNED))
+            allCards.text = text
+            text = "${getString(R.string.ustm)}:%d"
+            text = String.format(text, lessonManager.getBatchSize(BatchType.ULTRA_SHORT_TERM))
+            ustmCards.text = text
+            text = "${getString(R.string.stm)}:%d"
+            text = String.format(text, lessonManager.getBatchSize(BatchType.SHORT_TERM))
+            stmCards.text = text
+        }
+    }
+
+    private fun pushCursorToNext() {
+        if (currentPhase == REPEATING_LTM) {
+            LearningPhase.setLearningPhase(currentPhase)
+            reloadStack()
+        } else {
+            mCardCursor.moveToNext()
+            updateCurrentCard()
+            fillData()
+        }
+    }
+
+    /* MenuButton clicks */
+
+    fun mEditClicked(item: MenuItem?) {
+        val intent = Intent(context, EditCard::class.java)
+        intent.putExtra(Constants.CURSOR_POSITION, mCardCursor.position)
+        pendingIntent = intent
+        startActivityForResult(intent, Constants.REQUEST_CODE_EDIT_CARD)
+    }
+
+    fun mDeleteClicked(item: MenuItem?) {
+        val builder = AlertDialog.Builder(context)
+        builder.setMessage(R.string.delete_card_message)
+            .setPositiveButton(R.string.delete) { dialog, _ ->
+                // Muss vorher gespeichert werden, da sonst im Nachhinein der Wert
+                // verfälscht werden kann!
+                val isLast = mCardCursor.isLast
+                if (lessonManager.deleteCard(mCardCursor.position)) {
+                    if (isLast) {
+                        // Letzte Karte oder Timer abgelaufen. Darum Lernphase aktualisieren
+                        updateLearningPhase()
+                    } else {
+                        updateCurrentCard()
+                        fillData()
+                        setButtonsVisibility()
+                    }
+                } else {
+                    toaster.showToast(
+                        context as Activity,
+                        R.string.deleting_impossible,
+                        Toast.LENGTH_SHORT
+                    )
+                }
+                dialog.cancel()
+            }
+            .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
+        builder.create().show()
+    }
+
+    fun mPauseTimerClicked(item: MenuItem) {
+        if (restartButton != null && !timerService.isStmTimerFinished()) {
+            pauseTimer()
+            item.isVisible = false
+            restartButton!!.isVisible = true
+        } else {
+            toaster.showToast(context as Activity, R.string.pause_timer_error, Toast.LENGTH_LONG)
+        }
+    }
+
+    fun mRestartTimerClicked(item: MenuItem) {
+        if (pauseButton != null) {
+            restartTimer()
+            item.isVisible = false
+            pauseButton!!.isVisible = true
+        } else {
+            toaster.showToast(context as Activity, R.string.restart_timer_error, Toast.LENGTH_LONG)
+        }
+    }
+
+    fun mFlipSidesClicked(item: MenuItem?) {
+        lessonManager.getCardFromCurrentPack(mCardCursor.position)?.flipSides()
+        dataManager.saveRequired = true
+        updateCurrentCard()
+
+        if (currentPhase == REPEATING_LTM || currentPhase == REPEATING_STM || currentPhase == REPEATING_USTM) {
+            flipCardSides = !flipCardSides
+            if (flipCardSides) {
+                currentCard.side = SIDE_B
+            } else {
+                currentCard.side = SIDE_A
+            }
+        }
+        fillInData(flipCardSides)
+        setButtonsVisibility()
+    }
+
+    /* Button clicks */
+    fun nextCard(view: View?) {
+        // Karte ein Deck weiterschieben
+        mCardPackAdapter!!.setCardLearned()
+        if (!mCardCursor.isLast && !timerService.isUstmTimerFinished()) {
+            pushCursorToNext()
+        } else {
+            // Letzte Karte oder Timer abgelaufen. Darum Lernphase aktualisieren
+            updateLearningPhase()
+        }
+    }
+
+    fun skipWaiting(view: View?) {
+        stopWaiting = true
+        updateLearningPhase()
+    }
+
+    fun noClicked(view: View?) {
+        mCardPackAdapter!!.setCardUnLearned()
+        dataManager.saveRequired = true
+        if (!mCardCursor.isLast) {
+            pushCursorToNext()
+        } else {
+            completedLearning = true
+        }
+        updateLearningPhase()
+    }
+
+    fun yesClicked(view: View?) {
+        mCardPackAdapter!!.setCardLearned()
+        dataManager.saveRequired = true
+        if (!mCardCursor.isLast) {
+            pushCursorToNext()
+        } else {
+            completedLearning = true
+        }
+        updateLearningPhase()
+    }
+
+    fun showCard(view: View?) {
+        screenTouched()
     }
 }
