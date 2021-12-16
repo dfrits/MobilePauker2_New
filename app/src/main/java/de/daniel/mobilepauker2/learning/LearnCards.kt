@@ -465,6 +465,7 @@ class LearnCards : FlashCardSwipeScreen() {
     private fun setLearningPhase(newLearningsPhase: LearningPhase) {
         //Neue Phase dem Modelmanager mitteilen und Deck aktualisieren
         LearningPhase.setLearningPhase(newLearningsPhase)
+        lessonManager.setupCurrentPack()
         //Cursor an erste Stelle setzen
         mSavedCursorPosition = -1
         refreshCursor()
@@ -683,6 +684,7 @@ class LearnCards : FlashCardSwipeScreen() {
     private fun pushCursorToNext() {
         if (currentPhase == REPEATING_LTM) {
             LearningPhase.setLearningPhase(currentPhase)
+            lessonManager.setupCurrentPack()
             reloadStack()
         } else {
             mCardCursor.moveToNext()

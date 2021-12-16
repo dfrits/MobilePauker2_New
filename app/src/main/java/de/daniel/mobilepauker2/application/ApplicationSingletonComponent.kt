@@ -11,8 +11,6 @@ import de.daniel.mobilepauker2.learning.FlashCardSwipeScreen
 import de.daniel.mobilepauker2.learning.LearnCards
 import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
-import de.daniel.mobilepauker2.lesson.card.CardPackRamAdapter
-import de.daniel.mobilepauker2.lesson.card.FlashCardCursor
 import de.daniel.mobilepauker2.lessonimport.LessonImport
 import de.daniel.mobilepauker2.lessonimport.LessonImportAdapter
 import de.daniel.mobilepauker2.mainmenu.MainMenu
@@ -35,7 +33,6 @@ interface ApplicationSingletonComponent {
 
     fun inject(manager: DataManager)
     fun inject(manager: LessonManager)
-    fun inject(adapter: CardPackRamAdapter)
     fun inject(adapter: ChartAdapter)
     fun inject(utils: Toaster)
     fun inject(mainMenu: MainMenu)

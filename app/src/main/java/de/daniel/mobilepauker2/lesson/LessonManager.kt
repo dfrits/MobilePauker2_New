@@ -407,7 +407,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         }
     }
 
-    private fun setupCurrentPack(context: Context) {
+    fun setupCurrentPack() {
         var cardIterator: Iterator<Card>
         lesson?.let { lesson ->
             when (currentPhase) {

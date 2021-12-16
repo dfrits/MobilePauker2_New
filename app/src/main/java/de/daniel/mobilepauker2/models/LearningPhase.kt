@@ -1,5 +1,7 @@
 package de.daniel.mobilepauker2.models
 
+import androidx.lifecycle.LiveData
+
 enum class LearningPhase {
     /**
      * not learning

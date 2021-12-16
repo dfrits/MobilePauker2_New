@@ -56,7 +56,7 @@ abstract class FlashCardSwipeScreen : AppCompatActivity(R.layout.learn_cards),
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
-        savedInstanceState.putInt(INSTANCESTATE_CURSOR_POSITION, mCardCursor!!.position)
+        savedInstanceState.putInt(INSTANCESTATE_CURSOR_POSITION, mCardCursor.position)
         super.onSaveInstanceState(savedInstanceState)
     }
 
@@ -73,7 +73,7 @@ abstract class FlashCardSwipeScreen : AppCompatActivity(R.layout.learn_cards),
 
     override fun onLoadFinished(loader: Loader<Cursor>, cursor: Cursor?) {
         mCardCursor = mCardPackAdapter!!.fetchAllFlashCards()
-        if (mCardCursor == null || mCardCursor!!.count <= 0) // no cards available
+        if (mCardCursor.count <= 0) // no cards available
         {
             Log.d("FlashCardSwipeScreenActivity::onCreate", "No cards available so stopping")
             mActivitySetupOk = false
