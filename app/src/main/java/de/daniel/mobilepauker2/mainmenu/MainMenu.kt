@@ -28,13 +28,19 @@ import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.data.SaveAsCallback
 import de.daniel.mobilepauker2.data.SaveAsDialog
 import de.daniel.mobilepauker2.editcard.AddCard
+import de.daniel.mobilepauker2.learning.LearnCards
 import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lessonimport.LessonImport
+import de.daniel.mobilepauker2.models.LearningPhase
+import de.daniel.mobilepauker2.models.LearningPhase.*
+import de.daniel.mobilepauker2.models.LearningPhase.Companion.setLearningPhase
 import de.daniel.mobilepauker2.notification.NotificationService
 import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.settings.PaukerSettings
+import de.daniel.mobilepauker2.settings.SettingsManager
+import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
@@ -63,6 +69,9 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     @Inject
     lateinit var errorReporter: ErrorReporter
+
+    @Inject
+    lateinit var settingsManager: SettingsManager
 
     private val context = this
     private val RQ_WRITE_EXT_SAVE_NEW = 97
@@ -550,11 +559,21 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     fun learnNewCard(view: View) {
+        if (settingsManager.getBoolPreference(HIDE_TIMES)) {
+            setLearningPhase(SIMPLE_LEARNING)
+        } else {
+            setLearningPhase(FILLING_USTM)
+        }
+        lessonManager.setupCurrentPack()
 
+        startActivity(Intent(context, LearnCards::class.java))
     }
 
     fun repeatCards(view: View) {
+        setLearningPhase(REPEATING_LTM)
+        lessonManager.setupCurrentPack()
 
+        startActivity(Intent(context, LearnCards::class.java))
     }
 
     // Notification

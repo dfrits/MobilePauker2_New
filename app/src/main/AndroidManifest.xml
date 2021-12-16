@@ -96,6 +96,10 @@
             android:exported="true"
             android:theme="@style/AppTheme.NoActionBar.Dialog" />
 
+        <activity
+            android:name=".learning.LearnCards"
+            android:screenOrientation="portrait" />
+
         <service android:name=".learning.TimerService" />
 
         <!-- Notification -->
