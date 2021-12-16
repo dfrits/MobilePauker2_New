@@ -2,6 +2,7 @@ package de.daniel.mobilepauker2.learning
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.PendingIntent
 import android.content.*
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.widget.Button
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.NotificationCompat.*
 import androidx.core.app.NotificationManagerCompat
 import com.danilomendes.progressbar.InvertedTextProgressbar
 import de.daniel.mobilepauker2.R
@@ -30,9 +32,11 @@ import de.daniel.mobilepauker2.models.LearningPhase.Companion.currentPhase
 import de.daniel.mobilepauker2.models.view.MPEditText
 import de.daniel.mobilepauker2.models.view.MPTextView
 import de.daniel.mobilepauker2.settings.SettingsManager
-import de.daniel.mobilepauker2.settings.SettingsManager.Keys.STM
-import de.daniel.mobilepauker2.settings.SettingsManager.Keys.USTM
+import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_CHANNEL_ID
+import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_ID
+import de.daniel.mobilepauker2.utils.Constants.TIME_BAR_ID
 import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -60,7 +64,7 @@ class LearnCards : FlashCardSwipeScreen() {
     private var pauseButton: MenuItem? = null
     private var restartButton: MenuItem? = null
     private var timerAnimation: RelativeLayout? = null
-    private val ustmTimerText: String? = null
+    private var ustmTimerText: String? = null
 
     @Inject
     lateinit var errorReporter: ErrorReporter
@@ -99,6 +103,8 @@ class LearnCards : FlashCardSwipeScreen() {
         } else if (currentPhase === REPEATING_LTM) {
             repeatingLTM = true
         }
+
+        initButtons()
     }
 
     override fun updateCurrentCard() {
@@ -309,15 +315,21 @@ class LearnCards : FlashCardSwipeScreen() {
         bindService(timerServiceIntent, timerServiceConnection!!, BIND_AUTO_CREATE)
     }
 
-    private fun registerListener() { // TODO
-        /*registerReceiver(ustmTimeBroadcastReceiver, IntentFilter(TimerService.ustm_receiver))
+    private fun registerListener() {
+        registerReceiver(ustmTimeBroadcastReceiver, IntentFilter(TimerService.ustm_receiver))
         registerReceiver(stmTimeBroadcastReceiver, IntentFilter(TimerService.stm_receiver))
-        registerReceiver(ustmFinishedBroadcastReceiver, IntentFilter(TimerService.ustm_finished_receiver))
-        registerReceiver(stmFinishedBroadcastReceiver, IntentFilter(TimerService.stm_finished_receiver))*/
+        registerReceiver(
+            ustmFinishedBroadcastReceiver,
+            IntentFilter(TimerService.ustm_finished_receiver)
+        )
+        registerReceiver(
+            stmFinishedBroadcastReceiver,
+            IntentFilter(TimerService.stm_finished_receiver)
+        )
     }
 
     private fun hasCardsToBeFlipped(): Boolean {
-        val flipMode = settingsManager.getStringPreference(SettingsManager.Keys.FLIP_CARD_SIDES)
+        val flipMode = settingsManager.getStringPreference(FLIP_CARD_SIDES)
 
         return if (currentPhase == REPEATING_LTM
             || currentPhase == REPEATING_STM
@@ -542,7 +554,7 @@ class LearnCards : FlashCardSwipeScreen() {
                     currentCard.sideBText
                 }
                 val caseSensitive =
-                    settingsManager.getBoolPreference(SettingsManager.Keys.CASE_SENSITIV)
+                    settingsManager.getBoolPreference(CASE_SENSITIV)
                 val input: String = inputField.text.toString()
                 if (caseSensitive && cardText == input) {
                     yesClicked(null)
@@ -598,7 +610,7 @@ class LearnCards : FlashCardSwipeScreen() {
         // Layoutcontents setzen
         if (flipCardSides) {
             fillSideA(R.string.back, currentCard.sideBText, fontB)
-            var sideAText: String = ""
+            var sideAText = ""
             if (currentCard.side == SIDE_A || currentPhase == SIMPLE_LEARNING
                 || currentPhase == FILLING_USTM
             ) {
@@ -610,7 +622,7 @@ class LearnCards : FlashCardSwipeScreen() {
         } else {
             // Card sides not flipped so show side A in top box!
             fillSideA(R.string.front, currentCard.sideAText, fontA)
-            var sideBText: String = ""
+            var sideBText = ""
             if (currentCard.side == SIDE_B || currentPhase == SIMPLE_LEARNING
                 || currentPhase == FILLING_USTM
             ) {
@@ -648,7 +660,7 @@ class LearnCards : FlashCardSwipeScreen() {
         val allCards: TextView = findViewById(R.id.tAllCards)
         val ustmCards: TextView = findViewById(R.id.tUKZGCards)
         val stmCards: TextView = findViewById(R.id.tKZGCards)
-        var text = ""
+        var text: String
         if (repeatingLTM) {
             text = "${getString(R.string.expired)}:%d"
             text = String.format(text, mCardCursor.count - mCardCursor.position)
@@ -795,5 +807,131 @@ class LearnCards : FlashCardSwipeScreen() {
 
     fun showCard(view: View?) {
         screenTouched()
+    }
+
+    //Broadcast Receiver // TODO
+    private val ustmFinishedBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            runOnUiThread {
+                Log.d("LearnActivity::USTM-Timer finished", "Timer finished")
+                ustmTimerBar.setProgress(timerService.getUstmTotalTime() * 60)
+                ustmTimerBar.text = " "
+                if (currentPhase == WAITING_FOR_USTM) {
+                    Log.d("LearnActivity::onUSTMTimerFinish", "USTM Timer finished, stop waiting!")
+                    stopWaiting = true
+                    updateLearningPhase()
+                }
+            }
+        }
+    }
+    private val stmFinishedBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            runOnUiThread {
+                Log.d("LearnActivity::STM-Timer finished", "Timer finished")
+                notificationManager!!.cancel(TIME_BAR_ID)
+                stmTimerBar.text = " "
+                stmTimerBar.setProgress(timerService.getStmTotalTime() * 60)
+                if (pauseButton != null) {
+                    pauseButton!!.isVisible = false
+                }
+                if (currentPhase == WAITING_FOR_STM) {
+                    Log.d("Learnactivity::onSTMTimerFinish", "STM Timer finished, stop waiting!")
+                    stopWaiting = true
+                    updateLearningPhase()
+                }
+
+                // Ist die App pausiert, soll in der Titelleiste die Zeit angezeigt werden
+                val showNotify = settingsManager.getBoolPreference(SHOW_TIMER_BAR)
+                if (/*!isActivityVisible &&*/ timerService.isStmTimerFinished() && showNotify) {
+                    Log.d("LearnActivity::STM-Timer finished", "Acivity is visible")
+                    val mBuilder: Builder =
+                        Builder(context, NOTIFICATION_CHANNEL_ID)
+                            .setContentText(getString(R.string.stm_expired_notify_message))
+                            .setSmallIcon(R.drawable.notify_icon)
+                            .setContentTitle(getString(R.string.app_name))
+                            .setPriority(PRIORITY_DEFAULT)
+                            .setContentIntent(PendingIntent.getActivity(context, 0, getIntent(), 0))
+                            .setAutoCancel(true)
+                            .setVisibility(VISIBILITY_PUBLIC)
+                    Log.d("LearnActivity::STM-Timer finished", "Notification created")
+                    Timer().schedule(object : TimerTask() {
+                        override fun run() {
+                            notificationManager!!.notify(NOTIFICATION_ID, mBuilder.build())
+                        }
+                    }, 1000)
+                    Log.d("LearnActivity::STM-Timer finished", "Notification shown")
+                }
+            }
+        }
+    }
+    private val ustmTimeBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val timeElapsed = intent.getIntExtra(TimerService.ustm_time, 0)
+            runOnUiThread {
+                if (ustmTimerBar.visibility == View.VISIBLE && !timerService.isUstmTimerFinished()) {
+                    val sec = timeElapsed % 60
+                    ustmTimerText = java.lang.String.format(
+                        Locale.getDefault(),
+                        "%d / %ds",
+                        sec,
+                        timerService.getUstmTotalTime()
+                    )
+                    ustmTimerBar.setProgress(timeElapsed)
+                    ustmTimerBar.text = ustmTimerText
+                }
+            }
+        }
+    }
+    private val stmTimeBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val timeElapsed = intent.getIntExtra(TimerService.stm_time, 0)
+            runOnUiThread {
+                val timerText: String
+                val sec = timeElapsed % 60
+                val min = timeElapsed / 60
+                timerText = if (sec < 10) {
+                    java.lang.String.format(
+                        Locale.getDefault(),
+                        "%d:0%d / %d:00min", min, sec, timerService.getStmTotalTime()
+                    )
+                } else {
+                    java.lang.String.format(
+                        Locale.getDefault(),
+                        "%d:%d / %d:00min", min, sec, timerService.getStmTotalTime()
+                    )
+                }
+                stmTimerBar.setProgress(timeElapsed)
+                stmTimerBar.text = timerText
+
+                // Ist die App pausiert, soll in der Titelleiste die Zeit angezeigt werden
+                if (/*!isActivityVisible &&*/ !timerService.isStmTimerFinished()) {
+                    Log.d("LearnActivity::STM-onStmTimerUpdate", "Acivity is not visible")
+                    val ustmTimerBarText =
+                        if (timerService.isUstmTimerFinished() && ustmTimerText != null) "" else getString(
+                            R.string.ustm
+                        ) + " " + ustmTimerText
+                    val timerbarText =
+                        ustmTimerBarText + "  " + getString(R.string.stm) + " " + timerText
+                    val contentIntent = if (pendingIntent == null) getIntent() else pendingIntent!!
+                    val mBuilder: Builder = Builder(context, Constants.TIMER_BAR_CHANNEL_ID)
+                        .setContentText(timerbarText)
+                        .setSmallIcon(R.drawable.notify_icon)
+                        .setPriority(PRIORITY_DEFAULT)
+                        .setContentIntent(
+                            PendingIntent.getActivity(
+                                context,
+                                0,
+                                contentIntent,
+                                0
+                            )
+                        )
+                        .setAutoCancel(true)
+                        .setOngoing(true)
+                    Log.d("LearnActivity::STM-onStmTimerUpdate", "Notification created")
+                    notificationManager!!.notify(TIME_BAR_ID, mBuilder.build())
+                    Log.d("LearnActivity::STM-onStmTimerUpdate", "Show Notification")
+                }
+            }
+        }
     }
 }

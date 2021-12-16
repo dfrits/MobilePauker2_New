@@ -12,16 +12,6 @@ import de.daniel.mobilepauker2.utils.Log
 import java.util.*
 
 class TimerService: Service() {
-    val timerService = this
-
-    //Broadcast
-    val ustm_receiver = "com.paukertimerservice.ustm_time_receiver"
-    val stm_receiver = "com.paukertimerservice.stm_time_receiver"
-    val ustm_finished_receiver = "com.paukertimerservice.ustm_finished_receiver"
-    val stm_finished_receiver = "com.paukertimerservice.stm_finished_receiver"
-    val ustm_time = "USTM_TIME"
-    val stm_time = "STM_TIME"
-
     private val binder: IBinder = LocalBinder()
     private var ustm_totalTime = 0
     private var ustm_timeRemaining: Long = 0
@@ -196,24 +186,24 @@ class TimerService: Service() {
     }
 
     private fun onUstmTimerUpdate(timeElapsed: Int) {
-        val intent = Intent(ustm_receiver)
-        intent.putExtra(ustm_time, timeElapsed)
+        val intent = Intent(Companion.ustm_receiver)
+        intent.putExtra(Companion.ustm_time, timeElapsed)
         sendBroadcast(intent)
     }
 
     private fun onStmTimerUpdate(timeElapsed: Int) {
-        val intent = Intent(stm_receiver)
-        intent.putExtra(stm_time, timeElapsed)
+        val intent = Intent(Companion.stm_receiver)
+        intent.putExtra(Companion.stm_time, timeElapsed)
         sendBroadcast(intent)
     }
 
     private fun onUstmTimerFinish() {
-        val intent = Intent(ustm_finished_receiver)
+        val intent = Intent(Companion.ustm_finished_receiver)
         sendBroadcast(intent)
     }
 
     private fun onStmTimerFinish() {
-        val intent = Intent(stm_finished_receiver)
+        val intent = Intent(Companion.stm_finished_receiver)
         sendBroadcast(intent)
     }
 
@@ -249,5 +239,13 @@ class TimerService: Service() {
     companion object {
         val USTM_TOTAL_TIME = "USTM_TOTAL_TIME"
         val STM_TOTAL_TIME = "STM_TOTAL_TIME"
+
+        //Broadcast
+        val ustm_receiver = "com.paukertimerservice.ustm_time_receiver"
+        val stm_receiver = "com.paukertimerservice.stm_time_receiver"
+        val ustm_finished_receiver = "com.paukertimerservice.ustm_finished_receiver"
+        val stm_finished_receiver = "com.paukertimerservice.stm_finished_receiver"
+        val ustm_time = "USTM_TIME"
+        val stm_time = "STM_TIME"
     }
 }
