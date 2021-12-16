@@ -29,7 +29,7 @@ abstract class FlashCardSwipeScreen : AppCompatActivity(R.layout.learn_cards),
     protected var mActivitySetupOk = false
     protected var mSavedCursorPosition = -1
     private var LOADER_ID = -1
-    private val loader = LoaderManager.getInstance(this)
+    private lateinit var loader: LoaderManager
 
     @Inject
     lateinit var lessonManager: LessonManager
@@ -39,7 +39,9 @@ abstract class FlashCardSwipeScreen : AppCompatActivity(R.layout.learn_cards),
 
         (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
 
-        mCardPackAdapter = CardPackRamAdapter(this)
+        loader = LoaderManager.getInstance(this)
+
+        mCardPackAdapter = CardPackRamAdapter(lessonManager)
 
         // Setup the cursor
         Log.d("FlashCardSwipeScreenActivity::onCreate", "Seting up cursor")
@@ -82,7 +84,7 @@ abstract class FlashCardSwipeScreen : AppCompatActivity(R.layout.learn_cards),
     }
 
     override fun onLoaderReset(loader: Loader<Cursor>) {
-        mCardCursor!!.close()
+        mCardCursor.close()
     }
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> =
@@ -91,10 +93,10 @@ abstract class FlashCardSwipeScreen : AppCompatActivity(R.layout.learn_cards),
     abstract fun updateCurrentCard()
 
     open fun isCardCursorAvailable(): Boolean =
-        !(mCardCursor == null || mCardCursor!!.isClosed || mCardCursor!!.count <= 0)
+        !(mCardCursor.isClosed || mCardCursor.count <= 0)
 
     protected open fun reloadStack() {
-        mCardPackAdapter = CardPackRamAdapter(this)
+        mCardPackAdapter = CardPackRamAdapter(lessonManager)
         mSavedCursorPosition = -1
         loader.destroyLoader(LOADER_ID)
         refreshCursor()

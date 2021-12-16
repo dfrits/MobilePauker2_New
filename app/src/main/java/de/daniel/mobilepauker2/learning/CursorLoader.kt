@@ -5,7 +5,7 @@ import android.database.Cursor
 import androidx.loader.content.AsyncTaskLoader
 import de.daniel.mobilepauker2.lesson.card.CardPackRamAdapter
 
-class CursorLoader(context: Context, val adapter: CardPackRamAdapter) :
+class CursorLoader(context: Context, private val adapter: CardPackRamAdapter) :
     AsyncTaskLoader<Cursor>(context) {
 
     private var cursor: Cursor? = null

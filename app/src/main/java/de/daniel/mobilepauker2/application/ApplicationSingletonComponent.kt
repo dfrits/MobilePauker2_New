@@ -37,7 +37,6 @@ interface ApplicationSingletonComponent {
     fun inject(manager: LessonManager)
     fun inject(adapter: CardPackRamAdapter)
     fun inject(adapter: ChartAdapter)
-    fun inject(cursor: FlashCardCursor)
     fun inject(utils: Toaster)
     fun inject(mainMenu: MainMenu)
     fun inject(lessonImport: LessonImport)
