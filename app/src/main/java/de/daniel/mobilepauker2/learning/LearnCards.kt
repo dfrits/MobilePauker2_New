@@ -217,11 +217,11 @@ class LearnCards : FlashCardSwipeScreen() {
     }
 
     override fun onBackPressed() {
+        Log.d("LearnCardsActivity::onBackPressed", "Back Button pressed")
         val builder = AlertDialog.Builder(context)
         builder.setTitle(R.string.exit_learning_dialog)
             .setPositiveButton(R.string.yes) { _, _ ->
-                timerService.stopStmTimer()
-                timerService.stopUstmTimer()
+                stopBothTimer()
                 Log.d("LearnCardsActivity::onBackPressed", "Finish and Timer stopped")
                 finish()
             }
@@ -302,8 +302,7 @@ class LearnCards : FlashCardSwipeScreen() {
 
             override fun onServiceDisconnected(name: ComponentName) {
                 Log.d("LearnActivity::initTimer", "onServiceDisconnectedCalled")
-                timerService.stopUstmTimer()
-                timerService.stopStmTimer()
+                stopBothTimer()
             }
 
             override fun onBindingDied(name: ComponentName) {}
@@ -313,6 +312,12 @@ class LearnCards : FlashCardSwipeScreen() {
         timerServiceIntent.putExtra(TimerService.STM_TOTAL_TIME, stmTotalTime)
         startService(timerServiceIntent)
         bindService(timerServiceIntent, timerServiceConnection!!, BIND_AUTO_CREATE)
+    }
+
+    private fun stopBothTimer() {
+        unregisterListener()
+        timerService.stopUstmTimer()
+        timerService.stopStmTimer()
     }
 
     private fun registerListener() {
@@ -326,6 +331,16 @@ class LearnCards : FlashCardSwipeScreen() {
             stmFinishedBroadcastReceiver,
             IntentFilter(TimerService.stm_finished_receiver)
         )
+    }
+
+    private fun unregisterListener() {
+        try {
+            unregisterReceiver(ustmTimeBroadcastReceiver)
+            unregisterReceiver(stmTimeBroadcastReceiver)
+            unregisterReceiver(ustmFinishedBroadcastReceiver)
+            unregisterReceiver(stmFinishedBroadcastReceiver)
+        } catch (e: Exception) {
+        }
     }
 
     private fun hasCardsToBeFlipped(): Boolean {
@@ -811,7 +826,7 @@ class LearnCards : FlashCardSwipeScreen() {
         screenTouched()
     }
 
-    //Broadcast Receiver // TODO
+    //Broadcast Receiver
     private val ustmFinishedBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             runOnUiThread {
