@@ -53,7 +53,7 @@ class LearnCards : FlashCardSwipeScreen() {
     private var stopWaiting = false
     private var firstStart = true
     private var timerServiceConnection: ServiceConnection? = null
-    private lateinit var timerService: TimerService
+    private var timerService: TimerService? = null
     private lateinit var timerServiceIntent: Intent
     private lateinit var ustmTimerBar: InvertedTextProgressbar
     private lateinit var stmTimerBar: InvertedTextProgressbar
@@ -120,7 +120,9 @@ class LearnCards : FlashCardSwipeScreen() {
     }
 
     override fun screenTouched() {
-        if (timerService.isUstmTimerPaused() || timerService.isStmTimerPaused()) return
+        timerService?.let {
+            if (it.isUstmTimerPaused() || it.isStmTimerPaused()) return
+        }
 
         if (currentPhase == REPEATING_LTM || currentPhase == REPEATING_STM || currentPhase == REPEATING_USTM) {
             if (lessonManager.getCardFromCurrentPack(mCardCursor.position)!!.isRepeatedByTyping) {
@@ -298,8 +300,8 @@ class LearnCards : FlashCardSwipeScreen() {
                 val binder: LocalBinder = service as LocalBinder
                 timerService = binder.serviceInstance
                 registerListener()
-                timerService.startUstmTimer()
-                timerService.startStmTimer()
+                timerService!!.startUstmTimer()
+                timerService!!.startStmTimer()
                 findViewById<RelativeLayout>(R.id.lTimerFrame).visibility = View.VISIBLE
                 timerAnimation = findViewById(R.id.timerAnimationPanel)
             }
@@ -320,8 +322,8 @@ class LearnCards : FlashCardSwipeScreen() {
 
     private fun stopBothTimer() {
         unregisterListener()
-        timerService.stopUstmTimer()
-        timerService.stopStmTimer()
+        timerService!!.stopUstmTimer()
+        timerService!!.stopStmTimer()
     }
 
     private fun registerListener() {
@@ -368,14 +370,14 @@ class LearnCards : FlashCardSwipeScreen() {
     }
 
     private fun pauseTimer() {
-        timerService.pauseTimers()
-        if (!timerService.isStmTimerFinished()) {
+        timerService!!.pauseTimers()
+        if (!timerService!!.isStmTimerFinished()) {
             disableButtons()
         }
     }
 
     private fun restartTimer() {
-        timerService.restartTimers()
+        timerService!!.restartTimers()
         enableButtons()
     }
 
@@ -402,14 +404,14 @@ class LearnCards : FlashCardSwipeScreen() {
             }
             FILLING_USTM -> {
                 setButtonVisibilityFilling()
-                if (timerService.isStmTimerFinished()) // STM timeout so go straight to repeating ustm cards
+                if (timerService!!.isStmTimerFinished()) // STM timeout so go straight to repeating ustm cards
                 {
                     setLearningPhase(REPEATING_USTM)
                     updateLearningPhase()
-                } else if (zeroUnlearnedCards && !timerService.isUstmTimerFinished()) {
+                } else if (zeroUnlearnedCards && !timerService!!.isUstmTimerFinished()) {
                     setLearningPhase(WAITING_FOR_USTM)
                     updateLearningPhase()
-                } else if (timerService.isUstmTimerFinished()) {
+                } else if (timerService!!.isUstmTimerFinished()) {
                     setLearningPhase(REPEATING_USTM)
                     updateLearningPhase()
                 }
@@ -420,10 +422,10 @@ class LearnCards : FlashCardSwipeScreen() {
                 showHideTimerAnimation()
 
                 // USTM Timeout
-                if (timerService.isUstmTimerFinished() || stopWaiting) {
+                if (timerService!!.isUstmTimerFinished() || stopWaiting) {
                     stopWaiting = false
                     setLearningPhase(REPEATING_USTM)
-                    timerService.stopUstmTimer()
+                    timerService!!.stopUstmTimer()
                     updateLearningPhase()
                 }
             }
@@ -431,13 +433,13 @@ class LearnCards : FlashCardSwipeScreen() {
                 setButtonsVisibility()
                 if (zeroUSTMCards) // We have learned all the ustm cards
                 {
-                    if (timerService.isStmTimerFinished()) //STM timer has timed out so move to repeating STM
+                    if (timerService!!.isStmTimerFinished()) //STM timer has timed out so move to repeating STM
                     {
                         setLearningPhase(REPEATING_STM)
                     } else if (!zeroUnlearnedCards) // Unlearned cards available so go back to filling ustm;
                     {
                         setLearningPhase(FILLING_USTM)
-                        timerService.startUstmTimer()
+                        timerService!!.startUstmTimer()
                     } else {
                         setLearningPhase(WAITING_FOR_STM)
                     }
@@ -452,9 +454,9 @@ class LearnCards : FlashCardSwipeScreen() {
                 showHideTimerAnimation()
 
                 // USTM Timeout
-                if (timerService.isStmTimerFinished() || stopWaiting) {
+                if (timerService!!.isStmTimerFinished() || stopWaiting) {
                     stopWaiting = false
-                    timerService.stopStmTimer()
+                    timerService!!.stopStmTimer()
                     setLearningPhase(REPEATING_STM)
                     invalidateOptionsMenu()
                     updateLearningPhase()
@@ -763,7 +765,7 @@ class LearnCards : FlashCardSwipeScreen() {
     }
 
     fun mPauseTimerClicked(item: MenuItem) {
-        if (restartButton != null && !timerService.isStmTimerFinished()) {
+        if (restartButton != null && !timerService!!.isStmTimerFinished()) {
             pauseTimer()
             item.isVisible = false
             restartButton!!.isVisible = true
@@ -803,7 +805,7 @@ class LearnCards : FlashCardSwipeScreen() {
     fun nextCard(view: View?) {
         // Karte ein Deck weiterschieben
         mCardPackAdapter!!.setCardLearned()
-        if (!mCardCursor.isLast && !timerService.isUstmTimerFinished()) {
+        if (!mCardCursor.isLast && !timerService!!.isUstmTimerFinished()) {
             pushCursorToNext()
         } else {
             // Letzte Karte oder Timer abgelaufen. Darum Lernphase aktualisieren
@@ -847,7 +849,7 @@ class LearnCards : FlashCardSwipeScreen() {
         override fun onReceive(context: Context, intent: Intent) {
             runOnUiThread {
                 Log.d("LearnActivity::USTM-Timer finished", "Timer finished")
-                ustmTimerBar.setProgress(timerService.getUstmTotalTime() * 60)
+                ustmTimerBar.setProgress(timerService!!.getUstmTotalTime() * 60)
                 ustmTimerBar.text = " "
                 if (currentPhase == WAITING_FOR_USTM) {
                     Log.d("LearnActivity::onUSTMTimerFinish", "USTM Timer finished, stop waiting!")
@@ -863,7 +865,7 @@ class LearnCards : FlashCardSwipeScreen() {
                 Log.d("LearnActivity::STM-Timer finished", "Timer finished")
                 notificationManager!!.cancel(TIME_BAR_ID)
                 stmTimerBar.text = " "
-                stmTimerBar.setProgress(timerService.getStmTotalTime() * 60)
+                stmTimerBar.setProgress(timerService!!.getStmTotalTime() * 60)
                 if (pauseButton != null) {
                     pauseButton!!.isVisible = false
                 }
@@ -875,7 +877,7 @@ class LearnCards : FlashCardSwipeScreen() {
 
                 // Ist die App pausiert, soll in der Titelleiste die Zeit angezeigt werden
                 val showNotify = settingsManager.getBoolPreference(SHOW_TIMER_BAR)
-                if (/*!isActivityVisible &&*/ timerService.isStmTimerFinished() && showNotify) {
+                if (/*!isActivityVisible &&*/ timerService!!.isStmTimerFinished() && showNotify) {
                     Log.d("LearnActivity::STM-Timer finished", "Acivity is visible")
                     val mBuilder: Builder =
                         Builder(context, NOTIFICATION_CHANNEL_ID)
@@ -901,13 +903,13 @@ class LearnCards : FlashCardSwipeScreen() {
         override fun onReceive(context: Context, intent: Intent) {
             val timeElapsed = intent.getIntExtra(TimerService.ustm_time, 0)
             runOnUiThread {
-                if (ustmTimerBar.visibility == View.VISIBLE && !timerService.isUstmTimerFinished()) {
+                if (ustmTimerBar.visibility == View.VISIBLE && !timerService!!.isUstmTimerFinished()) {
                     val sec = timeElapsed % 60
                     ustmTimerText = java.lang.String.format(
                         Locale.getDefault(),
                         "%d / %ds",
                         sec,
-                        timerService.getUstmTotalTime()
+                        timerService!!.getUstmTotalTime()
                     )
                     ustmTimerBar.setProgress(timeElapsed)
                     ustmTimerBar.text = ustmTimerText
@@ -925,22 +927,22 @@ class LearnCards : FlashCardSwipeScreen() {
                 timerText = if (sec < 10) {
                     java.lang.String.format(
                         Locale.getDefault(),
-                        "%d:0%d / %d:00min", min, sec, timerService.getStmTotalTime()
+                        "%d:0%d / %d:00min", min, sec, timerService!!.getStmTotalTime()
                     )
                 } else {
                     java.lang.String.format(
                         Locale.getDefault(),
-                        "%d:%d / %d:00min", min, sec, timerService.getStmTotalTime()
+                        "%d:%d / %d:00min", min, sec, timerService!!.getStmTotalTime()
                     )
                 }
                 stmTimerBar.setProgress(timeElapsed)
                 stmTimerBar.text = timerText
 
                 // Ist die App pausiert, soll in der Titelleiste die Zeit angezeigt werden
-                if (/*!isActivityVisible &&*/ !timerService.isStmTimerFinished()) {
+                if (/*!isActivityVisible &&*/ !timerService!!.isStmTimerFinished()) {
                     Log.d("LearnActivity::STM-onStmTimerUpdate", "Acivity is not visible")
                     val ustmTimerBarText =
-                        if (timerService.isUstmTimerFinished() && ustmTimerText != null) "" else getString(
+                        if (timerService!!.isUstmTimerFinished() && ustmTimerText != null) "" else getString(
                             R.string.ustm
                         ) + " " + ustmTimerText
                     val timerbarText =
