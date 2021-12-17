@@ -90,21 +90,6 @@ class LearnCards : FlashCardSwipeScreen() {
             window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
-        if (currentPhase !== REPEATING_LTM
-            && (currentPhase !== SIMPLE_LEARNING
-                || currentPhase !== NOTHING)
-        ) {
-            // A check on mActivitySetupOk is done here as onCreate is called even if the
-            // super (FlashCardSwipeScreenActivity) onCreate fails to find any cards and calls finish()
-            if (mActivitySetupOk) {
-                initTimer()
-            }
-        } else if (currentPhase === REPEATING_LTM) {
-            repeatingLTM = true
-        }
-
-        initButtons()
     }
 
     override fun updateCurrentCard() {
@@ -169,6 +154,8 @@ class LearnCards : FlashCardSwipeScreen() {
             "LearnCardsActivity::cursorLoaded", "cursor loaded: " +
                 "savedPos= " + mSavedCursorPosition
         )
+        initAfterCursorLoaded()
+
         if (mSavedCursorPosition == -1) {
             setCursorToFirst()
             updateCurrentCard()
@@ -277,6 +264,23 @@ class LearnCards : FlashCardSwipeScreen() {
             restartButton?.isVisible = false
         }
         return true
+    }
+
+    private fun initAfterCursorLoaded() {
+        if (currentPhase !== REPEATING_LTM
+            && (currentPhase !== SIMPLE_LEARNING
+                || currentPhase !== NOTHING)
+        ) {
+            // A check on mActivitySetupOk is done here as onCreate is called even if the
+            // super (FlashCardSwipeScreenActivity) onCreate fails to find any cards and calls finish()
+            if (mActivitySetupOk) {
+                initTimer()
+            }
+        } else if (currentPhase === REPEATING_LTM) {
+            repeatingLTM = true
+        }
+
+        initButtons()
     }
 
     private fun initTimer() {
@@ -532,7 +536,19 @@ class LearnCards : FlashCardSwipeScreen() {
     private fun setButtonVisibilityRepeating() {
         bNext!!.visibility = View.GONE
         bShowMe!!.visibility = View.VISIBLE
-        val currentCard = lessonManager.getCardFromCurrentPack(mCardCursor.position)
+        val currentCard = try {
+            lessonManager.getCardFromCurrentPack(mCardCursor.position)
+        } catch (e: Exception) {
+            Log.d("LearnCards::setButtons()", "Cursor not loades yet.")
+            toaster.showToast(
+                context as Activity,
+                R.string.load_card_data_error,
+                Toast.LENGTH_SHORT
+            )
+
+            finish()
+            null
+        }
         val text: String =
             if (currentCard?.isRepeatedByTyping == true) getString(R.string.enter_answer)
             else getString(R.string.show_me)
