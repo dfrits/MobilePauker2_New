@@ -36,7 +36,7 @@ open class Batch internal constructor(val cards: MutableList<Card>) {
      * adds a card to this batch
      * @param card the new card
      */
-    fun addCard(card: Card) {
+    open fun addCard(card: Card) {
         cards.add(card)
         card.isLearned = false
     }

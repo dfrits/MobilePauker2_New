@@ -83,8 +83,8 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
     fun editCard(position: Int, sideAText: String, sideBText: String) {
         if (position < 0 || position >= currentPack.size) return
 
-        currentPack.get(position).sideAText = sideAText
-        currentPack.get(position).sideBText = sideBText
+        currentPack[position].sideAText = sideAText
+        currentPack[position].sideBText = sideBText
     }
 
     fun putCardToNextBatch(position: Int) {
@@ -95,7 +95,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
             )
             return
         }
-        val currentCard = currentPack.get(position)
+        val currentCard = currentPack[position]
         pushCurrentCard(currentCard)
     }
 
@@ -107,8 +107,8 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
             )
             return
         }
-        val currentCard = currentPack.get(position)
-        lesson?.let { lesson ->
+        val currentCard = currentPack[position]
+        lesson ?. let { lesson ->
             when (currentPhase) {
                 SIMPLE_LEARNING -> {
                 }
@@ -349,7 +349,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
         }
 
         return (currentPhase == REPEATING_LTM
-                && settingsManager.getBoolPreference(LEARN_NEW_CARDS_RANDOMLY))
+            && settingsManager.getBoolPreference(LEARN_NEW_CARDS_RANDOMLY))
     }
 
     private fun pushCurrentCard(currentCard: FlashCard) {
@@ -400,8 +400,8 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
                 }
                 else -> throw RuntimeException(
                     "unsupported learning phase \""
-                            + currentPhase
-                            + "\" -> can't find batch of card!"
+                        + currentPhase
+                        + "\" -> can't find batch of card!"
                 )
             }
         }

@@ -716,7 +716,6 @@ class LearnCards : FlashCardSwipeScreen() {
 
     private fun pushCursorToNext() {
         if (currentPhase == REPEATING_LTM) {
-            LearningPhase.setLearningPhase(currentPhase)
             lessonManager.setupCurrentPack()
             reloadStack()
         } else {
