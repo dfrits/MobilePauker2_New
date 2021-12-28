@@ -252,8 +252,6 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
     /**
      * Findet das nächste Ablaufdatum. Falls keines gefunden wird, wird [Long.MIN_VALUE]
      * zurückgegeben.
-     * @return Eine Map mit dem frühesten Ablaufdatum **(index = 0)** und die Anzahl abgelaufener
-     * Karten (**index = 1)**
      */
     fun getNextExpireDate(): NextExpireDateResult {
         val parser = Xml.newPullParser()
@@ -265,6 +263,7 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
             var batchCount = 0
             var expiredCards: Long = 0
             var done = false
+
             while (eventType != XmlPullParser.END_DOCUMENT && !done) {
                 var name: String
                 when (eventType) {
