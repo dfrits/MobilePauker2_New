@@ -4,7 +4,6 @@ import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.data.xml.FlashCardXMLPullFeedParser
 import de.daniel.mobilepauker2.models.NextExpireDateResult
 import java.io.IOException
-import java.net.URI
 import javax.inject.Inject
 
 class LessonImportViewModel @Inject constructor(private val dataManager: DataManager) {
@@ -23,8 +22,8 @@ class LessonImportViewModel @Inject constructor(private val dataManager: DataMan
         }
     }
 
-    fun getNextExpireDate(uri: URI): NextExpireDateResult =
-        FlashCardXMLPullFeedParser(uri.toURL()).getNextExpireDate()
+    fun getNextExpireDate(filename: String): NextExpireDateResult =
+        dataManager.getNextExpireDate(dataManager.getFilePathForName(filename))
 
     @Throws(IOException::class)
     fun openLesson(filename: String) {

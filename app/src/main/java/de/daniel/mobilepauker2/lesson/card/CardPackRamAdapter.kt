@@ -1,25 +1,16 @@
 package de.daniel.mobilepauker2.lesson.card
 
-import android.content.Context
 import android.database.Cursor
 import android.database.CursorIndexOutOfBoundsException
-import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.utils.Log
-import javax.inject.Inject
 
-class CardPackRamAdapter(context: Context) : CardPackAdapter(context) {
+class CardPackRamAdapter(val lessonManager: LessonManager) : CardPackAdapter() {
     val isLastCard: Boolean
-        get() = cardCursor.isLast()
+        get() = cardCursor.isLast
 
-    @Inject
-    lateinit var lessonManager: LessonManager
-    private val cardCursor: FlashCardCursor = FlashCardCursor(context)
-
-    init {
-        (context as PaukerApplication).applicationSingletonComponent.inject(this)
-    }
+    private val cardCursor: FlashCardCursor = FlashCardCursor(lessonManager)
 
     override fun open(): CardPackAdapter {
         return this
@@ -31,8 +22,7 @@ class CardPackRamAdapter(context: Context) : CardPackAdapter(context) {
 
     @Throws(CursorIndexOutOfBoundsException::class)
     override fun deleteFlashCard(cardId: Long): Boolean {
-        val position: Int = cardCursor.getPosition()
-        val returnVal: Boolean
+        val position: Int = cardCursor.position
         var requestFirst = false
         if (position < 0) {
             throw CursorIndexOutOfBoundsException("Before first row.")
@@ -42,12 +32,12 @@ class CardPackRamAdapter(context: Context) : CardPackAdapter(context) {
         }
 
         Log.d("CardPackRamAdapter::deleteFlashCard", "CardCount - " + cardCursor.count)
-        if (cardCursor.isFirst()) {
+        if (cardCursor.isFirst) {
             requestFirst = true
         } else {
             cardCursor.moveToPrevious()
         }
-        returnVal = lessonManager.deleteCard(position)
+        val returnVal = lessonManager.deleteCard(position)
 
         // Point to the first card if
         // * We deleted second last card (size now is 1)
@@ -67,10 +57,10 @@ class CardPackRamAdapter(context: Context) : CardPackAdapter(context) {
     }
 
     fun setCardLearned() {
-        lessonManager.putCardToNextBatch(cardCursor.getPosition())
+        lessonManager.putCardToNextBatch(cardCursor.position)
     }
 
     fun setCardUnLearned() {
-        lessonManager.moveCardToUnlearndBatch(cardCursor.getPosition())
+        lessonManager.moveCardToUnlearndBatch(cardCursor.position)
     }
 }

@@ -50,13 +50,11 @@ class Utility {
 
             listRunningApps?.forEach { runAppProccess ->
                 if (runAppProccess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                    Toast.makeText(
-                        context,
-                        "current foreground App ${runAppProccess.processName}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Log.d("Checking Foregroundapp",
+                        "current foreground App ${runAppProccess.processName}")
                 } else {
-                    Toast.makeText(context, "current background App ${runAppProccess.processName}", Toast.LENGTH_LONG).show()
+                    Log.d("Checking Backgroundapp",
+                        "Current background App: ${runAppProccess.processName}")
                 }
             }
             return false

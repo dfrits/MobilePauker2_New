@@ -17,43 +17,13 @@
 */
 package de.daniel.mobilepauker2.lesson.card
 
-import android.content.Context
 import android.database.AbstractCursor
 import android.database.CursorIndexOutOfBoundsException
-import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
-import javax.inject.Inject
 
 
-class FlashCardCursor(context: Context) : AbstractCursor() {
-
-    @Inject
-    lateinit var lessonManager: LessonManager
-
-    init {
-        (context as PaukerApplication).applicationSingletonComponent.inject(this)
-    }
-
-    /**
-     * Adds a new row to the end of the FlashCard array.
-     * @param columnValues in the same order as the the column names specified at cursor
-     * construction time
-     * @throws IllegalArgumentException if `columnValues.length != columnNames.length`
-     */
-    fun addRow(columnValues: Array<String>) {
-        require(columnValues.size == columnCount) {
-            ("columnNames.length = "
-                    + columnCount + ", columnValues.length = "
-                    + columnValues.size)
-        }
-        lessonManager.addCard(
-            columnValues[CardPackAdapter.KEY_SIDEA_ID],
-            columnValues[CardPackAdapter.KEY_SIDEB_ID],
-            columnValues[CardPackAdapter.KEY_INDEX_ID],
-            columnValues[CardPackAdapter.KEY_LEARN_STATUS_ID]
-        )
-    }
+class FlashCardCursor(val lessonManager: LessonManager) : AbstractCursor() {
 
     /**
      * Gets value at the given column for the current row.
@@ -65,13 +35,13 @@ class FlashCardCursor(context: Context) : AbstractCursor() {
                         + column + ", # of columns: " + columnCount
             )
         }
-        if (getPosition() < 0) {
+        if (position < 0) {
             throw CursorIndexOutOfBoundsException("Before first row.")
         }
-        if (getPosition() >= lessonManager.getBatchSize(BatchType.CURRENT)) {
+        if (position >= lessonManager.getBatchSize(BatchType.CURRENT)) {
             throw CursorIndexOutOfBoundsException("After last row.")
         }
-        val flashCard: FlashCard? = lessonManager.getCardFromCurrentPack(getPosition())
+        val flashCard: FlashCard? = lessonManager.getCardFromCurrentPack(position)
         when (column) {
             CardPackAdapter.KEY_SIDEA_ID -> {
                 return flashCard?.sideAText ?: ""
@@ -80,7 +50,7 @@ class FlashCardCursor(context: Context) : AbstractCursor() {
                 return flashCard?.sideBText ?: ""
             }
             CardPackAdapter.KEY_ROWID_ID -> {
-                return Integer.toString(getPosition())
+                return position.toString()
             }
             CardPackAdapter.KEY_LEARN_STATUS_ID -> {
                 return if (flashCard != null && flashCard.isLearned) {
@@ -90,7 +60,7 @@ class FlashCardCursor(context: Context) : AbstractCursor() {
                 }
             }
             CardPackAdapter.KEY_INDEX_ID -> {
-                return if (flashCard == null) null else flashCard.index
+                return flashCard?.index
             }
         }
         return null
@@ -98,12 +68,8 @@ class FlashCardCursor(context: Context) : AbstractCursor() {
 
     override fun getColumnCount(): Int = columnNames.size
 
-    // Create new Cursor
-    /*override fun requery(): Boolean {
-        return super.requery()
-    }*/
-
-    override fun getCount(): Int = lessonManager.getBatchSize(BatchType.CURRENT)
+    override fun getCount(): Int =
+        lessonManager.getBatchSize(BatchType.CURRENT)
 
     override fun getColumnNames(): Array<String> = arrayOf(
         CardPackAdapter.KEY_ROWID,

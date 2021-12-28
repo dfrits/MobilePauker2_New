@@ -77,7 +77,7 @@ class Lesson {
         Log.d("Lesson::refresExpiration", "entry")
         for (longTermBatch in longTermBatches) {
             Log.d("Lesson::refresExpiration", "loop")
-            longTermBatch.refreshExpiredCards()
+            longTermBatch.refreshExpiration()
         }
     }
 
