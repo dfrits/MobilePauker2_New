@@ -143,7 +143,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
             }
             init()
             if (lessonManager.isLessonNotNew())
-                if (fileNames.contains(dataManager.getReadableCurrentFileName())) {
+                if (fileNames.contains(dataManager.currentFileName)) {
                     try {
                         viewModel.openLesson(dataManager.getReadableCurrentFileName())
                     } catch (ignored: IOException) {
