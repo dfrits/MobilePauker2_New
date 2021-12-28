@@ -113,10 +113,8 @@ class FlashCardXMLStreamWriter(
             serializer.endDocument()
             serializer.flush()
             outputStream.close()
-            true
         } catch (e: Exception) {
             Log.e("FlashCardXMLStreamWriter::writeXML", "Exception caught")
-            false
         }
     }
 
@@ -254,7 +252,7 @@ class FlashCardXMLStreamWriter(
                 serializer.attribute(
                     "",
                     "LearnedTimestamp",
-                    java.lang.Long.toString(reverseTimeStamp)
+                    reverseTimeStamp.toString()
                 )
             }
 
