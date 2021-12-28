@@ -26,7 +26,8 @@
             android:name=".mainmenu.MainMenu"
             android:label="@string/app_name"
             android:windowSoftInputMode="stateHidden|adjustNothing"
-            tools:ignore="IntentFilterExportedReceiver">
+            tools:ignore="IntentFilterExportedReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
