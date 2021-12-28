@@ -322,8 +322,8 @@ class LearnCards : FlashCardSwipeScreen() {
 
     private fun stopBothTimer() {
         unregisterListener()
-        timerService!!.stopUstmTimer()
-        timerService!!.stopStmTimer()
+        timerService?.stopUstmTimer()
+        timerService?.stopStmTimer()
     }
 
     private fun registerListener() {
