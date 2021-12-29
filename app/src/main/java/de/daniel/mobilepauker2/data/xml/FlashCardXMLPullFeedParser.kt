@@ -21,7 +21,7 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
         var flashCards: MutableList<FlashCard>? = null
         val parser = Xml.newPullParser()
         var batchCount = 0
-        var description: String = "No Description"
+        var description = "No Description"
         return try {
             parser.setInput(getInputStream(), null)
             var eventType = parser.eventType
@@ -217,6 +217,7 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
             if (flashCard.initialBatch < 3) {
                 flashCard.isLearned = false
             } else {
+                // Warning using flash card set learned here sets the learned timestamp!
                 flashCard.frontSide.isLearned = true
             }
             if (newLesson.getLongTermBatchesSize() < flashCard.initialBatch - 2) {
@@ -235,11 +236,11 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
                     newLesson.addLongTermBatch()
                 }
             }
-            var batch: Batch
-            if (flashCard.isLearned) {
-                batch = newLesson.getLongTermBatchFromIndex(flashCard.initialBatch - 3)
+
+            val batch: Batch = if (flashCard.isLearned) {
+                newLesson.getLongTermBatchFromIndex(flashCard.initialBatch - 3)
             } else {
-                batch = newLesson.unlearnedBatch
+                newLesson.unlearnedBatch
             }
             batch.addCard(flashCard)
             summaryBatch.addCard(flashCard)
