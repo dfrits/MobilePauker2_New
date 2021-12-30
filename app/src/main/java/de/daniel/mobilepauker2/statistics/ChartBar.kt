@@ -8,8 +8,9 @@ import com.db.chart.model.BarSet
 import com.db.chart.renderer.AxisRenderer
 import com.db.chart.view.StackBarChartView
 import de.daniel.mobilepauker2.R
+import de.daniel.mobilepauker2.utils.Log
 
-internal class ChartBar(view: View, private val callback: ChartBarCallback) {
+internal class ChartBar(view: View) {
     private val chart: StackBarChartView = view.findViewById(R.id.chartBar)
     private val abgelaufenValue: TextView = view.findViewById(R.id.abgelaufenValue)
     private val gelerntValue: TextView = view.findViewById(R.id.gelerntValue)
@@ -82,7 +83,14 @@ internal class ChartBar(view: View, private val callback: ChartBarCallback) {
         chart.setXLabels(AxisRenderer.LabelPosition.OUTSIDE)
             .setYLabels(AxisRenderer.LabelPosition.NONE)
             .setTypeface(Typeface.DEFAULT_BOLD)
-            .setOnClickListener { callback.onClick() }
+
+        //chart.isClickable = true
+        /*chart.setOnClickListener {
+            Log.d("ChartBar::showBar", "On Bar clicked")
+            callback.onClick()
+        }*/
+        Log.d("ChartBar::showBar", "Set Callback")
+
         chart.show()
     }
 

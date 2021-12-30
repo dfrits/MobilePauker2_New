@@ -274,26 +274,25 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     private fun initChartList() {
         // Im Thread laufen lassen um MainThread zu entlasten
-        Thread {
-            chartView = findViewById(R.id.chartListView)
-            val layoutManager = LinearLayoutManager(
-                context,
-                LinearLayoutManager.HORIZONTAL, false
-            )
-            chartView?.let {
-                it.layoutManager = layoutManager
-                it.overScrollMode = View.OVER_SCROLL_NEVER
-                it.isScrollContainer = true
-                it.isNestedScrollingEnabled = true
-                val onClickListener: ChartAdapterCallback = object : ChartAdapterCallback {
-                    override fun onClick(position: Int) {
-                        runOnUiThread { showBatchDetails(position) }
-                    }
-                }
-                val adapter = ChartAdapter(application as PaukerApplication, onClickListener)
-                it.adapter = adapter
+        chartView = findViewById(R.id.chartListView)
+        val layoutManager = LinearLayoutManager(
+            context,
+            LinearLayoutManager.HORIZONTAL, false
+        )
+        chartView!!.layoutManager = layoutManager
+        chartView!!.overScrollMode = View.OVER_SCROLL_NEVER
+        chartView!!.isScrollContainer = true
+        chartView!!.isNestedScrollingEnabled = true
+        val onClickListener: ChartAdapterCallback = object : ChartAdapterCallback {
+            override fun onClick(position: Int) {
+                Log.d("MainMenu::ChartCallback", "On Bar clicked")
+                showBatchDetails(position)
             }
-        }.run()
+        }
+        Log.d("MainMenu::ChartInit", "Callback initialized")
+        val adapter = ChartAdapter(application as PaukerApplication, onClickListener)
+        chartView!!.adapter = adapter
+        Log.d("MainMenu::ChartInit", "Adapter set")
     }
 
     private fun showBatchDetails(index: Int) {
