@@ -415,7 +415,15 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 .setCancelable(false)
                 .setPositiveButton(
                     getString(R.string.ok)
-                ) { _, _ -> errorReporter.checkErrorAndSendMail() }
+                ) { _, _ ->
+                    val errorReportIntent = errorReporter.checkErrorAndSendMail()
+                    startActivity(
+                        Intent.createChooser(
+                            errorReportIntent,
+                            "Send mail..."
+                        )
+                    )
+                }
                 .setNeutralButton(
                     getString(R.string.cancel)
                 ) { dialog, _ ->

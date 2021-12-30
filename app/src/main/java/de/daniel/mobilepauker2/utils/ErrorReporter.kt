@@ -127,7 +127,7 @@ class ErrorReporter @Inject constructor(private val context: Context) :
         }
     }
 
-    fun checkErrorAndSendMail() {
+    fun checkErrorAndSendMail(): Intent? {
         try {
             filePath = context.filesDir.absolutePath
             if (bIsThereAnyErrorFile()) {
@@ -147,12 +147,13 @@ class ErrorReporter @Inject constructor(private val context: Context) :
 
                 // DELETE FILES !!!!
                 deleteErrorFiles()
-                sendErrorMail(wholeErrorText.toString())
+                return sendErrorMail(wholeErrorText.toString())
             }
         } catch (e: Exception) {
             e.printStackTrace()
             throw RuntimeException(e.message)
         }
+        return null
     }
 
     private fun createCustomInfoString(): String {
@@ -244,7 +245,7 @@ class ErrorReporter @Inject constructor(private val context: Context) :
         return returnVal
     }
 
-    private fun sendErrorMail(ErrorContent: String) {
+    private fun sendErrorMail(ErrorContent: String): Intent {
         val body = """
             ${context.resources.getString(R.string.crash_report_mail_body)}
             
@@ -264,12 +265,7 @@ class ErrorReporter @Inject constructor(private val context: Context) :
         )
         emailIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK // TODO Intent in Acitvity starten
 
-        context.startActivity(
-            Intent.createChooser(
-                emailIntent,
-                "Send mail..."
-            )
-        )
+        return emailIntent
     }
 
     private fun saveAsFile(ErrorContent: String) {
