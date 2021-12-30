@@ -5,7 +5,7 @@ import de.daniel.mobilepauker2.utils.Log
 import java.util.*
 import kotlin.math.pow
 
-class LongTermBatch(private val batchNumber: Int) : Batch(mutableListOf()) {
+class LongTermBatch(private val batchNumber: Int) : Batch(listOf()) {
     companion object {
         private const val ONE_SECOND: Long = 1000
         private const val ONE_MINUTE = ONE_SECOND * 60
@@ -60,20 +60,6 @@ class LongTermBatch(private val batchNumber: Int) : Batch(mutableListOf()) {
         }
     }
 
-    fun getOldestExpiredCard(): Card {
-        refreshExpiration()
-        // return the card with the oldest expiration date
-        val iterator: Iterator<*> = expiredCards.iterator()
-        var oldestCard = iterator.next() as Card
-        while (iterator.hasNext()) {
-            val tmpCard = iterator.next() as Card
-            if (tmpCard.getExpirationTime() < oldestCard.getExpirationTime()) {
-                oldestCard = tmpCard
-            }
-        }
-        return oldestCard
-    }
-
     fun refreshExpiration() {
         expiredCards.clear()
         val currentTime = System.currentTimeMillis()
@@ -85,7 +71,7 @@ class LongTermBatch(private val batchNumber: Int) : Batch(mutableListOf()) {
                 "LongTermBatch::refreshExpiration",
                 "currentTime = $currentTime,cardTime=$learnedTime,diff=$diff," +
                     "expirationTime$expirationTime,$frontSide"
-            );
+            )
             if (diff > expirationTime) {
                 expiredCards.add(card)
             }

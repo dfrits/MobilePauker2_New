@@ -4,6 +4,8 @@ import android.util.Xml
 import de.daniel.mobilepauker2.lesson.Lesson
 import de.daniel.mobilepauker2.lesson.batch.Batch
 import de.daniel.mobilepauker2.lesson.batch.LongTermBatch
+import de.daniel.mobilepauker2.lesson.batch.SummaryBatch
+import de.daniel.mobilepauker2.lesson.card.Card
 import de.daniel.mobilepauker2.lesson.card.ComponentOrientation
 import de.daniel.mobilepauker2.lesson.card.FlashCard
 import de.daniel.mobilepauker2.models.Font
@@ -121,14 +123,18 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
                                     ignoreCase = true
                                 )
                             ) {
-                                if (SIDEA) {
-                                    currentFlashCard.sideAText = parser.nextText()
-                                    //Log.d("FlashCardXMLPullFeedParser::parse","sideA=" + currentFlashCard.getSideAText());
-                                } else if (SIDEB) {
-                                    currentFlashCard.sideBText = parser.nextText()
-                                } else {
-                                    currentFlashCard.sideAText = "Empty"
-                                    currentFlashCard.sideBText = "Empty"
+                                when {
+                                    SIDEA -> {
+                                        currentFlashCard.sideAText = parser.nextText()
+                                        //Log.d("FlashCardXMLPullFeedParser::parse","sideA=" + currentFlashCard.getSideAText());
+                                    }
+                                    SIDEB -> {
+                                        currentFlashCard.sideBText = parser.nextText()
+                                    }
+                                    else -> {
+                                        currentFlashCard.sideAText = "Empty"
+                                        currentFlashCard.sideBText = "Empty"
+                                    }
                                 }
                             } else if (name.equals(
                                     FONT,
@@ -210,7 +216,7 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
 
     private fun setupLesson(flashCardList: List<FlashCard>, description: String): Lesson {
         val newLesson = Lesson()
-        val summaryBatch: Batch = newLesson.summaryBatch
+        val summaryBatch: SummaryBatch = newLesson.summaryBatch
         newLesson.description = description
         for (i in flashCardList.indices) {
             val flashCard: FlashCard = flashCardList[i]
@@ -238,7 +244,7 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
             }
 
             val batch: Batch = if (flashCard.isLearned) {
-                newLesson.getLongTermBatchFromIndex(flashCard.initialBatch - 3)
+                newLesson.getLongTermBatchFromIndex(flashCard.initialBatch - 3) as LongTermBatch
             } else {
                 newLesson.unlearnedBatch
             }
@@ -247,6 +253,8 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
         }
 
         newLesson.refreshExpiredCards()
+        printLessonToDebug(newLesson)
+
         return newLesson
     }
 
@@ -318,5 +326,25 @@ class FlashCardXMLPullFeedParser(feedUrl: URL) : FlashCardBasedFeedParser(feedUr
             Log.e("FlashCardXMLPullFeedParser:parse()", e.message, e)
             throw RuntimeException(e)
         }
+    }
+
+    private fun printLessonToDebug(lesson: Lesson) {
+        var cards: Collection<Card?>? = lesson.getLearnedCards()
+        Log.d("FlashCardXMLPullFeedParser::setupLesson", "Size of learned cards is " + cards!!.size)
+        cards = lesson.getExpiredCards()
+        Log.d("FlashCardXMLPullFeedParser::setupLesson", "Size of expired cards is " + cards.size)
+        cards = lesson.shortTermList
+        Log.d("FlashCardXMLPullFeedParser::setupLesson", "Size of shortTerm cards is " + cards.size)
+        cards = lesson.getCards()
+        Log.d("FlashCardXMLPullFeedParser::setupLesson", "Size of all cards is " + cards.size)
+        cards = lesson.ultraShortTermList
+        Log.d(
+            "FlashCardXMLPullFeedParser::setupLesson",
+            "Size of ultraShortTerm cards is " + cards.size
+        )
+        Log.d(
+            "FlashCardXMLPullFeedParser::setupLesson",
+            "Number of longterm batches is" + lesson.getLongTermBatchesSize()
+        )
     }
 }
