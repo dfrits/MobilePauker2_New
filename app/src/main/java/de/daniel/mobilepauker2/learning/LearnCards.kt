@@ -90,6 +90,8 @@ class LearnCards : FlashCardSwipeScreen() {
             window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        init()
     }
 
     override fun updateCurrentCard() {
@@ -156,7 +158,6 @@ class LearnCards : FlashCardSwipeScreen() {
             "LearnCardsActivity::cursorLoaded", "cursor loaded: " +
                 "savedPos= " + mSavedCursorPosition
         )
-        initAfterCursorLoaded()
 
         if (mSavedCursorPosition == -1) {
             setCursorToFirst()
@@ -268,7 +269,7 @@ class LearnCards : FlashCardSwipeScreen() {
         return true
     }
 
-    private fun initAfterCursorLoaded() {
+    private fun init() {
         if (currentPhase !== REPEATING_LTM
             && (currentPhase !== SIMPLE_LEARNING
                 || currentPhase !== NOTHING)
