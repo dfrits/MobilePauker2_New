@@ -159,7 +159,6 @@
     <!-- region Titles -->
     <string name="about_title">Over MobilePauker++</string>
     <string name="associate_dropbox_title">Koppelen aan Dropbox</string>
-    <string name="auto_save_title">Automatisch opslaan</string>
     <string name="auto_upload_title">Automatische synchronisatie</string>
     <string name="case_sensitive_title">Hoofdlettergevoelig</string>
     <string name="expire_toast_title">Meldingsballon tonen bij verlopen</string>
@@ -176,7 +175,6 @@
     <!-- endregion -->
 
     <!-- region Beschreibungen -->
-    <string name="auto_save_summ">Automatisch opslaan na elke les</string>
     <string name="auto_sync_disabled_summ">Nog geen account gekoppeld</string>
     <string name="case_sensitive_summ">Of kaarten moeten worden herhaald op basis van invoer</string>
     <string name="expire_toast_summ">Toont een informatieregel bij de volgende vervaldatum na het opslaan van de les</string>

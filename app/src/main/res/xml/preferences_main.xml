@@ -82,12 +82,6 @@
             android:title="@string/notifications"
             app:fragment="de.daniel.mobilepauker2.settings.SettingsFragmentNotifications" />
 
-        // Autospeichern
-        <SwitchPreference
-            android:defaultValue="@bool/auto_save_default"
-            android:key="@string/auto_save"
-            android:summary="@string/auto_save_summ"
-            android:title="@string/auto_save_title" />
         // Toast fürs Ablaufdatum
         <SwitchPreference
             android:defaultValue="@bool/expire_toast_default"

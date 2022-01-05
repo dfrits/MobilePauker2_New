@@ -15,7 +15,6 @@ class SettingsManager @Inject constructor(val context: Context) {
             Keys.USTM -> context.getString(R.string.ustm_key)
             Keys.ABOUT -> context.getString(R.string.about)
             Keys.AUTO_DOWNLOAD -> context.getString(R.string.auto_download)
-            Keys.AUTO_SAVE -> context.getString(R.string.auto_save)
             Keys.AUTO_UPLOAD -> context.getString(R.string.auto_upload)
             Keys.HIDE_TIMES -> context.getString(R.string.hide_times)
             Keys.REPEAT_CARDS -> context.getString(R.string.repeat_cards_mode)
@@ -48,7 +47,6 @@ class SettingsManager @Inject constructor(val context: Context) {
     private fun getDefaultBoolValue(key: Keys?): Boolean {
         return when (key) {
             Keys.AUTO_DOWNLOAD -> context.resources.getBoolean(R.bool.auto_download_default)
-            Keys.AUTO_SAVE -> context.resources.getBoolean(R.bool.auto_save_default)
             Keys.AUTO_UPLOAD -> context.resources.getBoolean(R.bool.auto_upload_default)
             Keys.HIDE_TIMES -> context.resources.getBoolean(R.bool.auto_upload_default)
             Keys.CASE_SENSITIV -> context.resources.getBoolean(R.bool.auto_upload_default)
@@ -76,7 +74,6 @@ class SettingsManager @Inject constructor(val context: Context) {
     enum class Keys {
         ABOUT,
         AUTO_DOWNLOAD,
-        AUTO_SAVE,
         AUTO_UPLOAD,
         CASE_SENSITIV,
         DB_PREFERENCE,
