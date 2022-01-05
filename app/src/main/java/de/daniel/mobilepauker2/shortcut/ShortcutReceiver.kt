@@ -20,14 +20,11 @@ import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.dropbox.SyncDialog
 import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.settings.SettingsManager
-import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.*
 import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
 import de.daniel.mobilepauker2.utils.Constants.FILES
 import de.daniel.mobilepauker2.utils.Constants.SHORTCUT_EXTRA
 import de.daniel.mobilepauker2.utils.Constants.SYNC_FILE_ACTION
-import de.daniel.mobilepauker2.utils.ErrorReporter
-import de.daniel.mobilepauker2.utils.Log
-import de.daniel.mobilepauker2.utils.Toaster
 import java.io.IOException
 import javax.inject.Inject
 
@@ -81,17 +78,18 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
     fun cancelClicked(view: View?) {}
 
     private fun handleShortcut(shortcutIntent: Intent) {
-        /*if (LearnCardsActivity.isLearningRunning()) { // TODO
+        if (Utility.isLearningRunning(context)) { // TODO
             toaster.showToast(
+                context as Activity,
                 R.string.shortcut_open_error_learning_running,
                 Toast.LENGTH_SHORT
             )
             return
-        }*/
+        }
         if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager())
             || (Build.VERSION.SDK_INT < Build.VERSION_CODES.R
-                    && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED)
+                && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED)
         ) {
             toaster.showToast(
                 context as Activity,

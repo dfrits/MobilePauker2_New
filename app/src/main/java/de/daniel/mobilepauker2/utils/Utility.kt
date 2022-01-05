@@ -61,6 +61,7 @@ class Utility {
                         "Checking Foregroundapp",
                         "current foreground App ${runAppProccess.processName}"
                     )
+                    return true
                 } else {
                     Log.d(
                         "Checking Backgroundapp",
