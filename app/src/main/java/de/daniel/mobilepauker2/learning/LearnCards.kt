@@ -33,13 +33,10 @@ import de.daniel.mobilepauker2.models.view.MPEditText
 import de.daniel.mobilepauker2.models.view.MPTextView
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
-import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.*
 import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_CHANNEL_ID
 import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_ID
 import de.daniel.mobilepauker2.utils.Constants.TIME_BAR_ID
-import de.daniel.mobilepauker2.utils.ErrorReporter
-import de.daniel.mobilepauker2.utils.Log
-import de.daniel.mobilepauker2.utils.Toaster
 import java.util.*
 import javax.inject.Inject
 
@@ -874,6 +871,8 @@ class LearnCards : FlashCardSwipeScreen() {
                     stopWaiting = true
                     updateLearningPhase()
                 }
+
+                Utility.isAppRunning(context)
 
                 // Ist die App pausiert, soll in der Titelleiste die Zeit angezeigt werden
                 val showNotify = settingsManager.getBoolPreference(SHOW_TIMER_BAR)
