@@ -291,7 +291,13 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
                 .setNeutralButton("Send E-Mail") { _, _ ->
                     errorReporter.init()
                     errorReporter.uncaughtException(null, e)
-                    errorReporter.checkErrorAndSendMail()
+                    val errorReportIntent = errorReporter.checkErrorAndSendMail()
+                    context.startActivity(
+                        Intent.createChooser(
+                            errorReportIntent,
+                            "Send mail..."
+                        )
+                    )
                 }
                 .setOnDismissListener {
                     PreferenceManager.getDefaultSharedPreferences(context)

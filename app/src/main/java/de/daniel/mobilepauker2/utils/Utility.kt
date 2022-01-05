@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import de.daniel.mobilepauker2.learning.LearnCards
 
 
 class Utility {
@@ -45,20 +46,61 @@ class Utility {
                 context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
             val listRunningApps = activityManager?.runningAppProcesses
 
-            if (listRunningApps.isNullOrEmpty())
+            if (listRunningApps.isNullOrEmpty()) {
+                Log.d(
+                    "Checking RunningAppsList",
+                    "List is null or empty"
+                )
                 Toast.makeText(context, "current null", Toast.LENGTH_LONG).show()
+                return false
+            }
 
-            listRunningApps?.forEach { runAppProccess ->
+            listRunningApps.forEach { runAppProccess ->
                 if (runAppProccess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                    Toast.makeText(
-                        context,
-                        "current foreground App ${runAppProccess.processName}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Log.d(
+                        "Checking Foregroundapp",
+                        "current foreground App ${runAppProccess.processName}"
+                    )
+                    return true
                 } else {
-                    Toast.makeText(context, "current background App ${runAppProccess.processName}", Toast.LENGTH_LONG).show()
+                    Log.d(
+                        "Checking Backgroundapp",
+                        "Current background App: ${runAppProccess.processName}"
+                    )
                 }
             }
+            return false
+        }
+
+        fun isLearningRunning(context: Context): Boolean {
+            val activityManager =
+                context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
+            val activityList = activityManager?.appTasks
+
+            if (activityList.isNullOrEmpty()){
+                Log.d(
+                    "Checking ActivityList",
+                    "List is null or empty"
+                )
+                return false
+            }
+
+            activityList.forEach { appTask ->
+                val activityName = appTask.taskInfo.topActivity?.className
+                if (activityName == LearnCards::class.java.canonicalName) {
+                    Log.d(
+                        "Checking ForegroundaActivity",
+                        "Current foreground Activity $activityName"
+                    )
+                    return true
+                } else {
+                    Log.d(
+                        "Checking BackgroundActivity",
+                        "Current background Activity: $activityName"
+                    )
+                }
+            }
+
             return false
         }
     }

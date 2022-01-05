@@ -7,10 +7,10 @@ import de.daniel.mobilepauker2.dropbox.DropboxAccDialog
 import de.daniel.mobilepauker2.dropbox.SyncDialog
 import de.daniel.mobilepauker2.editcard.AbstractEditCard
 import de.daniel.mobilepauker2.editcard.AddCard
+import de.daniel.mobilepauker2.learning.FlashCardSwipeScreen
+import de.daniel.mobilepauker2.learning.LearnCards
 import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
-import de.daniel.mobilepauker2.lesson.card.CardPackRamAdapter
-import de.daniel.mobilepauker2.lesson.card.FlashCardCursor
 import de.daniel.mobilepauker2.lessonimport.LessonImport
 import de.daniel.mobilepauker2.lessonimport.LessonImportAdapter
 import de.daniel.mobilepauker2.mainmenu.MainMenu
@@ -33,9 +33,7 @@ interface ApplicationSingletonComponent {
 
     fun inject(manager: DataManager)
     fun inject(manager: LessonManager)
-    fun inject(adapter: CardPackRamAdapter)
     fun inject(adapter: ChartAdapter)
-    fun inject(cursor: FlashCardCursor)
     fun inject(utils: Toaster)
     fun inject(mainMenu: MainMenu)
     fun inject(lessonImport: LessonImport)
@@ -55,4 +53,6 @@ interface ApplicationSingletonComponent {
     fun inject(shortcutReceiver: ShortcutReceiver)
     fun inject(notificationService: NotificationService)
     fun inject(alarmNotificationReceiver: AlarmNotificationReceiver)
+    fun inject(flashCardSwipeScreen: FlashCardSwipeScreen)
+    fun inject(learnCards: LearnCards)
 }

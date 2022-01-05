@@ -3,7 +3,6 @@ package de.daniel.mobilepauker2.dropbox
 import com.dropbox.core.DbxException
 import com.dropbox.core.v2.DbxClientV2
 import com.dropbox.core.v2.files.ListFolderResult
-import de.daniel.mobilepauker2.utils.CoroutinesAsyncTask
 
 /**
  * Async task to list items in a folder

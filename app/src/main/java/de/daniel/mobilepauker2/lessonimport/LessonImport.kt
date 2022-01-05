@@ -34,7 +34,6 @@ import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
 import java.io.File
 import java.io.IOException
-import java.net.URI
 import java.util.*
 import javax.inject.Inject
 
@@ -144,7 +143,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
             }
             init()
             if (lessonManager.isLessonNotNew())
-                if (fileNames.contains(dataManager.getReadableCurrentFileName())) {
+                if (fileNames.contains(dataManager.currentFileName)) {
                     try {
                         viewModel.openLesson(dataManager.getReadableCurrentFileName())
                     } catch (ignored: IOException) {
@@ -235,10 +234,7 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
             viewModel.itemClicked(position)
             var text: String? = getString(R.string.next_expire_date)
             try {
-                val uri: URI = dataManager.getFilePathForName(
-                    listView!!.getItemAtPosition(position) as String
-                ).toURI()
-                val result = viewModel.getNextExpireDate(uri)
+                val result = viewModel.getNextExpireDate(listView!!.getItemAtPosition(position) as String)
                 if (result.timeStamp > Long.MIN_VALUE) {
                     if (result.expiredCards > 0) {
                         text = "${getString(R.string.expired_cards)} ${result.expiredCards}"

@@ -9,13 +9,13 @@ import java.util.*
 
 class Lesson {
     var description: String = ""
+    val longTermBatches = mutableListOf<LongTermBatch>()
     val unlearnedBatch = Batch(mutableListOf())
     val shortTermBatch = mutableListOf<Card>()
     val ultraShortTermBatch = mutableListOf<Card>()
     val summaryBatch = SummaryBatch(this)
     val ultraShortTermList = mutableListOf<Card>()
     val shortTermList = mutableListOf<Card>()
-    val longTermBatches = mutableListOf<LongTermBatch>()
 
     fun getLongTermBatchesSize(): Int = longTermBatches.size
 
@@ -65,7 +65,7 @@ class Lesson {
         return expiredCards
     }
 
-    fun getLearnedCards(): Collection<Card>? {
+    fun getLearnedCards(): Collection<Card> {
         val learnedCards: MutableCollection<Card> = ArrayList()
         for (longTermBatch in longTermBatches) {
             learnedCards.addAll(longTermBatch.getLearnedCards())
@@ -77,7 +77,7 @@ class Lesson {
         Log.d("Lesson::refresExpiration", "entry")
         for (longTermBatch in longTermBatches) {
             Log.d("Lesson::refresExpiration", "loop")
-            longTermBatch.refreshExpiredCards()
+            longTermBatch.refreshExpiration()
         }
     }
 
