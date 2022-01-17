@@ -199,9 +199,6 @@
     <!-- region Keys -->
     <string name="about" translatable="false">About</string>
     <string name="associate_dropbox" translatable="false">Associate with Dropbox</string>
-    <string name="auto_download" translatable="false">Auto Download</string>
-    <string name="auto_save" translatable="false">Auto Save</string>
-    <string name="auto_upload" translatable="false">Auto Upload</string>
     <string name="case_sensitive" translatable="false">Case sensitiv</string>
     <string name="expire_toast" translatable="false">Enable Expire Toast</string>
     <string name="flip_card_sides" translatable="false">Flip card sides</string>
@@ -222,7 +219,6 @@
     <string name="about_title">About MobilePauker++</string>
     <string name="associate_dropbox_title">Associate with Dropbox</string>
     <string name="auto_download_title">Auto Download</string>
-    <string name="auto_save_title">Auto Save</string>
     <string name="auto_upload_title">Auto Upload</string>
     <string name="case_sensitive_title">Case sensitiv</string>
     <string name="expire_toast_title">Show Expire Toast</string>
@@ -244,10 +240,7 @@
     <!-- endregion -->
 
     <!-- region Beschreibungen -->
-    <string name="auto_save_summ">Save automatically after every session</string>
     <string name="auto_sync_disabled_summ">No account associated yet</string>
-    <string name="auto_sync_enabled_download_summ">Synchronize every time before you open a lesson</string>
-    <string name="auto_sync_enabled_upload_summ">Synchronize every time after you saved a lesson</string>
     <string name="case_sensitive_summ">If cards are repeated by input</string>
     <string name="expire_toast_summ">Shows a info line with the next expire date after saving the
         lesson</string>
@@ -296,5 +289,7 @@
     <string name="already_connected">Bereits verbunden</string>
     <string name="error_dropbox_file_not_found">Datei ist nicht länger verfügbar auf Dropbox</string>
     <string name="error_dropbox_file_older_than_local">File on Dropbox is older than this!</string>
+    <string name="tap_enter_answer">Tap to enter your answer.</string>
+    <string name="deleting_impossible">Löschen nicht möglich!</string>
     <!-- endregion -->
 </resources>

@@ -9,6 +9,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import de.daniel.mobilepauker2.learning.LearnCards
 
 
 class Utility {
@@ -45,16 +46,27 @@ class Utility {
                 context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
             val listRunningApps = activityManager?.runningAppProcesses
 
-            if (listRunningApps.isNullOrEmpty())
+            if (listRunningApps.isNullOrEmpty()) {
+                Log.d(
+                    "Checking RunningAppsList",
+                    "List is null or empty"
+                )
                 Toast.makeText(context, "current null", Toast.LENGTH_LONG).show()
+                return false
+            }
 
-            listRunningApps?.forEach { runAppProccess ->
+            listRunningApps.forEach { runAppProccess ->
                 if (runAppProccess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                    Toast.makeText(
-                        context,
-                        "current foreground App ${runAppProccess.processName}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Log.d(
+                        "Checking Foregroundapp",
+                        "current foreground App ${runAppProccess.processName}"
+                    )
+                    return true
+                } else {
+                    Log.d(
+                        "Checking Backgroundapp",
+                        "Current background App: ${runAppProccess.processName}"
+                    )
                 }
             }
             return false

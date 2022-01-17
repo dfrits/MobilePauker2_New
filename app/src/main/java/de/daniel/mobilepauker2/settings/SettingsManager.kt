@@ -14,9 +14,6 @@ class SettingsManager @Inject constructor(val context: Context) {
             Keys.STM -> context.getString(R.string.stm_key)
             Keys.USTM -> context.getString(R.string.ustm_key)
             Keys.ABOUT -> context.getString(R.string.about)
-            Keys.AUTO_DOWNLOAD -> context.getString(R.string.auto_download)
-            Keys.AUTO_SAVE -> context.getString(R.string.auto_save)
-            Keys.AUTO_UPLOAD -> context.getString(R.string.auto_upload)
             Keys.HIDE_TIMES -> context.getString(R.string.hide_times)
             Keys.REPEAT_CARDS -> context.getString(R.string.repeat_cards_mode)
             Keys.CASE_SENSITIV -> context.getString(R.string.case_sensitive)
@@ -47,11 +44,8 @@ class SettingsManager @Inject constructor(val context: Context) {
 
     private fun getDefaultBoolValue(key: Keys?): Boolean {
         return when (key) {
-            Keys.AUTO_DOWNLOAD -> context.resources.getBoolean(R.bool.auto_download_default)
-            Keys.AUTO_SAVE -> context.resources.getBoolean(R.bool.auto_save_default)
-            Keys.AUTO_UPLOAD -> context.resources.getBoolean(R.bool.auto_upload_default)
-            Keys.HIDE_TIMES -> context.resources.getBoolean(R.bool.auto_upload_default)
-            Keys.CASE_SENSITIV -> context.resources.getBoolean(R.bool.auto_upload_default)
+            Keys.HIDE_TIMES -> context.resources.getBoolean(R.bool.hide_times_default)
+            Keys.CASE_SENSITIV -> context.resources.getBoolean(R.bool.case_sensitive_default)
             Keys.LEARN_NEW_CARDS_RANDOMLY -> context.resources.getBoolean(R.bool.learn_new_cards_randomly_default)
             Keys.ENABLE_EXPIRE_TOAST -> context.resources.getBoolean(R.bool.expire_toast_default)
             Keys.SHOW_TIMER_NOTIFY -> context.resources.getBoolean(R.bool.show_timer_notification_default)
@@ -75,9 +69,6 @@ class SettingsManager @Inject constructor(val context: Context) {
 
     enum class Keys {
         ABOUT,
-        AUTO_DOWNLOAD,
-        AUTO_SAVE,
-        AUTO_UPLOAD,
         CASE_SENSITIV,
         DB_PREFERENCE,
         ENABLE_EXPIRE_TOAST,

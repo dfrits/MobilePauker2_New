@@ -8,7 +8,9 @@ import java.util.*
  * a batch is part of a lesson
  * @author Ronny.Standtke@gmx.net
  */
-open class Batch internal constructor(val cards: MutableList<Card>) {
+open class Batch internal constructor(private val cardList: List<Card>) {
+    val cards: MutableList<Card> = mutableListOf()
+
     // support for search result caching
     private var searchPattern: String? = null
     private var searchSide: Card.Element? = null
@@ -18,25 +20,11 @@ open class Batch internal constructor(val cards: MutableList<Card>) {
     private var currentSearchHit = 0
     //private var savedSearchHit: SearchHit? = null
 
-    private abstract class AbstractCardComparator<Card> : Comparator<Card> {
-        private var ascending = true
-        fun setAscending(ascending: Boolean) {
-            this.ascending = ascending
-        }
-
-        override fun compare(card1: Card, card2: Card): Int {
-            val result = compareCards(card1, card2)
-            return if (ascending) result else -result
-        }
-
-        protected abstract fun compareCards(card1: Card, card2: Card): Int
-    }
-
     /**
      * adds a card to this batch
      * @param card the new card
      */
-    fun addCard(card: Card) {
+    open fun addCard(card: Card) {
         cards.add(card)
         card.isLearned = false
     }
@@ -81,7 +69,7 @@ open class Batch internal constructor(val cards: MutableList<Card>) {
      * @param index the index where the card should be removed
      * @return the removed card
      */
-    fun removeCard(index: Int): Card {
+    open fun removeCard(index: Int): Card {
         // save current search hit
         //savedSearchHit = getCurrentSearchHit()
 
@@ -181,6 +169,20 @@ open class Batch internal constructor(val cards: MutableList<Card>) {
         }
     }*/
 
+    private abstract class AbstractCardComparator<Card> : Comparator<Card> {
+        private var ascending = true
+        fun setAscending(ascending: Boolean) {
+            this.ascending = ascending
+        }
+
+        override fun compare(card1: Card, card2: Card): Int {
+            val result = compareCards(card1, card2)
+            return if (ascending) result else -result
+        }
+
+        protected abstract fun compareCards(card1: Card, card2: Card): Int
+    }
+
     companion object {
         private val collator = Collator.getInstance()
         private val frontSideComparator: AbstractCardComparator<Card> =
@@ -253,11 +255,8 @@ open class Batch internal constructor(val cards: MutableList<Card>) {
             }
     }
 
-    /**
-     * constructs a new Batch with all the cards in <CODE>cards</CODE>
-     * @param cards initial batch cards
-     */
-    /*init {
-        searchHits = LinkedList<SearchHit>()
-    }*/
+    init {
+        //searchHits = LinkedList<SearchHit>()
+        cards.addAll(cardList)
+    }
 }

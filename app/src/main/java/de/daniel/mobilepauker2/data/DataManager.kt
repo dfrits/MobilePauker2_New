@@ -11,6 +11,7 @@ import de.daniel.mobilepauker2.data.xml.FlashCardXMLStreamWriter
 import de.daniel.mobilepauker2.lesson.Lesson
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.models.CacheFile
+import de.daniel.mobilepauker2.models.NextExpireDateResult
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -105,6 +106,13 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         currentFileName = file.name
         fileAbsolutePath = file.absolutePath
         lessonManager.setupLesson(lesson)
+    }
+
+    fun getNextExpireDate(file: File): NextExpireDateResult {
+        val uri = file.toURI()
+        val xmlFlasCardFeedParser = FlashCardXMLPullFeedParser(uri.toURL())
+
+        return xmlFlasCardFeedParser.getNextExpireDate()
     }
 
     fun writeLessonToFile(isNewFile: Boolean): SaveResult {

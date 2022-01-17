@@ -19,25 +19,25 @@ import javax.inject.Inject
 class ErrorReporter @Inject constructor(private val context: Context) :
     Thread.UncaughtExceptionHandler {
 
-    private val CustomParameters = HashMap<String, String>()
-    private var VersionName: String = ""
-    private var PackageName: String = ""
-    private var FilePath: String = ""
-    private var PhoneModel: String = ""
-    private var AndroidVersion: String = ""
-    private var Board: String = ""
-    private var Brand: String = ""
-    private var Device: String = ""
-    private var Display: String = ""
-    private var FingerPrint: String = ""
-    private var Host: String = ""
-    private var ID: String = ""
-    private var Model: String = ""
-    private var Product: String = ""
-    private var Tags: String = ""
-    private var Time: Long = 0
-    private var Type: String = ""
-    private var User: String = ""
+    private val customParameters = HashMap<String, String>()
+    private var versionName: String = ""
+    private var packageName: String = ""
+    private var filePath: String = ""
+    private var phoneModel: String = ""
+    private var androidVersion: String = ""
+    private var board: String = ""
+    private var brand: String = ""
+    private var device: String = ""
+    private var display: String = ""
+    private var fingerPrint: String = ""
+    private var host: String = ""
+    private var iD: String = ""
+    private var model: String = ""
+    private var product: String = ""
+    private var tags: String = ""
+    private var time: Long = 0
+    private var type: String = ""
+    private var user: String = ""
 
     private val availableInternalMemorySize: Long
         get() {
@@ -59,7 +59,7 @@ class ErrorReporter @Inject constructor(private val context: Context) :
 
     val isThereAnyErrorsToReport: Boolean
         get() {
-            FilePath = context.filesDir.absolutePath
+            filePath = context.filesDir.absolutePath
             return bIsThereAnyErrorFile()
         }
 
@@ -78,7 +78,7 @@ class ErrorReporter @Inject constructor(private val context: Context) :
         report.append(createInformationString())
         report.append("Custom Informations :\n")
         report.append("=====================\n")
-        report.append(CreateCustomInfoString())
+        report.append(createCustomInfoString())
         report.append("\n\n")
         report.append("Stack : \n")
         report.append("======= \n")
@@ -109,12 +109,12 @@ class ErrorReporter @Inject constructor(private val context: Context) :
     }
 
     fun addCustomData(Key: String, Value: String) {
-        CustomParameters[Key] = Value
+        customParameters[Key] = Value
     }
 
     fun deleteErrorFiles() {
         try {
-            FilePath = context.filesDir.absolutePath
+            filePath = context.filesDir.absolutePath
             if (bIsThereAnyErrorFile()) {
                 val fos = context.openFileOutput("error.stacktrace", Context.MODE_PRIVATE)
                 val text = "\n"
@@ -127,9 +127,9 @@ class ErrorReporter @Inject constructor(private val context: Context) :
         }
     }
 
-    fun checkErrorAndSendMail() {
+    fun checkErrorAndSendMail(): Intent? {
         try {
-            FilePath = context.filesDir.absolutePath
+            filePath = context.filesDir.absolutePath
             if (bIsThereAnyErrorFile()) {
                 val wholeErrorText = StringBuilder()
                 wholeErrorText.append("New Trace collected :\n")
@@ -147,21 +147,22 @@ class ErrorReporter @Inject constructor(private val context: Context) :
 
                 // DELETE FILES !!!!
                 deleteErrorFiles()
-                sendErrorMail(wholeErrorText.toString())
+                return sendErrorMail(wholeErrorText.toString())
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            throw RuntimeException("Exception in ErrorReporter!")
+            throw RuntimeException(e.message)
         }
+        return null
     }
 
-    private fun CreateCustomInfoString(): String {
-        val CustomInfo = StringBuilder()
-        for (CurrentKey in CustomParameters.keys) {
-            val CurrentVal = CustomParameters[CurrentKey]
-            CustomInfo.append(CurrentKey).append(" = ").append(CurrentVal).append("\n")
+    private fun createCustomInfoString(): String {
+        val customInfo = StringBuilder()
+        for (CurrentKey in customParameters.keys) {
+            val currentVal = customParameters[CurrentKey]
+            customInfo.append(CurrentKey).append(" = ").append(currentVal).append("\n")
         }
-        return CustomInfo.toString()
+        return customInfo.toString()
     }
 
     private fun recoltInformations() {
@@ -171,26 +172,26 @@ class ErrorReporter @Inject constructor(private val context: Context) :
             // Version
             if (pm != null) {
                 pi = pm.getPackageInfo(context.packageName, 0)
-                VersionName = pi.versionName
+                versionName = pi.versionName
                 // Package name
-                PackageName = pi.packageName
+                packageName = pi.packageName
                 // Device model
-                PhoneModel = Build.MODEL
+                phoneModel = Build.MODEL
                 // Android version
-                AndroidVersion = Build.VERSION.RELEASE
-                Board = Build.BOARD
-                Brand = Build.BRAND
-                Device = Build.DEVICE
-                Display = Build.DISPLAY
-                FingerPrint = Build.FINGERPRINT
-                Host = Build.HOST
-                ID = Build.ID
-                Model = Build.MODEL
-                Product = Build.PRODUCT
-                Tags = Build.TAGS
-                Time = Build.TIME
-                Type = Build.TYPE
-                User = Build.USER
+                androidVersion = Build.VERSION.RELEASE
+                board = Build.BOARD
+                brand = Build.BRAND
+                device = Build.DEVICE
+                display = Build.DISPLAY
+                fingerPrint = Build.FINGERPRINT
+                host = Build.HOST
+                iD = Build.ID
+                model = Build.MODEL
+                product = Build.PRODUCT
+                tags = Build.TAGS
+                time = Build.TIME
+                type = Build.TYPE
+                user = Build.USER
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -201,41 +202,41 @@ class ErrorReporter @Inject constructor(private val context: Context) :
     private fun createInformationString(): String {
         recoltInformations()
         var returnVal = ""
-        returnVal += "Version : $VersionName"
+        returnVal += "Version : $versionName"
         returnVal += "\n"
-        returnVal += "Package : $PackageName"
+        returnVal += "Package : $packageName"
         returnVal += "\n"
-        returnVal += "FilePath : $FilePath"
+        returnVal += "FilePath : $filePath"
         returnVal += "\n"
-        returnVal += "Phone Model$PhoneModel"
+        returnVal += "Phone Model$phoneModel"
         returnVal += "\n"
-        returnVal += "Android Version : $AndroidVersion"
+        returnVal += "Android Version : $androidVersion"
         returnVal += "\n"
-        returnVal += "Board : $Board"
+        returnVal += "Board : $board"
         returnVal += "\n"
-        returnVal += "Brand : $Brand"
+        returnVal += "Brand : $brand"
         returnVal += "\n"
-        returnVal += "Device : $Device"
+        returnVal += "Device : $device"
         returnVal += "\n"
-        returnVal += "Display : $Display"
+        returnVal += "Display : $display"
         returnVal += "\n"
-        returnVal += "Finger Print : $FingerPrint"
+        returnVal += "Finger Print : $fingerPrint"
         returnVal += "\n"
-        returnVal += "Host : $Host"
+        returnVal += "Host : $host"
         returnVal += "\n"
-        returnVal += "ID : $ID"
+        returnVal += "ID : $iD"
         returnVal += "\n"
-        returnVal += "Model : $Model"
+        returnVal += "Model : $model"
         returnVal += "\n"
-        returnVal += "Product : $Product"
+        returnVal += "Product : $product"
         returnVal += "\n"
-        returnVal += "Tags : $Tags"
+        returnVal += "Tags : $tags"
         returnVal += "\n"
-        returnVal += "Time : $Time"
+        returnVal += "Time : $time"
         returnVal += "\n"
-        returnVal += "Type : $Type"
+        returnVal += "Type : $type"
         returnVal += "\n"
-        returnVal += "User : $User"
+        returnVal += "User : $user"
         returnVal += "\n"
         returnVal += "Total Internal memory : $totalInternalMemorySize"
         returnVal += "\n"
@@ -244,9 +245,9 @@ class ErrorReporter @Inject constructor(private val context: Context) :
         return returnVal
     }
 
-    private fun sendErrorMail(ErrorContent: String) {
+    private fun sendErrorMail(ErrorContent: String): Intent {
         val body = """
-            ${context!!.resources.getString(R.string.crash_report_mail_body)}
+            ${context.resources.getString(R.string.crash_report_mail_body)}
             
             $ErrorContent
             
@@ -260,15 +261,11 @@ class ErrorReporter @Inject constructor(private val context: Context) :
         emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("fritsch_daniel@gmx.de"))
         emailIntent.putExtra(
             Intent.EXTRA_SUBJECT,
-            context!!.getString(R.string.crash_report_mail_subject)
+            context.getString(R.string.crash_report_mail_subject)
         )
+        emailIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 
-        context.startActivity(
-            Intent.createChooser(
-                emailIntent,
-                "Send mail..."
-            )
-        )
+        return emailIntent
     }
 
     private fun saveAsFile(ErrorContent: String) {

@@ -1,5 +1,6 @@
 package de.daniel.mobilepauker2.settings
 
+import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -8,8 +9,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.preference.*
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
+import de.daniel.mobilepauker2.dropbox.DropboxAccDialog
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.MinFilter
 import javax.inject.Inject
 
@@ -82,6 +85,12 @@ class SettingsFragmentMain : PreferenceFragmentCompat(),
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == Constants.REQUEST_CODE_DB_ACC_DIALOG && resultCode == Activity.RESULT_OK) {
+            initSyncPrefs()
+        }
+    }
+
     private fun init(preference: Preference) {
         if (preference is PreferenceGroup) {
             for (i in 0 until preference.preferenceCount) {
@@ -124,6 +133,47 @@ class SettingsFragmentMain : PreferenceFragmentCompat(),
                 }
                 preference.summary = String.format(newSumm.toString(), preference.entry)
             }
+        }
+
+        preference?.key?.let { preferenceKey ->
+            if (preferenceKey == settingsManager.getSettingsKey(SettingsManager.Keys.DB_PREFERENCE)) {
+                initSyncPrefs()
+            }
+        }
+    }
+
+    private fun initSyncPrefs() {
+        Log.d("SettingsFragment::initSyncPrefs", "init syncprefs")
+        val dbPref: Preference? =
+            findPreference(settingsManager.getSettingsKey(SettingsManager.Keys.DB_PREFERENCE))
+        val pref = PreferenceManager.getDefaultSharedPreferences(context)
+        val accessToken = pref.getString(Constants.DROPBOX_ACCESS_TOKEN, null)
+        if (accessToken == null) {
+            setPrefAss(dbPref)
+        } else {
+            pref.edit().putString(Constants.DROPBOX_ACCESS_TOKEN, accessToken).apply()
+            setPrefUnlink(dbPref)
+        }
+    }
+
+    private fun setPrefAss(dbPref: Preference?) {
+        dbPref?.setTitle(R.string.associate_dropbox_title)
+        val assIntent = Intent(context, DropboxAccDialog::class.java)
+        assIntent.putExtra(Constants.DROPBOX_AUTH_ACTION, true)
+        dbPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            startActivityForResult(assIntent, Constants.REQUEST_CODE_DB_ACC_DIALOG)
+            false
+        }
+    }
+
+    private fun setPrefUnlink(dbPref: Preference?) {
+        dbPref?.setTitle(R.string.unlink_dropbox_title)
+        val unlIntent = Intent(context, DropboxAccDialog::class.java)
+        unlIntent.putExtra(Constants.DROPBOX_UNLINK_ACTION, true)
+        dbPref?.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            Log.d("SettingsFragment::initSyncPrefs", "unlinkDB clicked")
+            startActivityForResult(unlIntent, Constants.REQUEST_CODE_DB_ACC_DIALOG)
+            false
         }
     }
 }

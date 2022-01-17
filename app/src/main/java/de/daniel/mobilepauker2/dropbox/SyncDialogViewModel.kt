@@ -7,7 +7,6 @@ import com.dropbox.core.v2.files.*
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.utils.Constants
-import de.daniel.mobilepauker2.utils.CoroutinesAsyncTask
 import de.daniel.mobilepauker2.utils.Log
 import java.io.File
 import java.util.*

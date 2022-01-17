@@ -28,12 +28,7 @@ class ChartAdapter(private val context: PaukerApplication, val callback: ChartAd
         val abgelaufen: Int
         val ungelernt: Int
         val gelernt: Int
-        val chartBarCallback: ChartBar.ChartBarCallback = object : ChartBar.ChartBarCallback {
-            override fun onClick() {
-                callback.onClick(position)
-            }
-        }
-        val chartBar = ChartBar(view, chartBarCallback)
+        val chartBar = ChartBar(view)
         when (position) {
             0 -> {
                 titel = context.resources.getString(R.string.sum)
@@ -66,7 +61,11 @@ class ChartAdapter(private val context: PaukerApplication, val callback: ChartAd
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {}
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.view.setOnClickListener {
+            callback.onClick(position)
+        }
+    }
 
     override fun getItemViewType(position: Int): Int {
         return position
@@ -74,9 +73,7 @@ class ChartAdapter(private val context: PaukerApplication, val callback: ChartAd
 
     override fun getItemCount(): Int = batchStatistics.size + 2
 
-    class ViewHolder(val view: View) : RecyclerView.ViewHolder(
-        view
-    )
+    class ViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     interface ChartAdapterCallback {
         fun onClick(position: Int)

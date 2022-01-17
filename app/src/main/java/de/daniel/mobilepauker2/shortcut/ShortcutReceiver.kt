@@ -13,21 +13,14 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.PreferenceManager
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
-import de.daniel.mobilepauker2.dropbox.SyncDialog
+import de.daniel.mobilepauker2.learning.LearnCards
 import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.settings.SettingsManager
-import de.daniel.mobilepauker2.utils.Constants
-import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
-import de.daniel.mobilepauker2.utils.Constants.FILES
+import de.daniel.mobilepauker2.utils.*
 import de.daniel.mobilepauker2.utils.Constants.SHORTCUT_EXTRA
-import de.daniel.mobilepauker2.utils.Constants.SYNC_FILE_ACTION
-import de.daniel.mobilepauker2.utils.ErrorReporter
-import de.daniel.mobilepauker2.utils.Log
-import de.daniel.mobilepauker2.utils.Toaster
 import java.io.IOException
 import javax.inject.Inject
 
@@ -59,6 +52,7 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
         if (Constants.SHORTCUT_ACTION == intent.action) {
             handleShortcut(intent)
         }
+        finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -81,41 +75,28 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
     fun cancelClicked(view: View?) {}
 
     private fun handleShortcut(shortcutIntent: Intent) {
-        /*if (LearnCardsActivity.isLearningRunning()) { // TODO
+        if (LearnCards.isRunning) {
             toaster.showToast(
+                context as Activity,
                 R.string.shortcut_open_error_learning_running,
                 Toast.LENGTH_SHORT
             )
+            startActivity(Intent(context, LearnCards::class.java))
             return
-        }*/
-        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager())
-            || (Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+        } else {
+            if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager())
+                || (Build.VERSION.SDK_INT < Build.VERSION_CODES.R
                     && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED)
-        ) {
-            toaster.showToast(
-                context as Activity,
-                R.string.shortcut_open_error_permission,
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-        val filename = shortcutIntent.getStringExtra(SHORTCUT_EXTRA) ?: return
-        if (settingsManager.getBoolPreference(SettingsManager.Keys.AUTO_DOWNLOAD)
-        ) {
-            Log.d("ShortcutReceiver::openLesson", "Check for newer version on DB")
-            val accessToken = PreferenceManager.getDefaultSharedPreferences(context)
-                .getString(Constants.DROPBOX_ACCESS_TOKEN, null)
-            val syncIntent = Intent(context, SyncDialog::class.java)
-            try {
-                syncIntent.putExtra(FILES, dataManager.getFilePathForName(filename))
-            } catch (e: IOException) {
-                e.printStackTrace()
+            ) {
+                toaster.showToast(
+                    context as Activity,
+                    R.string.shortcut_open_error_permission,
+                    Toast.LENGTH_SHORT
+                )
+                return
             }
-            syncIntent.putExtra(ACCESS_TOKEN, accessToken)
-            syncIntent.action = SYNC_FILE_ACTION
-            startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG_BEFORE_OPEN)
-        } else {
+            val filename = shortcutIntent.getStringExtra(SHORTCUT_EXTRA) ?: return
             openLesson(filename)
         }
     }
@@ -129,7 +110,6 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
             val intent = Intent(context, MainMenu::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
-            finish()
         } catch (e: IOException) {
             toaster.showToast(
                 context as Activity,

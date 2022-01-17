@@ -113,10 +113,8 @@ class FlashCardXMLStreamWriter(
             serializer.endDocument()
             serializer.flush()
             outputStream.close()
-            true
         } catch (e: Exception) {
             Log.e("FlashCardXMLStreamWriter::writeXML", "Exception caught")
-            false
         }
     }
 
@@ -128,7 +126,7 @@ class FlashCardXMLStreamWriter(
             serializer.startTag("", "FrontSide")
             if (card.isLearned) {
                 val timeStamp: Long = card.learnedTimestamp
-                serializer.attribute("", "LearnedTimestamp", timeStamp.toString())
+                serializer.attribute("", "LearnedTimestamp", "$timeStamp")
             }
             try {
                 serializer.attribute(
@@ -139,7 +137,7 @@ class FlashCardXMLStreamWriter(
                 serializer.attribute(
                     "",
                     "RepeatByTyping",
-                    card.isRepeatedByTyping.toString()
+                    "${card.isRepeatedByTyping}"
                 )
             } catch (e: IOException) {
                 Log.e(
@@ -173,17 +171,17 @@ class FlashCardXMLStreamWriter(
                     serializer.attribute(
                         "",
                         "Background",
-                        java.lang.String.valueOf(font.backgroundColor)
+                        "${font.backgroundColor}"
                     )
-                    serializer.attribute("", "Bold", java.lang.String.valueOf(font.isBold))
+                    serializer.attribute("", "Bold", "${font.isBold}")
                     serializer.attribute("", "Family", font.family)
                     serializer.attribute(
                         "",
                         "Foreground",
                         java.lang.String.valueOf(font.textColor)
                     )
-                    serializer.attribute("", "Italic", java.lang.String.valueOf(font.isItalic))
-                    serializer.attribute("", "Size", java.lang.String.valueOf(font.textSize))
+                    serializer.attribute("", "Italic", "${font.isItalic}")
+                    serializer.attribute("", "Size", "${font.textSize}")
                     serializer.endTag("", "Font")
                 }
             } catch (e: IOException) {
@@ -215,14 +213,12 @@ class FlashCardXMLStreamWriter(
                 serializer.attribute(
                     "",
                     "Orientation",
-                    java.lang.String.valueOf(
-                        card.reverseSide.orientation.orientation
-                    )
+                    card.reverseSide.orientation.orientation
                 )
                 serializer.attribute(
                     "",
                     "RepeatByTyping",
-                    java.lang.String.valueOf(card.isRepeatedByTyping)
+                    "${card.isRepeatedByTyping}"
                 )
             } catch (e: IOException) {
                 Log.e(
@@ -254,7 +250,7 @@ class FlashCardXMLStreamWriter(
                 serializer.attribute(
                     "",
                     "LearnedTimestamp",
-                    java.lang.Long.toString(reverseTimeStamp)
+                    "$reverseTimeStamp"
                 )
             }
 
@@ -269,17 +265,17 @@ class FlashCardXMLStreamWriter(
                     serializer.attribute(
                         "",
                         "Background",
-                        java.lang.String.valueOf(font.backgroundColor)
+                        "${font.backgroundColor}"
                     )
-                    serializer.attribute("", "Bold", java.lang.String.valueOf(font.isBold))
+                    serializer.attribute("", "Bold", "${font.isBold}")
                     serializer.attribute("", "Family", font.family)
                     serializer.attribute(
                         "",
                         "Foreground",
-                        java.lang.String.valueOf(font.textColor)
+                        "${font.textColor}"
                     )
-                    serializer.attribute("", "Italic", java.lang.String.valueOf(font.isItalic))
-                    serializer.attribute("", "Size", java.lang.String.valueOf(font.textSize))
+                    serializer.attribute("", "Italic", "${font.isItalic}")
+                    serializer.attribute("", "Size", "${font.textSize}")
                     serializer.endTag("", "Font")
                 }
             } catch (e: IOException) {

@@ -28,13 +28,19 @@ import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.data.SaveAsCallback
 import de.daniel.mobilepauker2.data.SaveAsDialog
 import de.daniel.mobilepauker2.editcard.AddCard
+import de.daniel.mobilepauker2.learning.LearnCards
 import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lessonimport.LessonImport
+import de.daniel.mobilepauker2.models.LearningPhase
+import de.daniel.mobilepauker2.models.LearningPhase.*
+import de.daniel.mobilepauker2.models.LearningPhase.Companion.setLearningPhase
 import de.daniel.mobilepauker2.notification.NotificationService
 import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.settings.PaukerSettings
+import de.daniel.mobilepauker2.settings.SettingsManager
+import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
@@ -64,6 +70,9 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     @Inject
     lateinit var errorReporter: ErrorReporter
 
+    @Inject
+    lateinit var settingsManager: SettingsManager
+
     private val context = this
     private val RQ_WRITE_EXT_SAVE_NEW = 97
     private val RQ_WRITE_EXT_SAVE = 98
@@ -78,7 +87,6 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences_main, false)
-        PreferenceManager.setDefaultValues(this, R.xml.preferences_dropbox, false)
         PreferenceManager.setDefaultValues(this, R.xml.preferences_notifications, false)
         createNotificationChannels()
 
@@ -265,26 +273,25 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
 
     private fun initChartList() {
         // Im Thread laufen lassen um MainThread zu entlasten
-        Thread {
-            chartView = findViewById(R.id.chartListView)
-            val layoutManager = LinearLayoutManager(
-                context,
-                LinearLayoutManager.HORIZONTAL, false
-            )
-            chartView?.let {
-                it.layoutManager = layoutManager
-                it.overScrollMode = View.OVER_SCROLL_NEVER
-                it.isScrollContainer = true
-                it.isNestedScrollingEnabled = true
-                val onClickListener: ChartAdapterCallback = object : ChartAdapterCallback {
-                    override fun onClick(position: Int) {
-                        runOnUiThread { showBatchDetails(position) }
-                    }
-                }
-                val adapter = ChartAdapter(application as PaukerApplication, onClickListener)
-                it.adapter = adapter
+        chartView = findViewById(R.id.chartListView)
+        val layoutManager = LinearLayoutManager(
+            context,
+            LinearLayoutManager.HORIZONTAL, false
+        )
+        chartView!!.layoutManager = layoutManager
+        chartView!!.overScrollMode = View.OVER_SCROLL_NEVER
+        chartView!!.isScrollContainer = true
+        chartView!!.isNestedScrollingEnabled = true
+        val onClickListener: ChartAdapterCallback = object : ChartAdapterCallback {
+            override fun onClick(position: Int) {
+                Log.d("MainMenu::ChartCallback", "On Bar clicked")
+                showBatchDetails(position)
             }
-        }.run()
+        }
+        Log.d("MainMenu::ChartInit", "Callback initialized")
+        val adapter = ChartAdapter(application as PaukerApplication, onClickListener)
+        chartView!!.adapter = adapter
+        Log.d("MainMenu::ChartInit", "Adapter set")
     }
 
     private fun showBatchDetails(index: Int) {
@@ -407,7 +414,15 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 .setCancelable(false)
                 .setPositiveButton(
                     getString(R.string.ok)
-                ) { _, _ -> errorReporter.checkErrorAndSendMail() }
+                ) { _, _ ->
+                    val errorReportIntent = errorReporter.checkErrorAndSendMail()
+                    startActivity(
+                        Intent.createChooser(
+                            errorReportIntent,
+                            "Send mail..."
+                        )
+                    )
+                }
                 .setNeutralButton(
                     getString(R.string.cancel)
                 ) { dialog, _ ->
@@ -550,11 +565,21 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     fun learnNewCard(view: View) {
+        if (settingsManager.getBoolPreference(HIDE_TIMES)) {
+            setLearningPhase(SIMPLE_LEARNING)
+        } else {
+            setLearningPhase(FILLING_USTM)
+        }
+        lessonManager.setupCurrentPack()
 
+        startActivity(Intent(context, LearnCards::class.java))
     }
 
     fun repeatCards(view: View) {
+        setLearningPhase(REPEATING_LTM)
+        lessonManager.setupCurrentPack()
 
+        startActivity(Intent(context, LearnCards::class.java))
     }
 
     // Notification

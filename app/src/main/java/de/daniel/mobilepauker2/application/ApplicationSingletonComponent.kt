@@ -7,10 +7,10 @@ import de.daniel.mobilepauker2.dropbox.DropboxAccDialog
 import de.daniel.mobilepauker2.dropbox.SyncDialog
 import de.daniel.mobilepauker2.editcard.AbstractEditCard
 import de.daniel.mobilepauker2.editcard.AddCard
+import de.daniel.mobilepauker2.learning.FlashCardSwipeScreen
+import de.daniel.mobilepauker2.learning.LearnCards
 import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
-import de.daniel.mobilepauker2.lesson.card.CardPackRamAdapter
-import de.daniel.mobilepauker2.lesson.card.FlashCardCursor
 import de.daniel.mobilepauker2.lessonimport.LessonImport
 import de.daniel.mobilepauker2.lessonimport.LessonImportAdapter
 import de.daniel.mobilepauker2.mainmenu.MainMenu
@@ -19,7 +19,6 @@ import de.daniel.mobilepauker2.models.view.MPTextView
 import de.daniel.mobilepauker2.notification.AlarmNotificationReceiver
 import de.daniel.mobilepauker2.notification.NotificationService
 import de.daniel.mobilepauker2.search.Search
-import de.daniel.mobilepauker2.settings.SettingsFragmentDropbox
 import de.daniel.mobilepauker2.settings.SettingsFragmentMain
 import de.daniel.mobilepauker2.settings.SettingsFragmentNotifications
 import de.daniel.mobilepauker2.shortcut.ShortcutReceiver
@@ -33,9 +32,7 @@ interface ApplicationSingletonComponent {
 
     fun inject(manager: DataManager)
     fun inject(manager: LessonManager)
-    fun inject(adapter: CardPackRamAdapter)
     fun inject(adapter: ChartAdapter)
-    fun inject(cursor: FlashCardCursor)
     fun inject(utils: Toaster)
     fun inject(mainMenu: MainMenu)
     fun inject(lessonImport: LessonImport)
@@ -44,7 +41,6 @@ interface ApplicationSingletonComponent {
     fun inject(abstractEditCard: AbstractEditCard)
     fun inject(addCard: AddCard)
     fun inject(settingsFragmentMain: SettingsFragmentMain)
-    fun inject(settingsFragmentDropbox: SettingsFragmentDropbox)
     fun inject(settingsFragmentNotifications: SettingsFragmentNotifications)
     fun inject(editDescription: EditDescription)
     fun inject(mpTextView: MPTextView)
@@ -55,4 +51,6 @@ interface ApplicationSingletonComponent {
     fun inject(shortcutReceiver: ShortcutReceiver)
     fun inject(notificationService: NotificationService)
     fun inject(alarmNotificationReceiver: AlarmNotificationReceiver)
+    fun inject(flashCardSwipeScreen: FlashCardSwipeScreen)
+    fun inject(learnCards: LearnCards)
 }

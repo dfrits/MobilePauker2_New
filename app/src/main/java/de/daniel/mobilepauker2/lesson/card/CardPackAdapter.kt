@@ -3,7 +3,7 @@ package de.daniel.mobilepauker2.lesson.card
 import android.content.Context
 import android.database.Cursor
 
-abstract class CardPackAdapter(protected val context: Context) {
+abstract class CardPackAdapter {
 
     abstract fun open(): CardPackAdapter
 

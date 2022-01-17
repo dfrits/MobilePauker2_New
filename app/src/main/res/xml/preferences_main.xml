@@ -82,12 +82,6 @@
             android:title="@string/notifications"
             app:fragment="de.daniel.mobilepauker2.settings.SettingsFragmentNotifications" />
 
-        // Autospeichern
-        <SwitchPreference
-            android:defaultValue="@bool/auto_save_default"
-            android:key="@string/auto_save"
-            android:summary="@string/auto_save_summ"
-            android:title="@string/auto_save_title" />
         // Toast fürs Ablaufdatum
         <SwitchPreference
             android:defaultValue="@bool/expire_toast_default"
@@ -95,9 +89,10 @@
             android:summary="@string/expire_toast_summ"
             android:title="@string/expire_toast_title" />
 
+        // Button zum verwalten des DB-Acc
         <Preference
-            android:title="@string/synchronizing_title"
-            app:fragment="de.daniel.mobilepauker2.settings.SettingsFragmentDropbox" />
+            android:key="@string/associate_dropbox"
+            android:title="@string/associate_dropbox_title" />
 
         // About
         <Preference android:title="@string/about">
