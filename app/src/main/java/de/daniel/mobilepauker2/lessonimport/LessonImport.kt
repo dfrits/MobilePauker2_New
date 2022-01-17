@@ -104,14 +104,14 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
             CONTEXT_CREATE_SHORTCUT -> {
                 Log.d(
                     "LessonImportActivity::createShortcut", "create new dynamic " +
-                            "shortcut for list pos:" + position + " id:" + menuInfo.id
+                        "shortcut for list pos:" + position + " id:" + menuInfo.id
                 )
                 createShortCut(position)
             }
             CONTEXT_DELETE_SHORTCUT -> {
                 Log.d(
                     "LessonImportActivity::deleteShortcut", "delete dynamic " +
-                            "shortcut for list pos:" + position + " id:" + menuInfo.id
+                        "shortcut for list pos:" + position + " id:" + menuInfo.id
                 )
                 deleteShortCut(position)
             }
@@ -234,7 +234,8 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
             viewModel.itemClicked(position)
             var text: String? = getString(R.string.next_expire_date)
             try {
-                val result = viewModel.getNextExpireDate(listView!!.getItemAtPosition(position) as String)
+                val result =
+                    viewModel.getNextExpireDate(listView!!.getItemAtPosition(position) as String)
                 if (result.timeStamp > Long.MIN_VALUE) {
                     if (result.expiredCards > 0) {
                         text = "${getString(R.string.expired_cards)} ${result.expiredCards}"
@@ -338,23 +339,13 @@ class LessonImport : AppCompatActivity(R.layout.open_lesson) {
     private fun openLesson(position: Int) {
         val filename = listView!!.getItemAtPosition(position) as String
         try {
-            if (settingsManager.getBoolPreference(SettingsManager.Keys.AUTO_DOWNLOAD)) {
-                val accessToken = preferences.getString(Constants.DROPBOX_ACCESS_TOKEN, null)
-                val syncIntent = Intent(context, SyncDialog::class.java)
-                syncIntent.putExtra(FILES, dataManager.getFilePathForName(filename))
-                syncIntent.putExtra(ACCESS_TOKEN, accessToken)
-                syncIntent.action = SYNC_FILE_ACTION
-                startActivityForResult(syncIntent, Constants.REQUEST_CODE_SYNC_DIALOG_BEFORE_OPEN)
-                Log.d("LessonImportActivity:openLesson", "Check for newer version on DB")
-            } else {
-                toaster.showToast(
-                    context as Activity,
-                    R.string.open_lesson_hint,
-                    Toast.LENGTH_SHORT
-                )
-                viewModel.openLesson(filename)
-                finish()
-            }
+            toaster.showToast(
+                context as Activity,
+                R.string.open_lesson_hint,
+                Toast.LENGTH_SHORT
+            )
+            viewModel.openLesson(filename)
+            finish()
         } catch (e: IOException) {
             resetSelection(null)
             toaster.showToast(

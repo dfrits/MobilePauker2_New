@@ -199,8 +199,6 @@
     <!-- region Keys -->
     <string name="about" translatable="false">About</string>
     <string name="associate_dropbox" translatable="false">Associate with Dropbox</string>
-    <string name="auto_download" translatable="false">Auto Download</string>
-    <string name="auto_upload" translatable="false">Auto Upload</string>
     <string name="case_sensitive" translatable="false">Case sensitiv</string>
     <string name="expire_toast" translatable="false">Enable Expire Toast</string>
     <string name="flip_card_sides" translatable="false">Flip card sides</string>
@@ -243,8 +241,6 @@
 
     <!-- region Beschreibungen -->
     <string name="auto_sync_disabled_summ">No account associated yet</string>
-    <string name="auto_sync_enabled_download_summ">Synchronize every time before you open a lesson</string>
-    <string name="auto_sync_enabled_upload_summ">Synchronize every time after you saved a lesson</string>
     <string name="case_sensitive_summ">If cards are repeated by input</string>
     <string name="expire_toast_summ">Shows a info line with the next expire date after saving the
         lesson</string>

@@ -87,7 +87,6 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences_main, false)
-        PreferenceManager.setDefaultValues(this, R.xml.preferences_dropbox, false)
         PreferenceManager.setDefaultValues(this, R.xml.preferences_notifications, false)
         createNotificationChannels()
 
