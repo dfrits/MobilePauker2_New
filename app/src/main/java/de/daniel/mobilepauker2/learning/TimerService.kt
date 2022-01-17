@@ -60,6 +60,8 @@ class TimerService: Service() {
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
+        stopUstmTimer()
+        stopStmTimer()
         stopSelf()
         return false
     }
