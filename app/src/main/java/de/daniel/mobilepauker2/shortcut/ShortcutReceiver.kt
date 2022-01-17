@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
+import de.daniel.mobilepauker2.learning.LearnCards
 import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.utils.*
@@ -51,6 +52,7 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
         if (Constants.SHORTCUT_ACTION == intent.action) {
             handleShortcut(intent)
         }
+        finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -73,28 +75,30 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
     fun cancelClicked(view: View?) {}
 
     private fun handleShortcut(shortcutIntent: Intent) {
-        if (Utility.isLearningRunning(context)) { // TODO
+        if (LearnCards.isRunning) {
             toaster.showToast(
                 context as Activity,
                 R.string.shortcut_open_error_learning_running,
                 Toast.LENGTH_SHORT
             )
+            startActivity(Intent(context, LearnCards::class.java))
             return
+        } else {
+            if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager())
+                || (Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+                    && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED)
+            ) {
+                toaster.showToast(
+                    context as Activity,
+                    R.string.shortcut_open_error_permission,
+                    Toast.LENGTH_SHORT
+                )
+                return
+            }
+            val filename = shortcutIntent.getStringExtra(SHORTCUT_EXTRA) ?: return
+            openLesson(filename)
         }
-        if (!(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager())
-            || (Build.VERSION.SDK_INT < Build.VERSION_CODES.R
-                && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED)
-        ) {
-            toaster.showToast(
-                context as Activity,
-                R.string.shortcut_open_error_permission,
-                Toast.LENGTH_SHORT
-            )
-            return
-        }
-        val filename = shortcutIntent.getStringExtra(SHORTCUT_EXTRA) ?: return
-        openLesson(filename)
     }
 
     private fun openLesson(filename: String) {
@@ -106,7 +110,6 @@ class ShortcutReceiver : AppCompatActivity(R.layout.progress_dialog) {
             val intent = Intent(context, MainMenu::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
-            finish()
         } catch (e: IOException) {
             toaster.showToast(
                 context as Activity,

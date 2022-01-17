@@ -71,37 +71,5 @@ class Utility {
             }
             return false
         }
-
-        fun isLearningRunning(context: Context): Boolean {
-            val activityManager =
-                context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
-            val activityList = activityManager?.appTasks
-
-            if (activityList.isNullOrEmpty()){
-                Log.d(
-                    "Checking ActivityList",
-                    "List is null or empty"
-                )
-                return false
-            }
-
-            activityList.forEach { appTask ->
-                val activityName = appTask.taskInfo.topActivity?.className
-                if (activityName == LearnCards::class.java.canonicalName) {
-                    Log.d(
-                        "Checking ForegroundaActivity",
-                        "Current foreground Activity $activityName"
-                    )
-                    return true
-                } else {
-                    Log.d(
-                        "Checking BackgroundActivity",
-                        "Current background Activity: $activityName"
-                    )
-                }
-            }
-
-            return false
-        }
     }
 }

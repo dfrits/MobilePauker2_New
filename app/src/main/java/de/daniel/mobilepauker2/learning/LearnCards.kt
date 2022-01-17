@@ -33,12 +33,14 @@ import de.daniel.mobilepauker2.models.view.MPEditText
 import de.daniel.mobilepauker2.models.view.MPTextView
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
-import de.daniel.mobilepauker2.utils.*
+import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_CHANNEL_ID
 import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_ID
 import de.daniel.mobilepauker2.utils.Constants.TIME_BAR_ID
+import de.daniel.mobilepauker2.utils.ErrorReporter
+import de.daniel.mobilepauker2.utils.Log
+import de.daniel.mobilepauker2.utils.Toaster
 import de.daniel.mobilepauker2.utils.Utility.Companion.isAppRunning
-import de.daniel.mobilepauker2.utils.Utility.Companion.isLearningRunning
 import java.util.*
 import javax.inject.Inject
 
@@ -80,15 +82,17 @@ class LearnCards : FlashCardSwipeScreen() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        isRunning = true
+
         (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
 
         @Suppress("Deprecation")
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.insetsController?.hide(WindowInsets.Type.statusBars())
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         }
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)*/
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         init()
     }
@@ -247,6 +251,8 @@ class LearnCards : FlashCardSwipeScreen() {
     }
 
     override fun onDestroy() {
+        isRunning = false
+
         if (timerServiceConnection != null) {
             stopService(timerServiceIntent)
             unbindService(timerServiceConnection!!)
@@ -967,5 +973,10 @@ class LearnCards : FlashCardSwipeScreen() {
                 }
             }
         }
+    }
+
+    companion object {
+        var isRunning = false
+        private set
     }
 }
