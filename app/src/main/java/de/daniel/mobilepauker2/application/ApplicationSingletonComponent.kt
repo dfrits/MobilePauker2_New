@@ -13,6 +13,7 @@ import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lessonimport.LessonImport
 import de.daniel.mobilepauker2.lessonimport.LessonImportAdapter
+import de.daniel.mobilepauker2.lessonimport.LessonReceiver
 import de.daniel.mobilepauker2.mainmenu.MainMenu
 import de.daniel.mobilepauker2.models.view.MPEditText
 import de.daniel.mobilepauker2.models.view.MPTextView
@@ -53,4 +54,5 @@ interface ApplicationSingletonComponent {
     fun inject(alarmNotificationReceiver: AlarmNotificationReceiver)
     fun inject(flashCardSwipeScreen: FlashCardSwipeScreen)
     fun inject(learnCards: LearnCards)
+    fun inject(lessonReceiver: LessonReceiver)
 }
