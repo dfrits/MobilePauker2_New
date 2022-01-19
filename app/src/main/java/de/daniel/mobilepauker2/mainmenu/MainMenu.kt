@@ -508,7 +508,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     fun mOpenSearchClicked(menuItem: MenuItem) {
-
+        (menuItem.actionView as SearchView).isIconified = false
     }
 
     fun mOpenLessonClicked(menuItem: MenuItem) {
