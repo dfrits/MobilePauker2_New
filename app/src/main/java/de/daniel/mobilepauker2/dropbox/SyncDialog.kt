@@ -78,6 +78,8 @@ class SyncDialog : AppCompatActivity(R.layout.progress_dialog) {
 
         (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
 
+        Log.d("SyncDialog::OnCreate", "ENTRY")
+
         val cm = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         if (!isInternetAvailable(cm)) {
             errorOccured(Exception(getString(R.string.check_internet_connection)))

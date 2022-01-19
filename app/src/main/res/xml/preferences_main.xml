@@ -89,10 +89,9 @@
             android:summary="@string/expire_toast_summ"
             android:title="@string/expire_toast_title" />
 
-        // Button zum verwalten des DB-Acc
         <Preference
-            android:key="@string/associate_dropbox"
-            android:title="@string/associate_dropbox_title" />
+            android:title="@string/synchronizing_title"
+            app:fragment="de.daniel.mobilepauker2.settings.SettingsFragmentDropbox" />
 
         // About
         <Preference android:title="@string/about">

@@ -18,6 +18,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
+import androidx.preference.PreferenceManager.getDefaultSharedPreferences
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sothree.slidinguppanel.SlidingUpPanelLayout
@@ -33,7 +34,6 @@ import de.daniel.mobilepauker2.lesson.EditDescription
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import de.daniel.mobilepauker2.lessonimport.LessonImport
-import de.daniel.mobilepauker2.models.LearningPhase
 import de.daniel.mobilepauker2.models.LearningPhase.*
 import de.daniel.mobilepauker2.models.LearningPhase.Companion.setLearningPhase
 import de.daniel.mobilepauker2.notification.NotificationService
@@ -42,6 +42,7 @@ import de.daniel.mobilepauker2.settings.PaukerSettings
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
 import de.daniel.mobilepauker2.statistics.ChartAdapter
+import de.daniel.mobilepauker2.settings.SettingsManager.Keys.HIDE_TIMES
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_CHANNEL_ID
@@ -87,6 +88,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
         (applicationContext as PaukerApplication).applicationSingletonComponent.inject(this)
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences_main, false)
+        PreferenceManager.setDefaultValues(this, R.xml.preferences_dropbox, false)
         PreferenceManager.setDefaultValues(this, R.xml.preferences_notifications, false)
         createNotificationChannels()
 
@@ -213,10 +215,10 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 onResume()
                 invalidateOptionsMenu()
             }
-            Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON -> {
+            REQUEST_CODE_SAVE_DIALOG_NEW_LESSON -> {
                 createNewLesson()
             }
-            Constants.REQUEST_CODE_SAVE_DIALOG_OPEN -> {
+            REQUEST_CODE_SAVE_DIALOG_OPEN -> {
                 startActivity(Intent(context, LessonImport::class.java))
             }
         }
@@ -317,7 +319,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 builder.setTitle(R.string.lesson_not_saved_dialog_title)
                     .setMessage(R.string.save_lesson_before_question)
                     .setPositiveButton(R.string.save) { _, _ ->
-                        checkSavePermissionThenSave(Constants.REQUEST_CODE_SAVE_DIALOG_OPEN)
+                        checkSavePermissionThenSave(REQUEST_CODE_SAVE_DIALOG_OPEN)
                     }
                     .setNeutralButton(R.string.open_lesson) { dialog, _ ->
                         startActivity(Intent(context, LessonImport::class.java))
@@ -500,7 +502,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             builder.setTitle(R.string.lesson_not_saved_dialog_title)
                 .setMessage(R.string.save_lesson_before_question)
                 .setPositiveButton(R.string.save) { _, _ ->
-                    checkSavePermissionThenSave(Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON)
+                    checkSavePermissionThenSave(REQUEST_CODE_SAVE_DIALOG_NEW_LESSON)
                 }
                 .setNeutralButton(R.string.no) { _, _ -> createNewLesson() }
             builder.create().show()
