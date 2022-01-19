@@ -28,6 +28,7 @@ import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.data.DataManager
 import de.daniel.mobilepauker2.data.SaveAsCallback
 import de.daniel.mobilepauker2.data.SaveAsDialog
+import de.daniel.mobilepauker2.dropbox.SyncDialog
 import de.daniel.mobilepauker2.editcard.AddCard
 import de.daniel.mobilepauker2.learning.LearnCards
 import de.daniel.mobilepauker2.lesson.EditDescription
@@ -40,16 +41,19 @@ import de.daniel.mobilepauker2.notification.NotificationService
 import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.settings.PaukerSettings
 import de.daniel.mobilepauker2.settings.SettingsManager
-import de.daniel.mobilepauker2.settings.SettingsManager.Keys.*
+import de.daniel.mobilepauker2.settings.SettingsManager.Keys.AUTO_UPLOAD
 import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.HIDE_TIMES
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
+import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
+import de.daniel.mobilepauker2.utils.Constants.FILES
 import de.daniel.mobilepauker2.utils.Constants.NOTIFICATION_CHANNEL_ID
 import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_NEW_LESSON
 import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_NORMAL
 import de.daniel.mobilepauker2.utils.Constants.REQUEST_CODE_SAVE_DIALOG_OPEN
 import de.daniel.mobilepauker2.utils.Constants.TIMER_BAR_CHANNEL_ID
+import de.daniel.mobilepauker2.utils.Constants.UPLOAD_FILE_ACTION
 import de.daniel.mobilepauker2.utils.ErrorReporter
 import de.daniel.mobilepauker2.utils.Log
 import de.daniel.mobilepauker2.utils.Toaster
@@ -206,6 +210,10 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     private fun saveFinished(requestCode: Int) {
+        if (settingsManager.getBoolPreference(AUTO_UPLOAD)) {
+            uploadCurrentFile()
+        }
+
         when (requestCode) {
             REQUEST_CODE_SAVE_DIALOG_NORMAL -> {
                 toaster.showToast(context as Activity, R.string.saving_success, Toast.LENGTH_SHORT)
@@ -222,6 +230,17 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
                 startActivity(Intent(context, LessonImport::class.java))
             }
         }
+    }
+
+    private fun uploadCurrentFile() {
+        val accessToken = getDefaultSharedPreferences(context)
+            .getString(Constants.DROPBOX_ACCESS_TOKEN, null)
+        val intent = Intent(context, SyncDialog::class.java)
+        intent.putExtra(ACCESS_TOKEN, accessToken)
+        val file = dataManager.getPathOfCurrentFile()
+        intent.putExtra(FILES, file)
+        intent.action = UPLOAD_FILE_ACTION
+        startActivity(intent)
     }
 
     private fun initButtons() {
