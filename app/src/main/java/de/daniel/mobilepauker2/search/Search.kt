@@ -70,7 +70,23 @@ class Search : AppCompatActivity() {
                 return true
             }
         })
-        searchView.setOnQueryTextFocusChangeListener { _, hasFocus -> if (!hasFocus) searchView.clearFocus() }
+
+        search.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                (item?.actionView as SearchView?)?.setQuery("", true)
+                return true
+            }
+
+        })
+
+        searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) searchView.clearFocus()
+        }
+
         val query = intent.getStringExtra(SearchManager.QUERY)
         query?.let {
             searchView.setQuery(it, true)
@@ -84,7 +100,7 @@ class Search : AppCompatActivity() {
         return false
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean=when {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when {
         viewModel.sortTypeSelected(item) -> {
             invalidateOptionsMenu()
             true
@@ -95,11 +111,16 @@ class Search : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == Constants.REQUEST_CODE_EDIT_CARD && resultCode == RESULT_OK) {
             viewModel.pack = lessonManager.currentPack
-            invalidateOptionsMenu()
         }
         listView?.isEnabled = true
 
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        invalidateOptionsMenu()
     }
 
     fun mOpenSearchClicked(searchMenuItem: MenuItem) {

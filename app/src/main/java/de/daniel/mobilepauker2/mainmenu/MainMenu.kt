@@ -42,8 +42,8 @@ import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.settings.PaukerSettings
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.AUTO_UPLOAD
-import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.HIDE_TIMES
+import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
@@ -150,6 +150,17 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
             searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
                 if (!hasFocus) searchView.clearFocus()
             }
+            search?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+                override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                    return true
+                }
+
+                override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                    (item?.actionView as SearchView?)?.setQuery("", false)
+                    return true
+                }
+
+            })
         }
         return true
     }
