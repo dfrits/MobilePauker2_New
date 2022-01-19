@@ -193,6 +193,7 @@
     <string name="about_title">モバイルぽーかーについて</string>
     <string name="associate_dropbox_title">Dropboxに接続する</string>
     <string name="case_sensitive_title">大文字と小文字を区別する</string>
+    <string name="auto_upload_title">自動アップロード</string>
     <string name="expire_toast_title">有効期限情報を見せる</string>
     <string name="flip_card_sides_title">カードの側を交わす</string>
     <string name="flip_cards">側を交わす</string>
@@ -214,6 +215,7 @@
     <!-- region Beschreibungen -->
     <string name="auto_sync_disabled_summ">Dropboxと接続したアカウントはありません</string>
     <string name="case_sensitive_summ">カードが入力によって繰り返される場合</string>
+    <string name="auto_sync_enabled_upload_summ">レッソンを法損したら同期する</string>
     <string name="expire_toast_summ">法損をしたら次の有効期限の情報を表示する</string>
     <string name="flip_card_sides_summ">復習でどんな側がまず見せられる (%s)</string>
     <string name="hide_times_summ">超短期記憶と短期記憶のタイマーが勉強で欠かされる</string>
