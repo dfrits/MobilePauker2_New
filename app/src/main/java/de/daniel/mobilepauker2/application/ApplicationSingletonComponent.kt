@@ -20,6 +20,7 @@ import de.daniel.mobilepauker2.models.view.MPTextView
 import de.daniel.mobilepauker2.notification.AlarmNotificationReceiver
 import de.daniel.mobilepauker2.notification.NotificationService
 import de.daniel.mobilepauker2.search.Search
+import de.daniel.mobilepauker2.settings.SettingsFragmentDropbox
 import de.daniel.mobilepauker2.settings.SettingsFragmentMain
 import de.daniel.mobilepauker2.settings.SettingsFragmentNotifications
 import de.daniel.mobilepauker2.shortcut.ShortcutReceiver
@@ -55,4 +56,5 @@ interface ApplicationSingletonComponent {
     fun inject(flashCardSwipeScreen: FlashCardSwipeScreen)
     fun inject(learnCards: LearnCards)
     fun inject(lessonReceiver: LessonReceiver)
+    fun inject(settingsFragmentDropbox: SettingsFragmentDropbox)
 }

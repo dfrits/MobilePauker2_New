@@ -23,7 +23,6 @@ import javax.inject.Singleton
 
 @Singleton
 class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context) {
-    private var fileAbsolutePath: String = ""
     var saveRequired: Boolean = false
     var currentFileName = Constants.DEFAULT_FILE_NAME
         private set
@@ -65,7 +64,7 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
             throw IOException("Filename invalid")
         }
         val filePath = "${Environment.getExternalStorageDirectory()}" +
-                "${Constants.DEFAULT_APP_FILE_DIRECTORY}$filename"
+            "${Constants.DEFAULT_APP_FILE_DIRECTORY}$filename"
         return File(filePath)
     }
 
@@ -104,7 +103,6 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
         val xmlFlashCardFeedParser = FlashCardXMLPullFeedParser(uri.toURL())
         val lesson: Lesson = xmlFlashCardFeedParser.parse()
         currentFileName = file.name
-        fileAbsolutePath = file.absolutePath
         lessonManager.setupLesson(lesson)
     }
 
