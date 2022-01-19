@@ -142,9 +142,7 @@ class DataManager @Inject constructor(val context: @JvmSuppressWildcards Context
     fun deleteLesson(file: File): Boolean = file.delete()
 
     fun isNameValid(filename: String): Boolean {
-        return if (isNameEmpty(filename)) {
-            false
-        } else validateFileEnding(filename)
+        return !isNameEmpty(filename) && validateFileEnding(filename)
     }
 
     fun setCorrectFileEnding(name: String): String {
