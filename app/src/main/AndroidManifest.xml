@@ -103,6 +103,24 @@
             android:screenOrientation="portrait"
             android:launchMode="singleTask"/>
 
+        <activity
+            android:name=".lessonimport.LessonReceiver"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:theme="@style/AppTheme.NoActionBar.Dialog"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:mimeType="application/gzip" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+            </intent-filter>
+        </activity>
+
         <service android:name=".learning.TimerService" />
 
         <!-- Notification -->
