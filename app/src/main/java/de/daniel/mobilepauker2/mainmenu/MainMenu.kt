@@ -42,9 +42,7 @@ import de.daniel.mobilepauker2.search.Search
 import de.daniel.mobilepauker2.settings.PaukerSettings
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.AUTO_UPLOAD
-import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.HIDE_TIMES
-import de.daniel.mobilepauker2.statistics.ChartAdapter.ChartAdapterCallback
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
 import de.daniel.mobilepauker2.utils.Constants.FILES
@@ -293,26 +291,7 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     private fun initChartList() {
-        // Im Thread laufen lassen um MainThread zu entlasten
-        chartView = findViewById(R.id.chartListView)
-        val layoutManager = LinearLayoutManager(
-            context,
-            LinearLayoutManager.HORIZONTAL, false
-        )
-        chartView!!.layoutManager = layoutManager
-        chartView!!.overScrollMode = View.OVER_SCROLL_NEVER
-        chartView!!.isScrollContainer = true
-        chartView!!.isNestedScrollingEnabled = true
-        val onClickListener: ChartAdapterCallback = object : ChartAdapterCallback {
-            override fun onClick(position: Int) {
-                Log.d("MainMenu::ChartCallback", "On Bar clicked")
-                showBatchDetails(position)
-            }
-        }
-        Log.d("MainMenu::ChartInit", "Callback initialized")
-        val adapter = ChartAdapter(application as PaukerApplication, onClickListener)
-        chartView!!.adapter = adapter
-        Log.d("MainMenu::ChartInit", "Adapter set")
+        // TODO NEW
     }
 
     private fun showBatchDetails(index: Int) {

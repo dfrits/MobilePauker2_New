@@ -24,7 +24,6 @@ import de.daniel.mobilepauker2.settings.SettingsFragmentDropbox
 import de.daniel.mobilepauker2.settings.SettingsFragmentMain
 import de.daniel.mobilepauker2.settings.SettingsFragmentNotifications
 import de.daniel.mobilepauker2.shortcut.ShortcutReceiver
-import de.daniel.mobilepauker2.statistics.ChartAdapter
 import de.daniel.mobilepauker2.utils.Toaster
 import javax.inject.Singleton
 
@@ -34,7 +33,6 @@ interface ApplicationSingletonComponent {
 
     fun inject(manager: DataManager)
     fun inject(manager: LessonManager)
-    fun inject(adapter: ChartAdapter)
     fun inject(utils: Toaster)
     fun inject(mainMenu: MainMenu)
     fun inject(lessonImport: LessonImport)
