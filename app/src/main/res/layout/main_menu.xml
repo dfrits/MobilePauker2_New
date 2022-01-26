@@ -29,16 +29,23 @@
                 android:text="@string/bar_chart_title"
                 android:textSize="12sp" />
         </RelativeLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
+        <!--
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/chartListView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="5dp"
+                    android:layout_toEndOf="@+id/labelFrame"
+                    android:orientation="horizontal"
+                    android:overScrollMode="never"
+                    android:scrollbars="none" />
+        -->
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/chartListView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="5dp"
-            android:layout_toEndOf="@+id/labelFrame"
-            android:orientation="horizontal"
-            android:overScrollMode="never"
-            android:scrollbars="none" />
+            android:layout_toEndOf="@+id/labelFrame"/>
 
         <LinearLayout
             android:id="@+id/labelFrame"
@@ -105,12 +112,12 @@
                 android:layout_above="@+id/bLearnNewCardFrame"
                 android:layout_alignParentStart="true"
                 android:layout_marginBottom="5dp"
+                app:layout_constraintBottom_toTopOf="@+id/bLearnNewCardFrame"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_default="percent"
                 app:layout_constraintHeight_max="70dp"
                 app:layout_constraintHeight_percent="0.3"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/bLearnNewCardFrame">
+                app:layout_constraintStart_toStartOf="parent">
 
                 <ImageButton
                     android:id="@+id/bAddNewCard"
@@ -155,13 +162,13 @@
                 android:layout_centerVertical="true"
                 android:layout_marginTop="5dp"
                 android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_default="percent"
                 app:layout_constraintHeight_max="70dp"
                 app:layout_constraintHeight_percent="0.3"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ImageButton
                     android:id="@+id/bLearnNewCard"
@@ -176,8 +183,8 @@
                     android:padding="5dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/button_learn_new_cards"
-                    app:tint="@color/color_selector_buttons_homescreen"
-                    android:tintMode="src_in" />
+                    android:tintMode="src_in"
+                    app:tint="@color/color_selector_buttons_homescreen" />
 
                 <TextView
                     android:id="@+id/tLearnNewCardDesc"
@@ -205,12 +212,12 @@
                 android:layout_below="@+id/bLearnNewCardFrame"
                 android:layout_alignParentStart="true"
                 android:layout_marginTop="5dp"
-                app:layout_constraintTop_toBottomOf="@+id/bLearnNewCardFrame"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_default="percent"
                 app:layout_constraintHeight_max="70dp"
                 app:layout_constraintHeight_percent="0.3"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintTop_toBottomOf="@+id/bLearnNewCardFrame">
 
                 <ImageButton
                     android:id="@+id/bRepeatExpiredCards"
@@ -225,8 +232,8 @@
                     android:padding="5dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/button_repeat_cards"
-                    app:tint="@color/color_selector_buttons_homescreen"
-                    android:tintMode="src_in" />
+                    android:tintMode="src_in"
+                    app:tint="@color/color_selector_buttons_homescreen" />
 
                 <TextView
                     android:id="@+id/tRepeatExpiredCardsDesc"

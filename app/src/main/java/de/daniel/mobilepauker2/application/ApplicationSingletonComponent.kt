@@ -24,6 +24,7 @@ import de.daniel.mobilepauker2.settings.SettingsFragmentDropbox
 import de.daniel.mobilepauker2.settings.SettingsFragmentMain
 import de.daniel.mobilepauker2.settings.SettingsFragmentNotifications
 import de.daniel.mobilepauker2.shortcut.ShortcutReceiver
+import de.daniel.mobilepauker2.statistics.BarChart
 import de.daniel.mobilepauker2.utils.Toaster
 import javax.inject.Singleton
 
@@ -55,4 +56,5 @@ interface ApplicationSingletonComponent {
     fun inject(learnCards: LearnCards)
     fun inject(lessonReceiver: LessonReceiver)
     fun inject(settingsFragmentDropbox: SettingsFragmentDropbox)
+    fun inject(barChart: BarChart)
 }

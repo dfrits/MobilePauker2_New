@@ -17,6 +17,8 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
+import androidx.fragment.app.add
+import androidx.fragment.app.commit
 import androidx.preference.PreferenceManager
 import androidx.preference.PreferenceManager.getDefaultSharedPreferences
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,6 +45,7 @@ import de.daniel.mobilepauker2.settings.PaukerSettings
 import de.daniel.mobilepauker2.settings.SettingsManager
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.AUTO_UPLOAD
 import de.daniel.mobilepauker2.settings.SettingsManager.Keys.HIDE_TIMES
+import de.daniel.mobilepauker2.statistics.BarChart
 import de.daniel.mobilepauker2.utils.Constants
 import de.daniel.mobilepauker2.utils.Constants.ACCESS_TOKEN
 import de.daniel.mobilepauker2.utils.Constants.FILES
@@ -291,7 +294,9 @@ class MainMenu : AppCompatActivity(R.layout.main_menu) {
     }
 
     private fun initChartList() {
-        // TODO NEW
+        supportFragmentManager.commit {
+            add<BarChart>(R.id.chartListView)
+        }
     }
 
     private fun showBatchDetails(index: Int) {
