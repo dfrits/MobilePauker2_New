@@ -60,24 +60,35 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
     }
 
     fun getBatchStatistics(): List<BatchStatistics> {
-        val batchSizes: ArrayList<BatchStatistics> = ArrayList<BatchStatistics>()
+        val batchStats: ArrayList<BatchStatistics> = ArrayList<BatchStatistics>()
         lesson?.let { lesson ->
             val longTermBatches: List<LongTermBatch> = lesson.longTermBatches
             var i = 0
             val size = longTermBatches.size
-            while (i < size) {
-                val longTermBatch = longTermBatches[i]
-                val numberOfCards = longTermBatch.getNumberOfCards()
-                val expiredCards = longTermBatch.getNumberOfExpiredCards()
-                if (numberOfCards == 0) {
-                    batchSizes.add(BatchStatistics(0, 0))
-                } else {
-                    batchSizes.add(BatchStatistics(numberOfCards, expiredCards))
+
+            val sumBatchStat =
+                BatchStatistics(getBatchSize(BatchType.LESSON), getBatchSize(BatchType.EXPIRED))
+            val unlBatchStat = BatchStatistics(getBatchSize(BatchType.UNLEARNED), 0)
+            batchStats.add(sumBatchStat)
+            batchStats.add(unlBatchStat)
+
+            if (size == 0) {
+                batchStats.add(BatchStatistics(0, 0))
+            } else {
+                while (i < size) {
+                    val longTermBatch = longTermBatches[i]
+                    val numberOfCards = longTermBatch.getNumberOfCards()
+                    val expiredCards = longTermBatch.getNumberOfExpiredCards()
+                    if (numberOfCards == 0) {
+                        batchStats.add(BatchStatistics(0, 0))
+                    } else {
+                        batchStats.add(BatchStatistics(numberOfCards, expiredCards))
+                    }
+                    i++
                 }
-                i++
             }
         }
-        return batchSizes
+        return batchStats
     }
 
     fun editCard(position: Int, sideAText: String, sideBText: String) {
@@ -108,7 +119,7 @@ class LessonManager @Inject constructor(val context: @JvmSuppressWildcards Conte
             return
         }
         val currentCard = currentPack[position]
-        lesson ?. let { lesson ->
+        lesson?.let { lesson ->
             when (currentPhase) {
                 SIMPLE_LEARNING -> {
                 }
