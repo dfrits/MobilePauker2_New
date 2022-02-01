@@ -28,7 +28,7 @@
         android:fontFamily="serif"
         android:textAlignment="center"
         android:textSize="12sp"
-        android:text="100"/>
+        android:text="Number of cards"/>
 
     <TextView
         android:id="@+id/gelerntValue"
@@ -38,7 +38,7 @@
         android:fontFamily="serif"
         android:textAlignment="center"
         android:textSize="12sp"
-        android:text="100" />
+        android:text="Number of cards" />
 
     <TextView
         android:id="@+id/sumValue"
@@ -48,5 +48,5 @@
         android:fontFamily="serif"
         android:textAlignment="center"
         android:textSize="12sp"
-        android:text="100" />
+        android:text="Number of cards" />
 </RelativeLayout>

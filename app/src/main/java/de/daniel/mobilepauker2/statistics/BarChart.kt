@@ -1,21 +1,21 @@
 package de.daniel.mobilepauker2.statistics
 
-import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
 import de.daniel.mobilepauker2.lesson.LessonManager
 import de.daniel.mobilepauker2.lesson.batch.BatchType
 import javax.inject.Inject
+
 
 class BarChart : Fragment(R.layout.chart_bar) {
 
@@ -31,44 +31,48 @@ class BarChart : Fragment(R.layout.chart_bar) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val chart = view.findViewById<BarChart>(R.id.chartBar)
-        val data = createBarData()
+        val data = createBarData(chart)
 
         prepareChartData(chart, data)
         configureChartAppearance(chart)
     }
 
-    private fun createBarData(): BarData {
+    private fun createBarData(chart: BarChart): BarData {
         val barDataList = mutableListOf<BarEntry>()
         val statistics = lessonManager.getBatchStatistics()
-        val lessonSize = lessonManager.getBatchSize(BatchType.LESSON)
         var i = 0
         var titel: String
         var abgl: Float
         var ungel: Float
         var gel: Float
 
+        val labels = mutableListOf<String>()
+
         while (i < statistics.size) {
             when (i) {
                 0 -> {
                     titel = requireContext().resources.getString(R.string.sum)
-                    abgl = lessonManager.getBatchSize(BatchType.EXPIRED).toFloat()
+                    abgl = statistics[i].expiredCardsSize.toFloat()
                     ungel = lessonManager.getBatchSize(BatchType.UNLEARNED).toFloat()
-                    gel = lessonSize - abgl - ungel
+                    gel = statistics[0].batchSize - abgl - ungel
                     val barEntry = BarEntry(i.toFloat(), floatArrayOf(ungel, gel, abgl))
+                    labels.add(titel)
                     barDataList.add(barEntry)
                 }
                 1 -> {
                     titel = requireContext().resources.getString(R.string.untrained)
-                    ungel = lessonManager.getBatchSize(BatchType.UNLEARNED).toFloat()
+                    ungel = statistics[i].batchSize.toFloat()
                     val barEntry = BarEntry(i.toFloat(), floatArrayOf(ungel, 0f, 0f))
+                    labels.add(titel)
                     barDataList.add(barEntry)
                 }
                 else -> {
                     titel = requireContext().getString(R.string.stack) + (i - 1)
-                    val sum: Int = statistics[i - 2].batchSize
-                    abgl = statistics[i - 2].expiredCardsSize.toFloat()
+                    val sum: Int = statistics[i].batchSize
+                    abgl = statistics[i].expiredCardsSize.toFloat()
                     gel = sum - abgl
                     val barEntry = BarEntry(i.toFloat(), floatArrayOf(0f, gel, abgl))
+                    labels.add(titel)
                     barDataList.add(barEntry)
                 }
             }
@@ -97,7 +101,16 @@ class BarChart : Fragment(R.layout.chart_bar) {
     private fun configureChartAppearance(chart: BarChart) {
         chart.setDrawBorders(false)
         chart.axisLeft.isEnabled = false
-        chart.xAxis.isEnabled = false
+        chart.xAxis.setDrawAxisLine(false)
+        chart.xAxis.setDrawGridLines(false)
+        chart.xAxis.setDrawGridLinesBehindData(false)
+        chart.xAxis.setDrawLimitLinesBehindData(false)
+        chart.xAxis.setDrawLabels(true)
+        chart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        chart.xAxis.setCenterAxisLabels(false)
+        chart.xAxis.granularity = 1f
+        chart.xAxis.isGranularityEnabled = true
+        chart.xAxis.labelCount = lessonManager.getBatchStatistics().size
         chart.axisRight.isEnabled = false
         chart.legend.isEnabled = false
         chart.description.isEnabled = false
@@ -105,8 +118,18 @@ class BarChart : Fragment(R.layout.chart_bar) {
         chart.setDrawGridBackground(false)
         chart.setDrawBarShadow(false)
         chart.isHighlightFullBarEnabled = false
-        chart.xAxis.setCenterAxisLabels(true)
         chart.setScaleEnabled(false)
         chart.setVisibleXRangeMaximum(5f)
+        chart.setVisibleXRangeMinimum(5f)
+
+        chart.xAxis.valueFormatter = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String {
+                return when (value) {
+                    0f -> "Sum"
+                    1f -> "Ungelernt"
+                    else -> "Stack ${value.toInt() - 1}"
+                }
+            }
+        }
     }
 }
