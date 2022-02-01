@@ -21,10 +21,10 @@ import javax.inject.Inject
 abstract class FlashCardSwipeScreen : AppCompatActivity(R.layout.learn_cards),
     LoaderManager.LoaderCallbacks<Cursor> {
 
-    protected val INSTANCESTATE_CURSOR_POSITION = "INSTANCESTATE_CURSOR_POSITION"
+    private val INSTANCESTATE_CURSOR_POSITION = "INSTANCESTATE_CURSOR_POSITION"
     protected lateinit var mCardCursor: Cursor
     protected var currentCard: FlashCard = FlashCard()
-    protected var gestureDetector: GestureDetector? = null
+    private var gestureDetector: GestureDetector? = null
     protected var mCardPackAdapter: CardPackRamAdapter? = null
     protected var mActivitySetupOk = false
     protected var mSavedCursorPosition = -1

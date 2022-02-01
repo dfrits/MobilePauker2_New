@@ -275,9 +275,9 @@ class LearnCards : FlashCardSwipeScreen() {
     }
 
     private fun init() {
-        if (currentPhase !== REPEATING_LTM
-            && (currentPhase !== SIMPLE_LEARNING
-                || currentPhase !== NOTHING)
+        if (currentPhase != REPEATING_LTM
+            && (currentPhase != SIMPLE_LEARNING
+                || currentPhase != NOTHING)
         ) {
             // A check on mActivitySetupOk is done here as onCreate is called even if the
             // super (FlashCardSwipeScreenActivity) onCreate fails to find any cards and calls finish()
@@ -503,13 +503,11 @@ class LearnCards : FlashCardSwipeScreen() {
         bShowMe = findViewById(R.id.bShowMe)
         lRepeatButtons = findViewById(R.id.lBRepeat)
         lSkipWaiting = findViewById(R.id.lBSkipWaiting)
-        setButtonsVisibility()
     }
 
     private fun showHideTimerAnimation() {
         if (timerAnimation == null) return
         timerAnimation!!.visibility = if (stopWaiting) View.GONE else View.VISIBLE
-        setButtonsVisibility()
     }
 
     private fun finishLearning() {

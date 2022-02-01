@@ -100,13 +100,14 @@ open class Batch internal constructor(private val cardList: List<Card>) {
      */
     fun sortCards(cardElement: Card.Element?, ascending: Boolean): Boolean {
         var comparator: AbstractCardComparator<Card>? = null
-        when (cardElement) {
-            Card.Element.FRONT_SIDE -> comparator = frontSideComparator
-            Card.Element.REVERSE_SIDE -> comparator = reverseSideComparator
-            Card.Element.BATCH_NUMBER -> comparator = batchNumberComparator
-            Card.Element.LEARNED_DATE -> comparator = learnedDateComparator
-            Card.Element.EXPIRED_DATE -> comparator = expiredDateComparator
-            Card.Element.REPEATING_MODE -> comparator = repeatingModeComparator
+        comparator = when (cardElement) {
+            Card.Element.FRONT_SIDE -> frontSideComparator
+            Card.Element.REVERSE_SIDE -> reverseSideComparator
+            Card.Element.BATCH_NUMBER -> batchNumberComparator
+            Card.Element.LEARNED_DATE -> learnedDateComparator
+            Card.Element.EXPIRED_DATE -> expiredDateComparator
+            Card.Element.REPEATING_MODE -> repeatingModeComparator
+            else -> null
         }
 
         if (comparator != null) {
