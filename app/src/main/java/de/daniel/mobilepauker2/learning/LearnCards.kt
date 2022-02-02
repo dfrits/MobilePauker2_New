@@ -15,6 +15,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.NotificationCompat.*
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.preference.PreferenceManager
 import com.danilomendes.progressbar.InvertedTextProgressbar
 import de.daniel.mobilepauker2.R
 import de.daniel.mobilepauker2.application.PaukerApplication
@@ -271,6 +273,14 @@ class LearnCards : FlashCardSwipeScreen() {
             pauseButton?.isVisible = false
             restartButton?.isVisible = false
         }
+
+        val pref = PreferenceManager.getDefaultSharedPreferences(context)
+        menu.findItem(R.id.mHideTimer).isChecked = pref.getBoolean(Constants.HIDE_TIMER_KEY, false)
+        findViewById<RelativeLayout>(R.id.lTimerFrame).foreground =
+            if (pref.getBoolean(Constants.HIDE_TIMER_KEY, false))
+                ResourcesCompat.getDrawable(resources, R.color.defaultBackground, null)
+            else ResourcesCompat.getDrawable(resources, android.R.color.transparent, null)
+
         return true
     }
 
@@ -804,6 +814,17 @@ class LearnCards : FlashCardSwipeScreen() {
         setButtonsVisibility()
     }
 
+    fun mHideTimerClicked(item: MenuItem?) {
+        val checked = item?.isChecked ?: false
+        findViewById<RelativeLayout>(R.id.lTimerFrame).foreground =
+            if (!checked) ResourcesCompat.getDrawable(resources, R.color.defaultBackground, null)
+            else ResourcesCompat.getDrawable(resources, android.R.color.transparent, null)
+        item?.isChecked = !checked
+
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+            .putBoolean(Constants.HIDE_TIMER_KEY, !checked).apply()
+    }
+
     /* Button clicks */
     fun nextCard(view: View?) {
         // Karte ein Deck weiterschieben
@@ -975,6 +996,6 @@ class LearnCards : FlashCardSwipeScreen() {
 
     companion object {
         var isRunning = false
-        private set
+            private set
     }
 }

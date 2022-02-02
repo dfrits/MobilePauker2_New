@@ -203,7 +203,7 @@
     <string name="case_sensitive" translatable="false">Case sensitiv</string>
     <string name="expire_toast" translatable="false">Enable Expire Toast</string>
     <string name="flip_card_sides" translatable="false">Flip card sides</string>
-    <string name="hide_times" translatable="false">Hide times</string>
+    <string name="hide_times" translatable="false">Hide Times</string>
     <string name="learn_new_cards_randomly" translatable="false">Learn new cards randomly</string>
     <string name="repeat_cards_mode" translatable="false">Repeat cards</string>
     <string name="return_forgotten_cards" translatable="false">Return forgotten cards</string>

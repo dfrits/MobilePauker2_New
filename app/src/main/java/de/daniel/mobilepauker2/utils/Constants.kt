@@ -44,6 +44,7 @@ object Constants {
     const val LAST_TEXT_COLOR_CHOICE = "LAST_TEXT_COLOR_CHOICE"
     const val LAST_BACK_COLOR_CHOICE = "LAST_BACK_COLOR_CHOICE"
     const val KEEP_OPEN_KEY = "KEEP_OPEN_KEY"
+    const val HIDE_TIMER_KEY = "HIDE_TIMER_KEY"
     val PAUKER_FILE_ENDING = arrayOf(".pau.gz", ".xml.gz")
 
     // Shortcut
